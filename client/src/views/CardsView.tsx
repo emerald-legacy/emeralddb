@@ -186,7 +186,7 @@ export function CardsView(): JSX.Element {
       packIndex: '9999',
       cardIndex: '999',
     }
-    const cardVersion = card.versions.filter(() => true)[0]
+    const cardVersion = findCardVersion(card)
     if (!cardVersion) {
       return dummy
     }
@@ -205,7 +205,7 @@ export function CardsView(): JSX.Element {
       packIndex: (cyclePosition + packPosition).toString(),
       cardIndex: cardPosition,
     }
-  }, [packs, cycles])
+  }, [packs, cycles, findCardVersion])
 
   const sortCardsByPackIndex = useCallback((cardA: CardWithVersions, cardB: CardWithVersions) => {
     const aIndex = calculatePackIndex(cardA)
