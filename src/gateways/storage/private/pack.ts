@@ -3,8 +3,6 @@ import { Pack } from '@5rdb/api'
 
 export const TABLE = 'packs'
 
-// Columns on the `packs` table EXCEPT `size` — we compute that from
-// `cards_in_packs` rather than reading the stored value, which has drifted.
 const PACK_COLS = [
   'packs.id',
   'packs.name',
@@ -34,8 +32,6 @@ export async function getPack(packId: string): Promise<Pack> {
 }
 
 export async function insertOrUpdatePack(pack: Pack): Promise<Pack> {
-  // `size` is derived on read; strip it from writes so the stored column
-  // stays whatever it was (dead storage) and we never drift further.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { size: _size, ...packWithoutSize } = pack
   const insert = pg(TABLE).insert({ ...packWithoutSize })
