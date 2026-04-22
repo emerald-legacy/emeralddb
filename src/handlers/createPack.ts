@@ -1,4 +1,4 @@
-import { insertOrUpdatePack } from '../gateways/storage/index'
+import { getPack, insertOrUpdatePack } from '../gateways/storage/index'
 import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Pack, Packs$create } from '@5rdb/api'
@@ -16,5 +16,6 @@ export const schema = {
 }
 
 export async function handler(req: ValidatedRequest<typeof schema>): Promise<Pack | undefined> {
-  return insertOrUpdatePack(req.body)
+  await insertOrUpdatePack(req.body)
+  return getPack(req.body.id)
 }
