@@ -18,7 +18,7 @@ const PACK_COLS = [
 export async function getAllPacks(): Promise<Pack[]> {
   return pg(TABLE)
     .select(...PACK_COLS)
-    .select(pg.raw('COUNT(DISTINCT cards_in_packs.card_id)::int AS size'))
+    .select(pg.raw('COALESCE(SUM(cards_in_packs.quantity), 0)::int AS size'))
     .leftJoin('cards_in_packs', 'cards_in_packs.pack_id', 'packs.id')
     .groupBy('packs.id')
 }
@@ -26,7 +26,7 @@ export async function getAllPacks(): Promise<Pack[]> {
 export async function getPack(packId: string): Promise<Pack> {
   return pg(TABLE)
     .select(...PACK_COLS)
-    .select(pg.raw('COUNT(DISTINCT cards_in_packs.card_id)::int AS size'))
+    .select(pg.raw('COALESCE(SUM(cards_in_packs.quantity), 0)::int AS size'))
     .leftJoin('cards_in_packs', 'cards_in_packs.pack_id', 'packs.id')
     .where('packs.id', packId)
     .groupBy('packs.id')
