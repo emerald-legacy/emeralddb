@@ -66,7 +66,6 @@ export function ManageCyclesView(): JSX.Element {
 
   const [packId, setPackId] = useState('')
   const [packName, setPackName] = useState('')
-  const [packSize, setPackSize] = useState(0)
   const [packPosition, setPackPosition] = useState(0)
   const [editedCycleId, setEditedCycleId] = useState('')
 
@@ -104,7 +103,6 @@ export function ManageCyclesView(): JSX.Element {
   function openPackModal(cycleId: string) {
     setPackId('')
     setPackName('')
-    setPackSize(0)
     setPackPosition(0)
     setEditedCycleId(cycleId)
     setPackModalOpen(true)
@@ -126,7 +124,6 @@ export function ManageCyclesView(): JSX.Element {
             cycle_id: editedCycleId,
             name: packName,
             id: packId,
-            size: packSize,
             position: packPosition,
           },
         })
@@ -259,7 +256,15 @@ export function ManageCyclesView(): JSX.Element {
                       variant="outlined"
                       color="secondary"
                       size="small"
-                      onClick={() => navigate(`/admin/pack/${pack.id}`)}
+                      onClick={() => navigate(`/admin/pack/${pack.id}/edit`)}
+                    >
+                      Edit Pack
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                      onClick={() => navigate(`/admin/pack/${pack.id}/cards`)}
                     >
                       Edit Pack Cards
                     </Button>
@@ -298,14 +303,6 @@ export function ManageCyclesView(): JSX.Element {
             <Box padding={1.5} border="1px solid lightgray" borderRadius={1}>
               <Typography variant="body2">ID: {packId}</Typography>
             </Box>
-            <TextField
-              value={packSize}
-              variant="outlined"
-              onChange={(e) => setPackSize(Number.parseInt(e.target.value) || 0)}
-              type="number"
-              label="Pack Size"
-              size="small"
-            />
             <TextField
               value={packPosition}
               variant="outlined"

@@ -1,312 +1,173 @@
 import {
+  Autocomplete,
   Box,
   Button,
+  Card,
+  CardContent,
   Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControlLabel,
-  Grid,
   TextField,
   Typography,
 } from '@mui/material'
-import { useParams } from 'react-router'
-import { Loading } from '../components/Loading'
-import { useUiStore } from '../providers/UiStoreProvider'
-import { RequestError } from '../components/RequestError'
-import { useEffect, useState, type JSX } from "react";
-import { CardInPack } from '@5rdb/api'
-import Autocomplete from '@mui/material/Autocomplete'
-import { privateApi } from '../api'
+import { useState, type JSX } from 'react'
+import { useNavigate, useParams } from 'react-router'
 import { useSnackbar } from 'notistack'
-import { useConfirm } from "material-ui-confirm";
-import { getImageUrl } from '../utils/imageUrl'
+import { Loading } from '../components/Loading'
+import { RequestError } from '../components/RequestError'
+import { useUiStore } from '../providers/UiStoreProvider'
+import { privateApi } from '../api'
+import type { Cycle, Pack } from '@5rdb/api'
+
+function toDateInputValue(released_at: unknown): string {
+  if (!released_at) return ''
+  // The Pack type says `Date | undefined`, but at runtime this is either an
+  // ISO-8601 string (from the JSON fetch) or a real Date (if something ever
+  // hands us one locally). Normalize both through Date so slice(0, 10)
+  // always yields the YYYY-MM-DD form an <input type="date"> expects.
+  try {
+    const iso = new Date(released_at as string | number | Date).toISOString()
+    return iso.slice(0, 10)
+  } catch {
+    return ''
+  }
+}
 
 export function EditPackView(): JSX.Element {
-  const { cards, packs, invalidateData } = useUiStore()
+  const { packs, cycles } = useUiStore()
   const params = useParams<{ id: string }>()
-  const [cardId, setCardId] = useState('')
-  const [flavor, setFlavor] = useState('')
-  const [illustrator, setIllustrator] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
-  const [position, setPosition] = useState('')
-  const [quantity, setQuantity] = useState(0)
-  const [rotated, setRotated] = useState(false)
-  const [cardsInPack, setCardsInPack] = useState<CardInPack[]>([])
-  const [modalOpen, setModalOpen] = useState(false)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [cardToDelete, setCardToDelete] = useState<CardInPack | null>(null)
-  const confirm = useConfirm()
-  const { enqueueSnackbar } = useSnackbar()
 
-  function compareCardsInPack(a: CardInPack, b: CardInPack) {
-    const positionA = a.position || '0'
-    const positionANumber = Number.parseInt(positionA.replace(/\D/g,''));
-    const positionAExtra = positionA.replace(/[0-9]/g, '');
-
-    const positionB = b.position || '0'
-    const positionBNumber = Number.parseInt(positionB.replace(/\D/g,''));
-    const positionBExtra = positionB.replace(/[0-9]/g, '');
-
-    return positionANumber - positionBNumber || positionAExtra.localeCompare(positionBExtra) || a.card_id.localeCompare(b.card_id);
-  }
-
-  useEffect(() => {
-    if (cards && params.id) {
-    const packCards = cards.filter((c) => c.versions.some((v) => v.pack_id === params.id))
-    const newCardsInPack: CardInPack[] = packCards.map((p) => {
-      const cardVersionInPack = p.versions.find((v) => v.pack_id === params.id)
-      return {
-        ...cardVersionInPack,
-        card_id: p.id,
-        pack_id: params.id!,
-        rotated: cardVersionInPack?.rotated || false,
-      }
-    }).sort((a, b) => compareCardsInPack(a, b))
-    setCardsInPack(newCardsInPack)
-    }
-  }, [cards, params.id])
-
-  if (!cards || !packs) {
+  if (!packs || !cycles) {
     return <Loading />
   }
-
-  const packId = params.id!
-  const pack = packs.find((p) => p.id === packId)
-
+  const pack = packs.find((p) => p.id === params.id)
   if (!pack) {
     return <RequestError requestError="No pack for that ID!" />
   }
 
-  async function updateCards() {
-    const newCard: CardInPack = {
-      card_id: cardId,
-      pack_id: packId,
-      flavor: flavor,
-      illustrator: illustrator,
-      image_url: imageUrl,
-      position: position,
-      quantity: quantity,
-      rotated: rotated,
-    }
+  return <EditPackForm pack={pack} cycles={cycles} />
+}
+
+function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
+  const { pack, cycles } = props
+  const navigate = useNavigate()
+  const { enqueueSnackbar } = useSnackbar()
+  const { invalidateData } = useUiStore()
+
+  const [name, setName] = useState(pack.name)
+  const [position, setPosition] = useState(pack.position)
+  const [releasedAt, setReleasedAt] = useState(toDateInputValue(pack.released_at))
+  const [publisherId, setPublisherId] = useState(pack.publisher_id ?? '')
+  const [cycleId, setCycleId] = useState(pack.cycle_id)
+  const [rotated, setRotated] = useState(pack.rotated)
+  const [saving, setSaving] = useState(false)
+
+  const cycleValue = cycles.find((c) => c.id === cycleId) ?? null
+
+  async function save() {
+    setSaving(true)
     try {
-      await privateApi.CardInPack.update({
+      await privateApi.Pack.create({
         body: {
-          cardInPack: newCard
-        }
+          id: pack.id,
+          name,
+          position,
+          cycle_id: cycleId,
+          publisher_id: publisherId || undefined,
+          released_at: releasedAt || undefined,
+          rotated,
+        },
       })
       await invalidateData()
-      enqueueSnackbar('Successfully posted pack card!', { variant: 'success' })
-      setModalOpen(false)
+      enqueueSnackbar('Pack updated', { variant: 'success' })
+      navigate('/admin/cycles')
     } catch (error) {
       console.log(error)
-      enqueueSnackbar("The card couldn't be added to the pack!", { variant: 'error' })
+      enqueueSnackbar("Couldn't update pack", { variant: 'error' })
+    } finally {
+      setSaving(false)
     }
-  }
-
-  function openDeleteDialog(cardInPack: CardInPack) {
-    console.log('openDeleteDialog called')
-    setCardToDelete(cardInPack)
-    setDeleteDialogOpen(true)
-  }
-
-  function closeDeleteDialog() {
-    console.log('closeDeleteDialog called - cancelling')
-    setDeleteDialogOpen(false)
-    setCardToDelete(null)
-  }
-
-  async function confirmDelete() {
-    console.log('confirmDelete called - deleting')
-    if (!cardToDelete) return
-
-    try {
-      await privateApi.CardInPack.delete({
-        body: {
-          cardInPack: cardToDelete
-        }
-      })
-      await invalidateData()
-      enqueueSnackbar('Successfully deleted card from pack!', { variant: 'success' })
-      setDeleteDialogOpen(false)
-      setCardToDelete(null)
-    } catch (error) {
-      console.log(error)
-      enqueueSnackbar("The card couldn't be deleted from the pack!", { variant: 'error' })
-    }
-  }
-
-  function openEditModal(card: CardInPack, index: number) {
-    setCardId(card.card_id)
-    setFlavor(card.flavor || '')
-    setIllustrator(card.illustrator || '')
-    setImageUrl(card.image_url || '')
-    setPosition(card.position || '')
-    setQuantity(card.quantity || 1)
-    setRotated(card.rotated || false)
-    setModalOpen(true)
-  }
-
-  function openCreateModal() {
-    setCardId('')
-    setFlavor('')
-    setIllustrator('')
-    setImageUrl('')
-    setPosition('')
-    setQuantity(3)
-    setRotated(false)
-    setModalOpen(true)
   }
 
   return (
-    <Grid container spacing={2} justifyContent="center">
-      <Grid size={12}>
-        <Typography>{pack.name}</Typography>
-      </Grid>
-      <Grid size={12}>
-        <Button variant="contained" color="secondary" onClick={() => openCreateModal()}>
-          Add Card
+    <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4, pb: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Edit Pack
+      </Typography>
+      <Card>
+        <CardContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              ID: {pack.id} (immutable)
+            </Typography>
+            <TextField
+              label="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              size="small"
+            />
+            <TextField
+              label="Position"
+              type="number"
+              value={position}
+              onChange={(e) => setPosition(Number.parseInt(e.target.value) || 0)}
+              required
+              size="small"
+            />
+            <TextField
+              label="Released at"
+              type="date"
+              value={releasedAt}
+              onChange={(e) => setReleasedAt(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+              size="small"
+            />
+            <TextField
+              label="Publisher ID"
+              value={publisherId}
+              onChange={(e) => setPublisherId(e.target.value)}
+              placeholder="e.g. L5C01"
+              size="small"
+            />
+            <Autocomplete
+              options={[...cycles].sort((a, b) => a.name.localeCompare(b.name))}
+              getOptionLabel={(c) => c.name}
+              value={cycleValue}
+              onChange={(_event, value) => setCycleId(value?.id ?? '')}
+              isOptionEqualToValue={(a, b) => a.id === b.id}
+              renderInput={(params) => (
+                <TextField {...params} label="Cycle" required size="small" />
+              )}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rotated}
+                  onChange={(e) => setRotated(e.target.checked)}
+                />
+              }
+              label="Rotated out"
+            />
+          </Box>
+        </CardContent>
+      </Card>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+        <Button
+          variant="outlined"
+          onClick={() => navigate('/admin/cycles')}
+          disabled={saving}
+        >
+          Cancel
         </Button>
-      </Grid>
-      {cardsInPack.map((card, index) => (
-        <Grid key={`${card.card_id}-${card.pack_id}`} size={6}>
-          <Grid container spacing={1}>
-            <Grid size={8}>
-              <Box border="1px solid lightgrey">
-                <Typography>Card: {card.card_id}</Typography>
-                <Typography>Flavor: {card.flavor}</Typography>
-                <Typography>Illustrator: {card.illustrator}</Typography>
-                <Typography>Position: {card.position}</Typography>
-                <Typography>Quantity: {card.quantity}</Typography>
-                <Typography>Rotated: {card.rotated ? 'Yes' : 'No'}</Typography>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => openEditModal(card, index)}
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => openDeleteDialog(card)}
-                >
-                  Delete
-                </Button>
-              </Box>
-            </Grid>
-            <Grid size={4}>
-              <img src={getImageUrl(card.image_url)} style={{ maxWidth: 150 }} />
-            </Grid>
-          </Grid>
-        </Grid>
-      ))}
-      <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-        <DialogTitle>Edit Pack Card</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={1}>
-            <Grid size={8}>
-              <Autocomplete
-                id="combo-box-cardId"
-                autoHighlight
-                options={[...cards].sort((a, b) => a.id.localeCompare(b.id))}
-                getOptionLabel={(option) => `${option.id}`}
-                value={cards.find((item) => item.id === cardId) || null}
-                renderInput={(params) => (
-                  <TextField required {...params} label="Card ID" variant="outlined" />
-                )}
-                onChange={(e, value) => {
-                  setCardId(value?.id || '')
-                }}
-              />
-              <TextField
-                value={flavor}
-                multiline
-                variant="outlined"
-                fullWidth
-                onChange={(e) => setFlavor(e.target.value)}
-                label="Flavor"
-                style={{ marginTop: 5 }}
-              />
-              <TextField
-                value={illustrator}
-                variant="outlined"
-                fullWidth
-                onChange={(e) => setIllustrator(e.target.value)}
-                label="Illustrator"
-                style={{ marginTop: 5 }}
-              />
-              <TextField
-                value={imageUrl}
-                variant="outlined"
-                fullWidth
-                onChange={(e) => setImageUrl(e.target.value)}
-                label="Image URL"
-                style={{ marginTop: 5 }}
-              />
-              <TextField
-                value={position}
-                multiline
-                variant="outlined"
-                fullWidth
-                onChange={(e) => setPosition(e.target.value)}
-                label="Position"
-                style={{ marginTop: 5 }}
-              />
-              <TextField
-                value={quantity}
-                multiline
-                variant="outlined"
-                fullWidth
-                onChange={(e) => setQuantity(Number.parseInt(e.target.value) || 0)}
-                type="number"
-                label="Quantity"
-                style={{ marginTop: 5 }}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={rotated}
-                    onChange={(value) => setRotated(value.target.checked)}
-                  />
-                }
-                label={'Rotated Out'}
-                labelPlacement="start"
-              />
-            </Grid>
-            <Grid size={4}>
-              <img src={getImageUrl(imageUrl)} style={{ maxWidth: 150 }} />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModalOpen(false)} color="secondary" variant="contained">
-            Close
-          </Button>
-          <Button variant="contained" color="secondary" onClick={() => updateCards()}>
-            Update Card
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
-        <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          <Typography>Do you really want to delete this card from the pack?</Typography>
-          {cardToDelete && (
-            <Box mt={2}>
-              <Typography variant="body2">Card: {cardToDelete.card_id}</Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDeleteDialog} variant="outlined" autoFocus>
-            Cancel
-          </Button>
-          <Button onClick={confirmDelete} variant="contained" color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Grid>
-  );
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={save}
+          disabled={saving || !name || !cycleId}
+        >
+          Save
+        </Button>
+      </Box>
+    </Box>
+  )
 }
