@@ -259,7 +259,7 @@ export function ManageCyclesView(): JSX.Element {
                       variant="outlined"
                       color="secondary"
                       size="small"
-                      onClick={() => navigate(`/admin/pack/${pack.id}`)}
+                      onClick={() => navigate(`/admin/pack/${pack.id}/cards`)}
                     >
                       Edit Pack Cards
                     </Button>

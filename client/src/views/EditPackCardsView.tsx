@@ -23,7 +23,7 @@ import { useSnackbar } from 'notistack'
 import { useConfirm } from "material-ui-confirm";
 import { getImageUrl } from '../utils/imageUrl'
 
-export function EditPackView(): JSX.Element {
+export function EditPackCardsView(): JSX.Element {
   const { cards, packs, invalidateData } = useUiStore()
   const params = useParams<{ id: string }>()
   const [cardId, setCardId] = useState('')
