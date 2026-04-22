@@ -12,6 +12,7 @@ export const schema = {
     cycle_id: Joi.string().required(),
     publisher_id: Joi.string(),
     released_at: Joi.date(),
+    rotated: Joi.boolean(),
   }),
 }
 
