@@ -15,6 +15,7 @@ const DecksView = lazy(() => import('./views/DecksView').then(m => ({ default: m
 const EditCardView = lazy(() => import('./views/EditCardView').then(m => ({ default: m.EditCardView })))
 const EditDeckView = lazy(() => import('./views/EditDeckView').then(m => ({ default: m.EditDeckView })))
 const EditPackCardsView = lazy(() => import('./views/EditPackCardsView').then(m => ({ default: m.EditPackCardsView })))
+const EditPackView = lazy(() => import('./views/EditPackView').then(m => ({ default: m.EditPackView })))
 const ManageCyclesView = lazy(() => import('./views/ManageCyclesView').then(m => ({ default: m.ManageCyclesView })))
 const NotLoggedIn = lazy(() => import('./views/NotLoggedIn').then(m => ({ default: m.NotLoggedIn })))
 const NotPermitted = lazy(() => import('./views/NotPermitted').then(m => ({ default: m.NotPermitted })))
@@ -62,6 +63,7 @@ export function Routes(): JSX.Element {
         <Route path="/card/:id/edit" element={<DataAdminRoute><EditCardView /></DataAdminRoute>} />
         <Route path="/card/create/new" element={<DataAdminRoute><CreateCardView /></DataAdminRoute>} />
         <Route path="/admin/pack/:id/cards" element={<DataAdminRoute><EditPackCardsView /></DataAdminRoute>} />
+        <Route path="/admin/pack/:id/edit" element={<DataAdminRoute><EditPackView /></DataAdminRoute>} />
         <Route path="/admin/cycles" element={<DataAdminRoute><ManageCyclesView /></DataAdminRoute>} />
         <Route path="/admin/traits" element={<DataAdminRoute><EditTraitsView /></DataAdminRoute>} />
         <Route path="/admin/formats" element={<DataAdminRoute><EditFormatsView /></DataAdminRoute>} />
