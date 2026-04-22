@@ -55,7 +55,6 @@ function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
 
   const [name, setName] = useState(pack.name)
   const [position, setPosition] = useState(pack.position)
-  const [size, setSize] = useState(pack.size)
   const [releasedAt, setReleasedAt] = useState(toDateInputValue(pack.released_at))
   const [publisherId, setPublisherId] = useState(pack.publisher_id ?? '')
   const [cycleId, setCycleId] = useState(pack.cycle_id)
@@ -72,7 +71,6 @@ function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
           id: pack.id,
           name,
           position,
-          size,
           cycle_id: cycleId,
           publisher_id: publisherId || undefined,
           released_at: releasedAt || undefined,
@@ -113,14 +111,6 @@ function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
               type="number"
               value={position}
               onChange={(e) => setPosition(Number.parseInt(e.target.value) || 0)}
-              required
-              size="small"
-            />
-            <TextField
-              label="Size"
-              type="number"
-              value={size}
-              onChange={(e) => setSize(Number.parseInt(e.target.value) || 0)}
               required
               size="small"
             />

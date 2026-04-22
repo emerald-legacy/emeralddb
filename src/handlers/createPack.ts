@@ -8,7 +8,6 @@ export const schema = {
     id: Joi.string().required(),
     name: Joi.string().required(),
     position: Joi.number().required(),
-    size: Joi.number().required(),
     cycle_id: Joi.string().required(),
     publisher_id: Joi.string(),
     released_at: Joi.date(),
