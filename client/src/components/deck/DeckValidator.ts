@@ -399,7 +399,6 @@ export function createDeckStatistics(
       ? deckMinimum + numberOfRallyCards
       : deckMinimum
 
-  // @ts-ignore
   const stats: DeckStatistics = {
     maxInfluence: maxInfluence,
     usedInfluence: usedInfluence,

@@ -21,8 +21,7 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
   const asciiDocUrl =
     'https://raw.githubusercontent.com/Emerald-Legacy/rules-documents/main/docs/Rules%20Reference%20Guide.adoc'
 
-  const reformatContent = (asciiDoc: string) => {
-    // @ts-ignore
+  function reformatContent(asciiDoc: string) {
     const asciiDoctor = asciidoctor()
     const convertedHtml = asciiDoctor
       .convert(asciiDoc)
