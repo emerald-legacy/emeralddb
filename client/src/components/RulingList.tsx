@@ -81,69 +81,57 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
     setRulingModalOpen(true)
   }
 
-  function confirmDeletion(ruling: Ruling) {
-    confirm({ description: 'Do you really want to delete this ruling?' })
+  async function confirmDeletion(ruling: Ruling) {
+    const { confirmed } = await confirm({ title: 'Delete Ruling', description: 'Do you really want to delete this ruling?', confirmationText: 'Delete' })
+    if (!confirmed) return
+    privateApi.Ruling.delete({ rulingId: ruling.id })
       .then(() => {
-        privateApi.Ruling.delete({ rulingId: ruling.id })
-          .then(() => {
-            window.location.reload()
-          })
-          .catch((error) => {
-            console.log(error)
-            enqueueSnackbar("The ruling couldn't be deleted!", { variant: 'error' })
-          })
+        window.location.reload()
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        console.log(error)
+        enqueueSnackbar("The ruling couldn't be deleted!", { variant: 'error' })
       })
   }
 
-  function createOrUpdateRuling() {
+  async function createOrUpdateRuling() {
     if (rulingId === -1) {
-      confirm({ description: 'Do you really want to create this ruling?' })
+      const { confirmed } = await confirm({ title: 'Create Ruling', description: 'Do you really want to create this ruling?', confirmationText: 'Create' })
+      if (!confirmed) return
+      privateApi.Ruling.create({
+        body: {
+          card_id: props.cardId,
+          text: rulingText,
+          source: rulingSource,
+          link: rulingLink,
+        },
+      })
         .then(() => {
-          privateApi.Ruling.create({
-            body: {
-              card_id: props.cardId,
-              text: rulingText,
-              source: rulingSource,
-              link: rulingLink,
-            },
-          })
-            .then(() => {
-              window.location.reload()
-            })
-            .catch((error) => {
-              console.log(error)
-              enqueueSnackbar("The ruling couldn't be created!", { variant: 'error' })
-            })
+          window.location.reload()
         })
-        .catch(() => {
-          // Cancel confirmation dialog => do nothing
+        .catch((error) => {
+          console.log(error)
+          enqueueSnackbar("The ruling couldn't be created!", { variant: 'error' })
         })
     } else {
-      confirm({ description: 'Do you really want to update this ruling?' })
+      const { confirmed } = await confirm({ title: 'Update Ruling', description: 'Do you really want to update this ruling?', confirmationText: 'Update' })
+      if (!confirmed) return
+      privateApi.Ruling.update({
+        rulingId: rulingId,
+        body: {
+          id: rulingId,
+          card_id: props.cardId,
+          text: rulingText,
+          source: rulingSource,
+          link: rulingLink,
+        },
+      })
         .then(() => {
-          privateApi.Ruling.update({
-            rulingId: rulingId,
-            body: {
-              id: rulingId,
-              card_id: props.cardId,
-              text: rulingText,
-              source: rulingSource,
-              link: rulingLink,
-            },
-          })
-            .then(() => {
-              window.location.reload()
-            })
-            .catch((error) => {
-              console.log(error)
-              enqueueSnackbar("The ruling couldn't be created!", { variant: 'error' })
-            })
+          window.location.reload()
         })
-        .catch(() => {
-          // Cancel confirmation dialog => do nothing
+        .catch((error) => {
+          console.log(error)
+          enqueueSnackbar("The ruling couldn't be created!", { variant: 'error' })
         })
     }
   }

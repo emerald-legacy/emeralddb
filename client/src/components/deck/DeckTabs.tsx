@@ -74,22 +74,18 @@ export function DeckTabs(props: {
     }
   }
 
-  function confirmDeletion(deckId: string) {
-    confirm({ description: 'Do you really want to delete this deck and all of its decklists?' })
+  async function confirmDeletion(deckId: string) {
+    const { confirmed } = await confirm({ title: 'Delete Deck', description: 'Do you really want to delete this deck and all of its decklists?', confirmationText: 'Delete' })
+    if (!confirmed) return
+    privateApi.Deck.delete({ deckId: deckId })
       .then(() => {
-        privateApi.Deck.delete({ deckId: deckId })
-          .then(() => {
-            props.onDeckUpdated()
-            setCurrentDeckId(undefined)
-            enqueueSnackbar('The deck was deleted successfully!', { variant: 'success' })
-          })
-          .catch((error) => {
-            console.log(error)
-            enqueueSnackbar("The deck couldn't be deleted!", { variant: 'error' })
-          })
+        props.onDeckUpdated()
+        setCurrentDeckId(undefined)
+        enqueueSnackbar('The deck was deleted successfully!', { variant: 'success' })
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        console.log(error)
+        enqueueSnackbar("The deck couldn't be deleted!", { variant: 'error' })
       })
   }
 

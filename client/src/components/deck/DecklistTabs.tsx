@@ -127,23 +127,19 @@ export function DecklistTabs(props: {
     )
   }
 
-  function confirmDeletion(decklistId: string) {
-    confirm({ description: 'Do you really want to delete this version of the deck?' })
+  async function confirmDeletion(decklistId: string) {
+    const { confirmed } = await confirm({ description: 'Do you really want to delete this version of the deck?' })
+    if (!confirmed) return
+    privateApi.Decklist.delete({ decklistId: decklistId })
       .then(() => {
-        privateApi.Decklist.delete({ decklistId: decklistId })
-          .then(() => {
-            props.onDecklistUpdated()
-            setCurrentDecklistId(latestDecklistForDeck(deck)?.id || undefined)
-            enqueueSnackbar('The decklist was deleted successfully!', { variant: 'success' })
-            queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
-          })
-          .catch((error) => {
-            const message = error.data()
-            enqueueSnackbar(`The decklist couldn't be deleted: ${message}!`, { variant: 'error' })
-          })
+        props.onDecklistUpdated()
+        setCurrentDecklistId(latestDecklistForDeck(deck)?.id || undefined)
+        enqueueSnackbar('The decklist was deleted successfully!', { variant: 'success' })
+        queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        const message = error.data()
+        enqueueSnackbar(`The decklist couldn't be deleted: ${message}!`, { variant: 'error' })
       })
   }
 
@@ -163,24 +159,20 @@ export function DecklistTabs(props: {
     setDecklistToPublish(undefined)
   }
 
-  function unpublishDecklist(decklistId: string) {
-    confirm({ description: 'Do you really want to unpublish this version of the deck?' })
+  async function unpublishDecklist(decklistId: string) {
+    const { confirmed } = await confirm({ description: 'Do you really want to unpublish this version of the deck?' })
+    if (!confirmed) return
+    privateApi.Decklist.unpublish({ decklistId: decklistId })
       .then(() => {
-        privateApi.Decklist.unpublish({ decklistId: decklistId })
-          .then(() => {
-            props.onDecklistUpdated()
-            enqueueSnackbar('The decklist was unpublished successfully!', { variant: 'success' })
-            queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
-          })
-          .catch((error) => {
-            const message = error.data()
-            enqueueSnackbar(`The decklist couldn't be unpublished: ${message}!`, {
-              variant: 'error',
-            })
-          })
+        props.onDecklistUpdated()
+        enqueueSnackbar('The decklist was unpublished successfully!', { variant: 'success' })
+        queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        const message = error.data()
+        enqueueSnackbar(`The decklist couldn't be unpublished: ${message}!`, {
+          variant: 'error',
+        })
       })
   }
 

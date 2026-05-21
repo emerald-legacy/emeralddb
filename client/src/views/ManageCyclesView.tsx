@@ -116,52 +116,44 @@ export function ManageCyclesView(): JSX.Element {
     setCycleModalOpen(true)
   }
 
-  function createPack() {
-    confirm({ description: 'Do you really want to create this pack?' })
+  async function createPack() {
+    const { confirmed } = await confirm({ description: 'Do you really want to create this pack?' })
+    if (!confirmed) return
+    privateApi.Pack.create({
+      body: {
+        cycle_id: editedCycleId,
+        name: packName,
+        id: packId,
+        position: packPosition,
+      },
+    })
       .then(() => {
-        privateApi.Pack.create({
-          body: {
-            cycle_id: editedCycleId,
-            name: packName,
-            id: packId,
-            position: packPosition,
-          },
-        })
-          .then(() => {
-            window.location.reload()
-          })
-          .catch((error) => {
-            console.log(error)
-            enqueueSnackbar("The pack couldn't be created!", { variant: 'error' })
-          })
+        window.location.reload()
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        console.log(error)
+        enqueueSnackbar("The pack couldn't be created!", { variant: 'error' })
       })
   }
 
-  function createCycle() {
-    confirm({ description: 'Do you really want to create this cycle?' })
+  async function createCycle() {
+    const { confirmed } = await confirm({ description: 'Do you really want to create this cycle?' })
+    if (!confirmed) return
+    privateApi.Cycle.create({
+      body: {
+        id: newCycleId,
+        name: cycleName,
+        size: cycleSize,
+        position: cyclePosition,
+        publisher: 'emerald-legacy'
+      },
+    })
       .then(() => {
-        privateApi.Cycle.create({
-          body: {
-            id: newCycleId,
-            name: cycleName,
-            size: cycleSize,
-            position: cyclePosition,
-            publisher: 'emerald-legacy'
-          },
-        })
-          .then(() => {
-            window.location.reload()
-          })
-          .catch((error) => {
-            console.log(error)
-            enqueueSnackbar("The cycle couldn't be created!", { variant: 'error' })
-          })
+        window.location.reload()
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        console.log(error)
+        enqueueSnackbar("The cycle couldn't be created!", { variant: 'error' })
       })
   }
 

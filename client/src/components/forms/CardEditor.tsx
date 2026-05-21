@@ -290,7 +290,7 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
     return card
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const originalCard = props.existingCard
     if (originalCard) {
       // Update on existing card
@@ -312,42 +312,35 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
           </span>
         )
 
-        confirm({ description: confirmationMessage })
+        const { confirmed } = await confirm({ title: 'Save Changes', description: confirmationMessage, confirmationText: 'Save' })
+        if (!confirmed) return
+        const newCard = assembleCard()
+        privateApi.Card.update({ cardId: newCard.id, body: newCard })
           .then(() => {
-            const newCard = assembleCard()
-            privateApi.Card.update({ cardId: newCard.id, body: newCard })
-              .then(() => {
-                uiStore.invalidateData()
-                navigate(`/card/${newCard.id}`)
-              })
-              .catch((error) => {
-                console.log(error)
-              })
+            uiStore.invalidateData()
+            navigate(`/card/${newCard.id}`)
           })
-          .catch(() => {
-            // Cancel confirmation dialog => do nothing
+          .catch((error) => {
+            console.log(error)
           })
       }
     } else {
       // New card
-      confirm({
+      const { confirmed } = await confirm({
         title: `Create card ${name} (${id})`,
         description: 'Do you want to create this card?',
+        confirmationText: 'Create',
       })
+      if (!confirmed) return
+      const newCard = assembleCard()
+      privateApi.Card.create({ body: newCard })
         .then(() => {
-          const newCard = assembleCard()
-          privateApi.Card.create({ body: newCard })
-            .then(() => {
-              uiStore.invalidateData()
-              navigate(`/card/${newCard.id}`)
-            })
-            .catch((error) => {
-              console.log(error)
-              // TODO: Show error
-            })
+          uiStore.invalidateData()
+          navigate(`/card/${newCard.id}`)
         })
-        .catch(() => {
-          // Cancel confirmation dialog => do nothing
+        .catch((error) => {
+          console.log(error)
+          // TODO: Show error
         })
     }
   }

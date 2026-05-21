@@ -111,54 +111,46 @@ export function CardDetailView(): JSX.Element {
     setIdFromNameAndExtra(newName, nameExtra)
   }
 
-  function confirmDeletion() {
-    confirm({ description: 'Do you really want to delete this card?' })
+  async function confirmDeletion() {
+    const { confirmed } = await confirm({ title: 'Delete Card', description: 'Do you really want to delete this card?', confirmationText: 'Delete' })
+    if (!confirmed) return
+    privateApi.Card.delete({
+      cardId: card.id,
+      body: { replacementCardId: deletionReplacementCardId },
+    })
       .then(() => {
-        privateApi.Card.delete({
-          cardId: card.id,
-          body: { replacementCardId: deletionReplacementCardId },
-        })
-          .then(() => {
-            if (deletionReplacementCardId) {
-              navigate(`/card/${deletionReplacementCardId}`)
-            } else {
-              navigate('/cards')
-            }
-            setDeletionModalOpen(false)
-          })
-          .catch((error) => {
-            console.log(error)
-            enqueueSnackbar("The card couldn't be deleted!", { variant: 'error' })
-          })
+        if (deletionReplacementCardId) {
+          navigate(`/card/${deletionReplacementCardId}`)
+        } else {
+          navigate('/cards')
+        }
+        setDeletionModalOpen(false)
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        console.log(error)
+        enqueueSnackbar("The card couldn't be deleted!", { variant: 'error' })
       })
   }
 
-  function confirmRename() {
-    confirm({ description: 'Do you really want to delete this card?' })
+  async function confirmRename() {
+    const { confirmed } = await confirm({ title: 'Rename Card', description: 'Do you really want to rename this card?', confirmationText: 'Rename' })
+    if (!confirmed) return
+    privateApi.Card.rename({
+      cardId: card.id,
+      body: {
+        existingCardId: card.id,
+        newCardId: newCardId,
+        name: newName,
+        nameExtra: newNameExtra,
+      },
+    })
       .then(() => {
-        privateApi.Card.rename({
-          cardId: card.id,
-          body: {
-            existingCardId: card.id,
-            newCardId: newCardId,
-            name: newName,
-            nameExtra: newNameExtra,
-          },
-        })
-          .then(() => {
-            navigate(`/card/${newCardId}`)
-            setRenameModalOpen(false)
-          })
-          .catch((error) => {
-            console.log(error)
-            enqueueSnackbar("The card couldn't be renamed!", { variant: 'error' })
-          })
+        navigate(`/card/${newCardId}`)
+        setRenameModalOpen(false)
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        console.log(error)
+        enqueueSnackbar("The card couldn't be renamed!", { variant: 'error' })
       })
   }
 
