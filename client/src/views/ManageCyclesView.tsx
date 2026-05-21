@@ -1,5 +1,5 @@
 import { Pack } from '@5rdb/api'
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles'
 import {
   Box,
   Button,
@@ -10,10 +10,10 @@ import {
   Grid,
   TextField,
   Typography,
-} from '@mui/material';
+} from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
-import React, { useState, type JSX } from 'react';
+import React, { useState, type JSX } from 'react'
 import { useNavigate } from 'react-router'
 import { privateApi } from '../api'
 import { Loading } from '../components/Loading'
@@ -21,21 +21,17 @@ import { useUiStore } from '../providers/UiStoreProvider'
 import { toSlugId } from '../utils/slugIdUtils'
 import CachedIcon from '@mui/icons-material/Cached'
 
-const PREFIX = 'ManageCyclesView';
+const PREFIX = 'ManageCyclesView'
 
 const classes = {
   editButton: `${PREFIX}-editButton`,
   createButton: `${PREFIX}-createButton`,
   deleteButton: `${PREFIX}-deleteButton`,
-  input: `${PREFIX}-input`
-};
+  input: `${PREFIX}-input`,
+}
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')((
-  {
-    theme
-  }
-) => ({
+const Root = styled('div')(({ theme }) => ({
   [`& .${classes.editButton}`]: {
     backgroundColor: theme.palette.warning.light,
     marginRight: theme.spacing(1),
@@ -54,11 +50,10 @@ const Root = styled('div')((
 
   [`& .${classes.input}`]: {
     marginBottom: theme.spacing(1),
-  }
-}));
+  },
+}))
 
 export function ManageCyclesView(): JSX.Element {
-
   const navigate = useNavigate()
   const { packs, cycles } = useUiStore()
   const [packModalOpen, setPackModalOpen] = useState(false)
@@ -112,7 +107,11 @@ export function ManageCyclesView(): JSX.Element {
   }
 
   async function createPack() {
-    const { confirmed } = await confirm({ title: 'Create Pack', description: 'Do you really want to create this pack?', confirmationText: 'Create' })
+    const { confirmed } = await confirm({
+      title: 'Create Pack',
+      description: 'Do you really want to create this pack?',
+      confirmationText: 'Create',
+    })
     if (!confirmed) return
     privateApi.Pack.create({
       body: {
@@ -132,7 +131,11 @@ export function ManageCyclesView(): JSX.Element {
   }
 
   async function createCycle() {
-    const { confirmed } = await confirm({ title: 'Create Cycle', description: 'Do you really want to create this cycle?', confirmationText: 'Create' })
+    const { confirmed } = await confirm({
+      title: 'Create Cycle',
+      description: 'Do you really want to create this cycle?',
+      confirmationText: 'Create',
+    })
     if (!confirmed) return
     privateApi.Cycle.create({
       body: {
@@ -140,7 +143,7 @@ export function ManageCyclesView(): JSX.Element {
         name: cycleName,
         size: cycleSize,
         position: cyclePosition,
-        publisher: 'emerald-legacy'
+        publisher: 'emerald-legacy',
       },
     })
       .then(() => {
@@ -153,7 +156,11 @@ export function ManageCyclesView(): JSX.Element {
   }
 
   async function confirmRotateCycle(cycleId: string) {
-    const { confirmed } = await confirm({ title: 'Confirm Rotation', description: 'Do you really want to rotate out this cycle?', confirmationText: 'Rotate Cycle' })
+    const { confirmed } = await confirm({
+      title: 'Confirm Rotation',
+      description: 'Do you really want to rotate out this cycle?',
+      confirmationText: 'Rotate Cycle',
+    })
     if (!confirmed) return
     try {
       await privateApi.Cycle.rotate({ cycleId })
@@ -165,7 +172,11 @@ export function ManageCyclesView(): JSX.Element {
   }
 
   async function confirmRotatePack(packId: string) {
-    const { confirmed } = await confirm({ title: 'Confirm Rotation', description: 'Do you really want to rotate out this pack?', confirmationText: 'Rotate Pack' })
+    const { confirmed } = await confirm({
+      title: 'Confirm Rotation',
+      description: 'Do you really want to rotate out this pack?',
+      confirmationText: 'Rotate Pack',
+    })
     if (!confirmed) return
     try {
       await privateApi.Pack.rotate({ packId })
@@ -180,83 +191,104 @@ export function ManageCyclesView(): JSX.Element {
     <Root>
       <Box sx={{ pb: 4 }}>
         <Grid container spacing={3}>
-        <Grid size={12}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h4">Cycles</Typography>
-            <Button variant="contained" color="secondary" size="medium" onClick={() => openCycleModal()}>
-              Add Cycle
-            </Button>
-          </Box>
-        </Grid>
-        {cycles.map((cycle) => (
-          <Grid size={6} key={cycle.id}>
-            <Box
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                p: 1,
-                mb: 1,
-              }}
-            >
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {cycle.rotated && <CachedIcon style={{ color: 'red', fontSize: 16, marginRight: 8 }} />}
-                  {cycle.name}
-                </Typography>
-                <Button variant="contained" color="error" size="small" onClick={() => confirmRotateCycle(cycle.id)} disabled={cycle.rotated}>
-                  Rotate Cycle
-                </Button>
-              </Box>
-              {packsForCycle(cycle.id).map((pack) => (
-                <Box
-                  key={pack.id}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  sx={{ ml: 4, mb: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}
-                >
-                  <Typography variant="body2">
-                    {pack.rotated && <CachedIcon style={{ color: 'red', fontSize: 14, marginRight: 8 }} />}
-                    {pack.name}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      size="small"
-                      onClick={() => navigate(`/admin/pack/${pack.id}/edit`)}
-                    >
-                      Edit Pack
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      size="small"
-                      onClick={() => navigate(`/admin/pack/${pack.id}/cards`)}
-                    >
-                      Edit Pack Cards
-                    </Button>
-                    <Button variant="outlined" color="error" size="small" onClick={() => confirmRotatePack(pack.id)} disabled={pack.rotated}>
-                      Rotate Pack
-                    </Button>
-                  </Box>
-                </Box>
-              ))}
-              <Box sx={{ ml: 4, mt: 2 }}>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  onClick={() => openPackModal(cycle.id)}
-                >
-                  Add Pack
-                </Button>
-              </Box>
+          <Grid size={12}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Typography variant="h4">Cycles</Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="medium"
+                onClick={() => openCycleModal()}
+              >
+                Add Cycle
+              </Button>
             </Box>
           </Grid>
-        ))}
-      </Grid>
+          {cycles.map((cycle) => (
+            <Grid size={6} key={cycle.id}>
+              <Box
+                sx={{
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  p: 1,
+                  mb: 1,
+                }}
+              >
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {cycle.rotated && (
+                      <CachedIcon style={{ color: 'red', fontSize: 16, marginRight: 8 }} />
+                    )}
+                    {cycle.name}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() => confirmRotateCycle(cycle.id)}
+                    disabled={cycle.rotated}
+                  >
+                    Rotate Cycle
+                  </Button>
+                </Box>
+                {packsForCycle(cycle.id).map((pack) => (
+                  <Box
+                    key={pack.id}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{ ml: 4, mb: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}
+                  >
+                    <Typography variant="body2">
+                      {pack.rotated && (
+                        <CachedIcon style={{ color: 'red', fontSize: 14, marginRight: 8 }} />
+                      )}
+                      {pack.name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        size="small"
+                        onClick={() => navigate(`/admin/pack/${pack.id}/edit`)}
+                      >
+                        Edit Pack
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        size="small"
+                        onClick={() => navigate(`/admin/pack/${pack.id}/cards`)}
+                      >
+                        Edit Pack Cards
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => confirmRotatePack(pack.id)}
+                        disabled={pack.rotated}
+                      >
+                        Rotate Pack
+                      </Button>
+                    </Box>
+                  </Box>
+                ))}
+                <Box sx={{ ml: 4, mt: 2 }}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    onClick={() => openPackModal(cycle.id)}
+                  >
+                    Add Pack
+                  </Button>
+                </Box>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
       <Dialog open={packModalOpen} onClose={() => setPackModalOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Create New Pack</DialogTitle>
@@ -291,7 +323,12 @@ export function ManageCyclesView(): JSX.Element {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={cycleModalOpen} onClose={() => setCycleModalOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={cycleModalOpen}
+        onClose={() => setCycleModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Create New Cycle</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -333,5 +370,5 @@ export function ManageCyclesView(): JSX.Element {
         </DialogActions>
       </Dialog>
     </Root>
-  );
+  )
 }

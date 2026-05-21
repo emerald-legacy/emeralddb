@@ -7,6 +7,12 @@ import { command as cardCommand } from './commands/card'
 import { command as rulingsCommand } from './commands/rulings'
 import { Config } from './types'
 
+async function registerCommands(config: Config): Promise<unknown> {
+  const rest = new REST({ version: '10' }).setToken(config.botToken)
+  const body = [cardCommand.command, rulingsCommand.command].map((command) => command.toJSON())
+  return rest.put(Routes.applicationCommands(config.clientId), { body })
+}
+
 export async function createBot(config: Config): Promise<Service> {
   console.log('BOT: registering commands')
   await registerCommands(config)
@@ -36,10 +42,4 @@ export async function createBot(config: Config): Promise<Service> {
       console.log('BOT: shutdown done')
     },
   }
-}
-
-async function registerCommands(config: Config): Promise<unknown> {
-  const rest = new REST({ version: '10' }).setToken(config.botToken)
-  const body = [cardCommand.command, rulingsCommand.command].map((command) => command.toJSON())
-  return rest.put(Routes.applicationCommands(config.clientId), { body })
 }

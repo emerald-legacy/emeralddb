@@ -5,7 +5,7 @@ import { RequestError } from '../components/RequestError'
 import { useCard } from '../hooks/useCard'
 import { CardEditor } from '../components/forms/CardEditor'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 export function EditCardView(): JSX.Element {
   const params = useParams<{ id: string }>()

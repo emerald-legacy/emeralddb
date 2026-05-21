@@ -8,5 +8,5 @@ export function toSlugId(input: string): string {
     .replaceAll(')', '')
     .replaceAll(/\W/g, ' ')
     .replaceAll(' ', '-')
-    .replaceAll('--', '-');
+    .replaceAll('--', '-')
 }

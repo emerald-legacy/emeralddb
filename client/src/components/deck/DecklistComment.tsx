@@ -1,6 +1,6 @@
 import { Box, Button, Grid, IconButton, TextField, Typography } from '@mui/material'
 import { DecklistCommentWithChildren } from './DecklistComments'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { privateApi } from '../../api'
 import { useSnackbar } from 'notistack'
 import ReplyIcon from '@mui/icons-material/Reply'
@@ -63,7 +63,11 @@ export function DecklistComment(props: {
   }
 
   async function confirmDeletion() {
-    const { confirmed } = await confirm({ title: 'Delete Comment', description: 'Do you really want to delete this comment?', confirmationText: 'Delete' })
+    const { confirmed } = await confirm({
+      title: 'Delete Comment',
+      description: 'Do you really want to delete this comment?',
+      confirmationText: 'Delete',
+    })
     if (!confirmed) return
     privateApi.Comment.delete({ id: props.comment.id })
       .then(() => {

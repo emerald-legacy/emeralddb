@@ -1,5 +1,5 @@
 import { Grid, TextField, Typography, Box } from '@mui/material'
-import { useRef, useState, type JSX } from 'react';
+import { useRef, useState, type JSX } from 'react'
 import { CardText } from './CardText'
 import { CardTextEditorButtons } from './CardTextEditorButtons'
 import { getColorForFactionId } from '../../utils/factionUtils'
@@ -9,7 +9,6 @@ export function CardTextEditor(props: {
   text?: string
   faction?: string
 }): JSX.Element {
-  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   const inputRef = useRef<any>(null)
   const [text, setText] = useState(props.text || '')
   const [selectionStart, setSelectionStart] = useState(0)

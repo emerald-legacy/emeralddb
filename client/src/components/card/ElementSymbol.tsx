@@ -1,6 +1,6 @@
 import { capitalize } from '../../utils/stringUtils'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 export function ElementSymbol(props: { element: string; withoutName?: boolean }): JSX.Element {
   return (

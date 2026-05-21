@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 export function NotPermitted(props: { reason?: string }): JSX.Element {
   return (

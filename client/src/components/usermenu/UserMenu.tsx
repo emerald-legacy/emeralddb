@@ -11,10 +11,10 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material'
-import { useState, useEffect, type JSX } from 'react';
+import { useState, useEffect, type JSX } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { privateApi } from '../../api'
-import { getToken, hasAuth0Token, setToken } from '../../utils/auth'
+import { getToken, setToken } from '../../utils/auth'
 import { Queries } from '../HeaderBar'
 import { LoginButton } from './LoginButton'
 import { LogoutButton } from './LogoutButton'
@@ -28,7 +28,7 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
   const [modalOpen, setModalOpen] = useState(false)
   const [modalUsername, setModalUsername] = useState<string>()
 
-  const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0();
+  const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0()
 
   const { currentUser, setCurrentUser } = useCurrentUser()
 
@@ -79,7 +79,8 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
           aria-haspopup="true"
           onClick={handleMenu}
           color="inherit"
-          size="large">
+          size="large"
+        >
           <AccountCircle />
         </IconButton>
         <Menu
@@ -132,7 +133,7 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
           </DialogActions>
         </Dialog>
       </div>
-    );
+    )
   }
 
   if (isLoading || (isAuthenticated && !currentUser)) {

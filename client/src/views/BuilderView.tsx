@@ -1,6 +1,6 @@
 import { DeckWithVersions } from '@5rdb/api'
 import { Box, Grid, Typography } from '@mui/material'
-import { useEffect, useState, type JSX } from 'react';
+import { useEffect, useState, type JSX } from 'react'
 import { publicApi } from '../api'
 import { DeckTabs } from '../components/deck/DeckTabs'
 import { useCurrentUser } from '../providers/UserProvider'

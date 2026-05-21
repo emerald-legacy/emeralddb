@@ -7,19 +7,26 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle, FormControlLabel,
-  Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow,
+  DialogTitle,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
-  Typography
-} from "@mui/material";
+  Typography,
+} from '@mui/material'
 import { Loading } from '../components/Loading'
 import { useUiStore } from '../providers/UiStoreProvider'
-import React, { useState, type JSX } from 'react';
-import { Format } from "@5rdb/api";
+import React, { useState, type JSX } from 'react'
+import { Format } from '@5rdb/api'
 import { privateApi } from '../api'
 import { useSnackbar } from 'notistack'
-import EditIcon from "@mui/icons-material/Edit";
-import { CycleList } from "../components/CycleList";
+import EditIcon from '@mui/icons-material/Edit'
+import { CycleList } from '../components/CycleList'
 
 export function EditFormatsView(): JSX.Element {
   const { formats, invalidateData } = useUiStore()
@@ -116,60 +123,47 @@ export function EditFormatsView(): JSX.Element {
                 </Button>
               </Box>
               <Table size="small">
-        <TableHead>
-          <TableCell>
-            Position
-          </TableCell>
-          <TableCell>
-            Format ID
-          </TableCell>
-          <TableCell>
-            Format Display Name
-          </TableCell>
-          <TableCell>
-            Supported in Deckbuilding
-          </TableCell>
-          <TableCell>
-            Maintainer
-          </TableCell>
-          <TableCell>
-            Description
-          </TableCell>
-          <TableCell>
-            Info Link
-          </TableCell>
-          <TableCell>
-            Number of Legal Packs
-          </TableCell>
-          <TableCell>
-            Actions
-          </TableCell>
-        </TableHead>
-        <TableBody>
-          {sortedFormats.map((format) => (
-            <TableRow key={format.id}>
-              <TableCell>{format.position}</TableCell>
-              <TableCell>{format.id}</TableCell>
-              <TableCell>{format.name}</TableCell>
-              <TableCell>{format.supported ? 'Yes' : 'No'}</TableCell>
-              <TableCell>{format.maintainer || 'N/A'}</TableCell>
-              <TableCell>{format.description || 'N/A'}</TableCell>
-              <TableCell>
-                {format.info_link ?
-                  <a href={format.info_link}>{format.info_link}</a> :
-                  'N/A'
-                }
-              </TableCell>
-              <TableCell>{format.legal_packs?.length || 0}</TableCell>
-              <TableCell>
-                <IconButton color='secondary' onClick={() => openEditModal(format)} size="large">
-                  <EditIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                <TableHead>
+                  <TableCell>Position</TableCell>
+                  <TableCell>Format ID</TableCell>
+                  <TableCell>Format Display Name</TableCell>
+                  <TableCell>Supported in Deckbuilding</TableCell>
+                  <TableCell>Maintainer</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Info Link</TableCell>
+                  <TableCell>Number of Legal Packs</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableHead>
+                <TableBody>
+                  {sortedFormats.map((format) => (
+                    <TableRow key={format.id}>
+                      <TableCell>{format.position}</TableCell>
+                      <TableCell>{format.id}</TableCell>
+                      <TableCell>{format.name}</TableCell>
+                      <TableCell>{format.supported ? 'Yes' : 'No'}</TableCell>
+                      <TableCell>{format.maintainer || 'N/A'}</TableCell>
+                      <TableCell>{format.description || 'N/A'}</TableCell>
+                      <TableCell>
+                        {format.info_link ? (
+                          <a href={format.info_link}>{format.info_link}</a>
+                        ) : (
+                          'N/A'
+                        )}
+                      </TableCell>
+                      <TableCell>{format.legal_packs?.length || 0}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          color="secondary"
+                          onClick={() => openEditModal(format)}
+                          size="large"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </Grid>
@@ -261,12 +255,7 @@ export function EditFormatsView(): JSX.Element {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        open={packModalOpen}
-        onClose={() => setPackModalOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={packModalOpen} onClose={() => setPackModalOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Select Legal Packs</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
@@ -288,5 +277,5 @@ export function EditFormatsView(): JSX.Element {
         </DialogActions>
       </Dialog>
     </Box>
-  );
+  )
 }

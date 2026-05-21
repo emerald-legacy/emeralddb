@@ -7,6 +7,49 @@ import { listAlternatives } from '../format'
 
 const name = 'rulings'
 
+function color(ruling: RulingInput): number {
+  switch (ruling.source) {
+    case 'Developer ruling':
+      return 0x0000ff // Blue
+    default:
+      return 0x00ff00 // Green
+  }
+}
+
+const links = /\[([^\]]+)]\([^)]+\)/g // Matches `[some text](some link)` and captures `some text`
+function formatRulingText(rawText: string): string {
+  return rawText.replace(links, (_, text) => `\`${text}\``).trim()
+}
+
+function truncate(n: number, str: string): string {
+  if (str.length <= n) {
+    return str
+  }
+  const subString = str.substring(0, n - 1)
+  return subString.substring(0, subString.lastIndexOf(' ')) + '…'
+}
+
+/**
+ *
+ * @see https://discordjs.guide/popular-topics/embeds.html#embed-limits
+ */
+const toEmbed =
+  (card: CachedCard) =>
+  (ruling: RulingInput): EmbedBuilder =>
+    new EmbedBuilder()
+      .setColor(color(ruling))
+      .setAuthor({
+        name: truncate(256, card.name),
+        url: `https://www.emeralddb.org/card/${card.id}`,
+      })
+      .setTitle(truncate(256, `Rulling #${ruling.id}`))
+      .setURL(ruling.link)
+      .setThumbnail(card.image)
+      .setDescription(truncate(4096, formatRulingText(ruling.text)))
+      .setFooter({
+        text: truncate(2048, ruling.source),
+      })
+
 export const command: Command = {
   name,
   command: new SlashCommandBuilder()
@@ -61,47 +104,4 @@ export const command: Command = {
       throw e
     }
   },
-}
-
-/**
- *
- * @see https://discordjs.guide/popular-topics/embeds.html#embed-limits
- */
-const toEmbed =
-  (card: CachedCard) =>
-  (ruling: RulingInput): EmbedBuilder =>
-    new EmbedBuilder()
-      .setColor(color(ruling))
-      .setAuthor({
-        name: truncate(256, card.name),
-        url: `https://www.emeralddb.org/card/${card.id}`,
-      })
-      .setTitle(truncate(256, `Rulling #${ruling.id}`))
-      .setURL(ruling.link)
-      .setThumbnail(card.image)
-      .setDescription(truncate(4096, formatRulingText(ruling.text)))
-      .setFooter({
-        text: truncate(2048, ruling.source),
-      })
-
-function color(ruling: RulingInput): number {
-  switch (ruling.source) {
-    case 'Developer ruling':
-      return 0x0000ff // Blue
-    default:
-      return 0x00ff00 // Green
-  }
-}
-
-const links = /\[([^\]]+)]\([^)]+\)/g // Matches `[some text](some link)` and captures `some text`
-function formatRulingText(rawText: string): string {
-  return rawText.replace(links, (_, text) => `\`${text}\``).trim()
-}
-
-function truncate(n: number, str: string): string {
-  if (str.length <= n) {
-    return str
-  }
-  const subString = str.substring(0, n - 1)
-  return subString.substring(0, subString.lastIndexOf(' ')) + '…'
 }

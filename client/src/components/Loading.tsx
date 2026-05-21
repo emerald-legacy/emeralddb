@@ -1,6 +1,6 @@
 import { Container, Typography } from '@mui/material'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 export function Loading(): JSX.Element {
   return (

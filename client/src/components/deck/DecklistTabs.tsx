@@ -1,9 +1,9 @@
-import { DeckWithVersions, DecklistWithExtraInfo, Decklist as DecklistType } from '@5rdb/api'
-import { styled } from '@mui/material/styles';
-import { Box, Button, Grid, Tab, Tabs, Typography } from '@mui/material';
+import { DeckWithVersions, DecklistWithExtraInfo } from '@5rdb/api'
+import { styled } from '@mui/material/styles'
+import { Box, Button, Grid, Tab, Tabs, Typography } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { privateApi } from '../../api'
 import { Decklist } from './Decklist'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -14,39 +14,14 @@ import { EmeraldDBLink } from '../EmeraldDBLink'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { UiStoreQueries } from '../../providers/UiStoreProvider'
 
-const PREFIX = 'DecklistTabs';
+const PREFIX = 'DecklistTabs'
 
 const classes = {
   newDeckButton: `${PREFIX}-newDeckButton`,
   unselectedList: `${PREFIX}-unselectedList`,
   selectedList: `${PREFIX}-selectedList`,
-  deleteButton: `${PREFIX}-deleteButton`
-};
-
-const StyledTabPanel = styled(TabPanel)((
-  {
-    theme
-  }
-) => ({
-  [`& .${classes.newDeckButton}`]: {
-    marginBottom: 3,
-  },
-
-  [`& .${classes.unselectedList}`]: {
-    borderColor: 'lightgrey',
-  },
-
-  [`& .${classes.selectedList}`]: {
-    borderColor: theme.palette.primary.main,
-    backgroundColor: theme.palette.secondary.light,
-    color: theme.palette.secondary.contrastText,
-  },
-
-  [`& .${classes.deleteButton}`]: {
-    backgroundColor: theme.palette.error.main,
-    color: theme.palette.error.contrastText,
-  }
-}));
+  deleteButton: `${PREFIX}-deleteButton`,
+}
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -65,14 +40,31 @@ function TabPanel(props: TabPanelProps): JSX.Element {
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box>{children}</Box>}
     </div>
   )
 }
+
+const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
+  [`& .${classes.newDeckButton}`]: {
+    marginBottom: 3,
+  },
+
+  [`& .${classes.unselectedList}`]: {
+    borderColor: 'lightgrey',
+  },
+
+  [`& .${classes.selectedList}`]: {
+    borderColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.secondary.light,
+    color: theme.palette.secondary.contrastText,
+  },
+
+  [`& .${classes.deleteButton}`]: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+  },
+}))
 
 export function sortedVersionsForDeck(deck: DeckWithVersions): DecklistWithExtraInfo[] {
   return deck.versions.sort(
@@ -122,7 +114,11 @@ export function DecklistTabs(props: {
   }
 
   async function confirmDeletion(decklistId: string) {
-    const { confirmed } = await confirm({ title: 'Delete Version', description: 'Do you really want to delete this version of the deck?', confirmationText: 'Delete' })
+    const { confirmed } = await confirm({
+      title: 'Delete Version',
+      description: 'Do you really want to delete this version of the deck?',
+      confirmationText: 'Delete',
+    })
     if (!confirmed) return
     privateApi.Decklist.delete({ decklistId: decklistId })
       .then(() => {
@@ -138,13 +134,21 @@ export function DecklistTabs(props: {
   }
 
   async function publishDecklist(decklistId: string) {
-    const { confirmed } = await confirm({ title: 'Publish Decklist', description: 'Do you really want to publish this version of the deck?', confirmationText: 'Publish' })
+    const { confirmed } = await confirm({
+      title: 'Publish Decklist',
+      description: 'Do you really want to publish this version of the deck?',
+      confirmationText: 'Publish',
+    })
     if (!confirmed) return
     publishMutation.mutate(decklistId)
   }
 
   async function unpublishDecklist(decklistId: string) {
-    const { confirmed } = await confirm({ title: 'Unpublish Version', description: 'Do you really want to unpublish this version of the deck?', confirmationText: 'Unpublish' })
+    const { confirmed } = await confirm({
+      title: 'Unpublish Version',
+      description: 'Do you really want to unpublish this version of the deck?',
+      confirmationText: 'Unpublish',
+    })
     if (!confirmed) return
     privateApi.Decklist.unpublish({ decklistId: decklistId })
       .then(() => {
@@ -259,5 +263,5 @@ export function DecklistTabs(props: {
         </Grid>
       </Grid>
     </StyledTabPanel>
-  );
+  )
 }

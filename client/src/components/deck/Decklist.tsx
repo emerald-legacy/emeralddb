@@ -11,7 +11,7 @@ import { CardWithQuantity, createDeckStatistics } from './DeckValidator'
 import { CardQuantitySelector } from '../builder/CardQuantitySelector'
 import min from 'lodash/min'
 import { Loading } from '../Loading'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { CardFactionIcon } from '../card/CardFactionIcon'
 import { getImageUrl } from '../../utils/imageUrl'
 
@@ -82,7 +82,11 @@ export function ProvinceCardSubList(props: {
               quantity={card.quantity}
             />
           )}
-          <CardLink cardId={card.id} format={props.format} packId={props.cardPackIds?.[card.id]} />{' '}
+          <CardLink
+            cardId={card.id}
+            format={props.format}
+            packId={props.cardPackIds?.[card.id]}
+          />{' '}
         </Typography>
       ))}
     </>
@@ -211,7 +215,9 @@ export function Decklist(props: {
           <img
             src={getImageUrl(
               (decklist.card_pack_ids?.[stats.stronghold.id]
-                ? stats.stronghold.versions.find(v => v.pack_id === decklist.card_pack_ids![stats.stronghold!.id])
+                ? stats.stronghold.versions.find(
+                    (v) => v.pack_id === decklist.card_pack_ids![stats.stronghold!.id]
+                  )
                 : undefined
               )?.image_url || stats.stronghold.versions[0]?.image_url
             )}
@@ -221,7 +227,12 @@ export function Decklist(props: {
         )}
       </Grid>
       <Grid size={{ xs: 12, sm: 6, lg: 6 }}>
-        <Grid container justifyContent="space-between" direction="column" style={{ height: '100%' }}>
+        <Grid
+          container
+          justifyContent="space-between"
+          direction="column"
+          style={{ height: '100%' }}
+        >
           <Grid>
             {!props.withoutHeader && isLoggedIn() && (
               <Button
@@ -256,11 +267,23 @@ export function Decklist(props: {
                 <div>
                   {stats.stronghold && (
                     <b>
-                      <CardLink cardId={stats.stronghold.id} format={stats.format} packId={decklist.card_pack_ids?.[stats.stronghold.id]} />
+                      <CardLink
+                        cardId={stats.stronghold.id}
+                        format={stats.format}
+                        packId={decklist.card_pack_ids?.[stats.stronghold.id]}
+                      />
                     </b>
                   )}
                 </div>
-                <div>{stats.role && <CardLink cardId={stats.role.id} format={stats.format} packId={decklist.card_pack_ids?.[stats.role.id]} />}</div>
+                <div>
+                  {stats.role && (
+                    <CardLink
+                      cardId={stats.role.id}
+                      format={stats.format}
+                      packId={decklist.card_pack_ids?.[stats.role.id]}
+                    />
+                  )}
+                </div>
                 <ProvinceCardSubListWithTitle
                   cards={stats.provinces}
                   title="Provinces"
@@ -373,5 +396,5 @@ export function Decklist(props: {
         />
       </Grid>
     </Grid>
-  );
+  )
 }

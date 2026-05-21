@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, Grid, TextField, Typography } from '@mui/material'
 import { useNavigate } from 'react-router'
 import { privateApi } from '../api'
-import React, { useState, type JSX } from 'react';
+import React, { useState, type JSX } from 'react'
 import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useBetaEnvironment } from '../hooks/useBetaEnvironment'

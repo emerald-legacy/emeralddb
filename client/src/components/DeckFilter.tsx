@@ -1,12 +1,12 @@
-import { useEffect, useReducer, useState, type JSX } from 'react';
-import { styled } from '@mui/material/styles';
+import { useEffect, useReducer, useState, type JSX } from 'react'
+import { styled } from '@mui/material/styles'
 import { PublishedDecklist } from '@5rdb/api'
-import { Button, lighten, Grid, Paper, TextField } from '@mui/material';
+import { Button, lighten, Grid, Paper, TextField } from '@mui/material'
 import { clans } from '../utils/enums'
 import Autocomplete from '@mui/material/Autocomplete'
-import { useUiStore } from "../providers/UiStoreProvider";
+import { useUiStore } from '../providers/UiStoreProvider'
 
-const PREFIX = 'DeckFilter';
+const PREFIX = 'DeckFilter'
 
 const classes = {
   filter: `${PREFIX}-filter`,
@@ -16,14 +16,10 @@ const classes = {
   filterGridItem: `${PREFIX}-filterGridItem`,
   traitTextField: `${PREFIX}-traitTextField`,
   packDialog: `${PREFIX}-packDialog`,
-  packFilter: `${PREFIX}-packFilter`
-};
+  packFilter: `${PREFIX}-packFilter`,
+}
 
-const StyledPaper = styled(Paper)((
-  {
-    theme
-  }
-) => ({
+const StyledPaper = styled(Paper)(({ theme }) => ({
   [`&.${classes.filter}`]: {
     padding: theme.spacing(1),
   },
@@ -60,8 +56,8 @@ const StyledPaper = styled(Paper)((
 
   [`& .${classes.packFilter}`]: {
     minWidth: '60%',
-  }
-}));
+  },
+}))
 
 export interface DeckFilterState {
   format: string
@@ -126,7 +122,6 @@ export function DeckFilter(props: {
   filterState: DeckFilterState | undefined
   onFilterChanged: (filter: DeckFilterState) => void
 }): JSX.Element {
-
   const { relevantFormats } = useUiStore()
   const [initialFilterState] = useState<DeckFilterState>(props.filterState || initialState)
   const [filterState, dispatchFilter] = useReducer(filterReducer, initialFilterState)
@@ -204,5 +199,5 @@ export function DeckFilter(props: {
         </Grid>
       </Grid>
     </StyledPaper>
-  );
+  )
 }

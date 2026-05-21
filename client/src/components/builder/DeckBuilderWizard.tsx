@@ -10,7 +10,7 @@ import {
   Stepper,
   Typography,
 } from '@mui/material'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { clans } from '../../utils/enums'
 import { CardLink } from '../card/CardLink'
@@ -42,7 +42,7 @@ export function DeckBuilderWizard(props: {
     .filter((c) => {
       if (!chosenFormat) return true
       if (!chosenFormat.legal_packs || chosenFormat.legal_packs.length === 0) return true
-      return chosenFormat.legal_packs.some(packId => c.versions.some(v => v.pack_id === packId))
+      return chosenFormat.legal_packs.some((packId) => c.versions.some((v) => v.pack_id === packId))
     })
   const roles = cards.filter((c) => c.type === 'role' && !c.text?.includes('Draft format only.'))
 
@@ -140,7 +140,11 @@ export function DeckBuilderWizard(props: {
                   key={format.id}
                   value={format.id}
                   control={<Radio />}
-                  label={<div onClick={() => setFormat(format.id)} style={{ cursor: 'pointer' }}><FormatWithInfo format={format} /></div>}
+                  label={
+                    <div onClick={() => setFormat(format.id)} style={{ cursor: 'pointer' }}>
+                      <FormatWithInfo format={format} />
+                    </div>
+                  }
                   onClick={() => setFormat(format.id)}
                 />
               ))}
@@ -162,7 +166,10 @@ export function DeckBuilderWizard(props: {
                   value={clan.id}
                   control={<Radio />}
                   label={
-                    <span onClick={() => setPrimaryClan(clan.id)} style={{ fontSize: 18, cursor: 'pointer' }}>
+                    <span
+                      onClick={() => setPrimaryClan(clan.id)}
+                      style={{ fontSize: 18, cursor: 'pointer' }}
+                    >
                       <CardFactionIcon faction={clan.id} colored /> {clan.name}
                     </span>
                   }
@@ -217,8 +224,18 @@ export function DeckBuilderWizard(props: {
             <Typography variant="h6" align="center">
               Choose Role
             </Typography>
-            <Grid container spacing={{ xs: 0, sm: 2 }} style={{ minWidth: 550 }} justifyContent={{ xs: 'center', sm: 'flex-start' }} onMouseLeave={() => setHoveredCardId(null)}>
-              <Grid size={{ xs: 12, sm: 6 }} display="flex" justifyContent={{ xs: 'center', sm: 'flex-start' }}>
+            <Grid
+              container
+              spacing={{ xs: 0, sm: 2 }}
+              style={{ minWidth: 550 }}
+              justifyContent={{ xs: 'center', sm: 'flex-start' }}
+              onMouseLeave={() => setHoveredCardId(null)}
+            >
+              <Grid
+                size={{ xs: 12, sm: 6 }}
+                display="flex"
+                justifyContent={{ xs: 'center', sm: 'flex-start' }}
+              >
                 <RadioGroup
                   value={role}
                   onChange={(e) => setRole((e.target as HTMLInputElement).value)}
@@ -233,7 +250,7 @@ export function DeckBuilderWizard(props: {
                         marginBottom: 1,
                         marginLeft: 0,
                         marginRight: 0,
-                        '& .MuiFormControlLabel-label': { paddingLeft: 0 }
+                        '& .MuiFormControlLabel-label': { paddingLeft: 0 },
                       }}
                       label={
                         <div
@@ -259,7 +276,11 @@ export function DeckBuilderWizard(props: {
                   ))}
                 </RadioGroup>
               </Grid>
-              <Grid size={{ xs: 12, sm: 6 }} display="flex" justifyContent={{ xs: 'center', sm: 'flex-start' }}>
+              <Grid
+                size={{ xs: 12, sm: 6 }}
+                display="flex"
+                justifyContent={{ xs: 'center', sm: 'flex-start' }}
+              >
                 <RadioGroup
                   value={role}
                   onChange={(e) => setRole((e.target as HTMLInputElement).value)}
@@ -274,7 +295,7 @@ export function DeckBuilderWizard(props: {
                         marginBottom: 1,
                         marginLeft: 0,
                         marginRight: 0,
-                        '& .MuiFormControlLabel-label': { paddingLeft: 0 }
+                        '& .MuiFormControlLabel-label': { paddingLeft: 0 },
                       }}
                       label={
                         <div
@@ -362,5 +383,5 @@ export function DeckBuilderWizard(props: {
         </Grid>
       </Grid>
     </Grid>
-  );
+  )
 }
