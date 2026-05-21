@@ -1,6 +1,6 @@
 import { DeckWithVersions, DecklistWithExtraInfo, Decklist as DecklistType } from '@5rdb/api'
 import { styled } from '@mui/material/styles';
-import { Box, Button, Grid, Tab, Tabs, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Button, Grid, Tab, Tabs, Typography } from '@mui/material';
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { useState, type JSX } from 'react';
@@ -93,8 +93,6 @@ export function DecklistTabs(props: {
   const [currentDecklistId, setCurrentDecklistId] = useState(
     latestDecklistForDeck(deck)?.id || undefined
   )
-  const [publishModalOpen, setPublishModalOpen] = useState(false)
-  const [decklistToPublish, setDecklistToPublish] = useState<string | undefined>(undefined)
 
   const confirm = useConfirm()
   const { enqueueSnackbar } = useSnackbar()
@@ -111,10 +109,6 @@ export function DecklistTabs(props: {
       const message = error.data()
       enqueueSnackbar(`The decklist couldn't be published: ${message}!`, { variant: 'error' })
     },
-    onSettled: () => {
-      setPublishModalOpen(false)
-      setDecklistToPublish(undefined)
-    }
   })
 
   const versions = sortedVersionsForDeck(deck)
@@ -127,60 +121,42 @@ export function DecklistTabs(props: {
     )
   }
 
-  function confirmDeletion(decklistId: string) {
-    confirm({ description: 'Do you really want to delete this version of the deck?' })
+  async function confirmDeletion(decklistId: string) {
+    const { confirmed } = await confirm({ title: 'Delete Version', description: 'Do you really want to delete this version of the deck?', confirmationText: 'Delete' })
+    if (!confirmed) return
+    privateApi.Decklist.delete({ decklistId: decklistId })
       .then(() => {
-        privateApi.Decklist.delete({ decklistId: decklistId })
-          .then(() => {
-            props.onDecklistUpdated()
-            setCurrentDecklistId(latestDecklistForDeck(deck)?.id || undefined)
-            enqueueSnackbar('The decklist was deleted successfully!', { variant: 'success' })
-            queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
-          })
-          .catch((error) => {
-            const message = error.data()
-            enqueueSnackbar(`The decklist couldn't be deleted: ${message}!`, { variant: 'error' })
-          })
+        props.onDecklistUpdated()
+        setCurrentDecklistId(latestDecklistForDeck(deck)?.id || undefined)
+        enqueueSnackbar('The decklist was deleted successfully!', { variant: 'success' })
+        queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        const message = error.data()
+        enqueueSnackbar(`The decklist couldn't be deleted: ${message}!`, { variant: 'error' })
       })
   }
 
-  function handlePublishClick(decklistId: string) {
-    setDecklistToPublish(decklistId)
-    setPublishModalOpen(true)
+  async function publishDecklist(decklistId: string) {
+    const { confirmed } = await confirm({ title: 'Publish Decklist', description: 'Do you really want to publish this version of the deck?', confirmationText: 'Publish' })
+    if (!confirmed) return
+    publishMutation.mutate(decklistId)
   }
 
-  function handlePublishConfirm() {
-    if (decklistToPublish) {
-      publishMutation.mutate(decklistToPublish)
-    }
-  }
-
-  function handlePublishCancel() {
-    setPublishModalOpen(false)
-    setDecklistToPublish(undefined)
-  }
-
-  function unpublishDecklist(decklistId: string) {
-    confirm({ description: 'Do you really want to unpublish this version of the deck?' })
+  async function unpublishDecklist(decklistId: string) {
+    const { confirmed } = await confirm({ title: 'Unpublish Version', description: 'Do you really want to unpublish this version of the deck?', confirmationText: 'Unpublish' })
+    if (!confirmed) return
+    privateApi.Decklist.unpublish({ decklistId: decklistId })
       .then(() => {
-        privateApi.Decklist.unpublish({ decklistId: decklistId })
-          .then(() => {
-            props.onDecklistUpdated()
-            enqueueSnackbar('The decklist was unpublished successfully!', { variant: 'success' })
-            queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
-          })
-          .catch((error) => {
-            const message = error.data()
-            enqueueSnackbar(`The decklist couldn't be unpublished: ${message}!`, {
-              variant: 'error',
-            })
-          })
+        props.onDecklistUpdated()
+        enqueueSnackbar('The decklist was unpublished successfully!', { variant: 'success' })
+        queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        const message = error.data()
+        enqueueSnackbar(`The decklist couldn't be unpublished: ${message}!`, {
+          variant: 'error',
+        })
       })
   }
 
@@ -239,7 +215,7 @@ export function DecklistTabs(props: {
                           <Button
                             variant="outlined"
                             color="primary"
-                            onClick={() => handlePublishClick(v.id)}
+                            onClick={() => publishDecklist(v.id)}
                             fullWidth
                             size="small"
                             startIcon={<ShareIcon />}
@@ -282,20 +258,6 @@ export function DecklistTabs(props: {
           </Grid>
         </Grid>
       </Grid>
-      <Dialog open={publishModalOpen} onClose={handlePublishCancel}>
-        <DialogTitle>Publish Decklist</DialogTitle>
-        <DialogContent>
-          <Typography>Do you really want to publish this version of the deck?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handlePublishCancel} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handlePublishConfirm} color="secondary" variant="contained">
-            Publish
-          </Button>
-        </DialogActions>
-      </Dialog>
     </StyledTabPanel>
   );
 }
