@@ -14,7 +14,7 @@ import {
 import { useState, useEffect, type JSX } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { privateApi } from '../../api'
-import { getToken, hasAuth0Token, setToken } from '../../utils/auth'
+import { getToken, setToken } from '../../utils/auth'
 import { Queries } from '../HeaderBar'
 import { LoginButton } from './LoginButton'
 import { LogoutButton } from './LogoutButton'

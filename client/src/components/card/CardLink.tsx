@@ -1,4 +1,4 @@
-import { Popover, Theme } from '@mui/material'
+import { Popover } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useState, useEffect, type MouseEvent, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'

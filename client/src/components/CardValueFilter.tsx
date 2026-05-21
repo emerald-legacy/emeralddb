@@ -9,7 +9,7 @@ const classes = {
   button: `${PREFIX}-button`,
 }
 
-const StyledGrid = styled(Grid)(({ theme }) => ({
+const StyledGrid = styled(Grid)(() => ({
   [`& .${classes.button}`]: {
     height: 24,
     width: 24,

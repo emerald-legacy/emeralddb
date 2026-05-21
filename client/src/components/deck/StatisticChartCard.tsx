@@ -1,5 +1,5 @@
-import React, { type JSX } from 'react'
-import { Box, Grid, Paper, Typography } from '@mui/material'
+import { type JSX } from 'react'
+import { Grid, Paper, Typography } from '@mui/material'
 import { BarChart } from '@mui/x-charts/BarChart'
 
 interface StatisticChartCardProps {

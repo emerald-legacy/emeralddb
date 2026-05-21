@@ -12,8 +12,6 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import LinkIcon from '@mui/icons-material/Link'
 import { EmeraldDBLink } from '../EmeraldDBLink'
 import { getFactionName } from '../../utils/factionUtils'
-import { useUiStore } from '../../providers/UiStoreProvider'
-
 const PREFIX = 'DeckTabs'
 
 const classes = {
@@ -55,8 +53,6 @@ export function DeckTabs(props: {
   onDeckUpdated: () => void
 }): JSX.Element {
   const { decks } = props
-  const { formats } = useUiStore()
-
   const confirm = useConfirm()
   const { enqueueSnackbar } = useSnackbar()
   const [currentDeckId, setCurrentDeckId] = useState<string | undefined>()

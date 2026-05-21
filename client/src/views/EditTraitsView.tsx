@@ -17,7 +17,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useNavigate } from 'react-router'
 import { Loading } from '../components/Loading'
 import { useUiStore } from '../providers/UiStoreProvider'
 import React, { useState, type JSX } from 'react'
@@ -29,7 +28,6 @@ import DeleteIcon from '@mui/icons-material/Delete'
 
 export function EditTraitsView(): JSX.Element {
   const { traits, invalidateData } = useUiStore()
-  const navigate = useNavigate()
   const [editIndex, setEditIndex] = useState(-1)
   const [traitId, setTraitId] = useState('')
   const [traitName, setTraitName] = useState('')

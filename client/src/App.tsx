@@ -1,4 +1,3 @@
-import { Theme } from '@mui/material/styles'
 import {
   ThemeProvider,
   createTheme,

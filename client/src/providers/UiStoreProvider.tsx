@@ -1,7 +1,6 @@
 import { Pack, Cycle, Trait, CardWithVersions, Format, CardInPack } from '@5rdb/api'
 import { createContext, ReactNode, useContext, useMemo, type JSX } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { publicApi } from '../api'
 
 export interface UiStore {
   cards: CardWithVersions[]

@@ -20,7 +20,6 @@ import { CardInPack } from '@5rdb/api'
 import Autocomplete from '@mui/material/Autocomplete'
 import { privateApi } from '../api'
 import { useSnackbar } from 'notistack'
-import { useConfirm } from 'material-ui-confirm'
 import { getImageUrl } from '../utils/imageUrl'
 
 export function EditPackCardsView(): JSX.Element {
@@ -37,7 +36,6 @@ export function EditPackCardsView(): JSX.Element {
   const [modalOpen, setModalOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [cardToDelete, setCardToDelete] = useState<CardInPack | null>(null)
-  const confirm = useConfirm()
   const { enqueueSnackbar } = useSnackbar()
 
   function compareCardsInPack(a: CardInPack, b: CardInPack) {

@@ -9,7 +9,6 @@ import { getColorForFactionId } from '../utils/factionUtils'
 import { DecklistComments } from '../components/deck/DecklistComments'
 import { DeckStatisticsDisplay } from '../components/deck/DeckStatisticsDisplay'
 import { useUiStore } from '../providers/UiStoreProvider'
-import { Pack } from '@5rdb/api'
 
 import type { JSX } from 'react'
 

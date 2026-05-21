@@ -1,7 +1,6 @@
 import { CardWithVersions, Pack, Trait, CardInPack } from '@5rdb/api'
 import { Box, Grid, Paper, Typography, List, ListItem } from '@mui/material'
 import { useState, type JSX } from 'react'
-import { BarChart } from '@mui/x-charts/BarChart'
 import { StatisticChartCard } from './StatisticChartCard'
 import { useUiStore } from '../../providers/UiStoreProvider'
 

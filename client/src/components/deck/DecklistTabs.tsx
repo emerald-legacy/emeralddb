@@ -1,4 +1,4 @@
-import { DeckWithVersions, DecklistWithExtraInfo, Decklist as DecklistType } from '@5rdb/api'
+import { DeckWithVersions, DecklistWithExtraInfo } from '@5rdb/api'
 import { styled } from '@mui/material/styles'
 import { Box, Button, Grid, Tab, Tabs, Typography } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'

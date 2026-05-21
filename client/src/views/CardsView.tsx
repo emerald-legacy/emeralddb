@@ -1,5 +1,4 @@
 import {
-  Paper,
   useMediaQuery,
   Button,
   Dialog,
@@ -13,7 +12,6 @@ import {
   CardContent,
   Divider,
 } from '@mui/material'
-import { styled } from '@mui/material/styles'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { useNavigate, useLocation } from 'react-router'
 import { useUiStore } from '../providers/UiStoreProvider'
@@ -27,19 +25,6 @@ import { Loading } from '../components/Loading'
 import { CardLink } from '../components/card/CardLink'
 import { CardImageOrText } from '../components/card/CardImageOrText'
 import { Pagination } from '@mui/material'
-
-const PREFIX = 'CardsView'
-
-const classes = {
-  table: `${PREFIX}-table`,
-}
-
-// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')(({ theme }) => ({
-  [`& .${classes.table}`]: {
-    marginTop: theme.spacing(1),
-  },
-}))
 
 interface NameProps {
   id: string

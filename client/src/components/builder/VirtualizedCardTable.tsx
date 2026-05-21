@@ -220,7 +220,7 @@ export const VirtualizedCardTable: React.FC<MuiVirtualizedTableProps> = ({
     <StyledContainer ref={parentRef}>
       {/* Header */}
       <div className={classes.header} style={{ height: headerHeight }}>
-        {columns.map((column, columnIndex) => (
+        {columns.map((column) => (
           <TableCell
             key={column.columnType}
             component="div"
