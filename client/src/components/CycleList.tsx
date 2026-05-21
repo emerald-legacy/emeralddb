@@ -243,7 +243,7 @@ export function CycleList(props: {
 
   function createRootElement(): JSX.Element {
     return (
-      <List dense>
+      <StyledList dense>
         <ListItemButton onClick={() => toggleElementExpanded('root')}>
           {props.withCheckbox && (
             <ListItemIcon>
@@ -272,7 +272,7 @@ export function CycleList(props: {
             {cyclesWithPacks.map((cycle) => createCycleElement(cycle))}
           </List>
         </Collapse>
-      </List>
+      </StyledList>
     )
   }
 
