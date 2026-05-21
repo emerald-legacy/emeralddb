@@ -199,7 +199,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   const filteredCards = showAllCards ? cards : prefilterCards(cards, decklist, formats, true)
 
   function updateDeck(decklist: DecklistViewModel, deckId: string) {
-    const { stronghold, role, ...decklistToSave } = decklist as any
+    const { stronghold: _stronghold, role: _role, ...decklistToSave } = decklist as any
     const cardPackIds: Record<string, string> = {}
     for (const cardId of Object.keys(decklist.cards)) {
       const version = validCardVersionForFormat(cardId, decklist.format)

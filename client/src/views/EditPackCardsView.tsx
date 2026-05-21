@@ -141,7 +141,7 @@ export function EditPackCardsView(): JSX.Element {
     }
   }
 
-  function openEditModal(card: CardInPack, index: number) {
+  function openEditModal(card: CardInPack, _index: number) {
     setCardId(card.card_id)
     setFlavor(card.flavor || '')
     setIllustrator(card.illustrator || '')
