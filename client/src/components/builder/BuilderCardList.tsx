@@ -13,7 +13,7 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import min from 'lodash/min'
-import { useState, useMemo, type JSX } from 'react';
+import { useState, useMemo, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { convertTraitList } from '../../utils/cardTextUtils'
 import { applyFilters, CardFilter, FilterState } from '../CardFilter'
@@ -221,20 +221,20 @@ export function BuilderCardList(props: {
           card.military !== null && card.military !== undefined
             ? card.military
             : card.military_bonus !== null && card.military_bonus !== undefined
-            ? card.military_bonus
-            : card.type === 'character' || card.type === 'attachment'
-            ? '-'
-            : '',
+              ? card.military_bonus
+              : card.type === 'character' || card.type === 'attachment'
+                ? '-'
+                : '',
       },
       pol: {
         pol:
           card.political !== null && card.political !== undefined
             ? card.political
             : card.political_bonus !== null && card.political_bonus !== undefined
-            ? card.political_bonus
-            : card.type === 'character' || card.type === 'attachment'
-            ? '-'
-            : '',
+              ? card.political_bonus
+              : card.type === 'character' || card.type === 'attachment'
+                ? '-'
+                : '',
       },
       glory: {
         glory: card.glory?.toString() || '',
@@ -427,7 +427,15 @@ export function BuilderCardList(props: {
                 columns={columns}
               />
             )}
-            {displayMode === DisplayMode.IMAGES && <VirtualizedCardImages tableData={tableData} isSmOrSmaller={isSmOrSmaller} format={props.format} validCardVersionForFormat={validCardVersionForFormat} onCardClick={handleImageClick} />}
+            {displayMode === DisplayMode.IMAGES && (
+              <VirtualizedCardImages
+                tableData={tableData}
+                isSmOrSmaller={isSmOrSmaller}
+                format={props.format}
+                validCardVersionForFormat={validCardVersionForFormat}
+                onCardClick={handleImageClick}
+              />
+            )}
           </Grid>
         </Grid>
       </Paper>

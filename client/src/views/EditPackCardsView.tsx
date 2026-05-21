@@ -15,12 +15,12 @@ import { useParams } from 'react-router'
 import { Loading } from '../components/Loading'
 import { useUiStore } from '../providers/UiStoreProvider'
 import { RequestError } from '../components/RequestError'
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useState, type JSX } from 'react'
 import { CardInPack } from '@5rdb/api'
 import Autocomplete from '@mui/material/Autocomplete'
 import { privateApi } from '../api'
 import { useSnackbar } from 'notistack'
-import { useConfirm } from "material-ui-confirm";
+import { useConfirm } from 'material-ui-confirm'
 import { getImageUrl } from '../utils/imageUrl'
 
 export function EditPackCardsView(): JSX.Element {
@@ -42,29 +42,35 @@ export function EditPackCardsView(): JSX.Element {
 
   function compareCardsInPack(a: CardInPack, b: CardInPack) {
     const positionA = a.position || '0'
-    const positionANumber = Number.parseInt(positionA.replace(/\D/g,''));
-    const positionAExtra = positionA.replace(/[0-9]/g, '');
+    const positionANumber = Number.parseInt(positionA.replace(/\D/g, ''))
+    const positionAExtra = positionA.replace(/[0-9]/g, '')
 
     const positionB = b.position || '0'
-    const positionBNumber = Number.parseInt(positionB.replace(/\D/g,''));
-    const positionBExtra = positionB.replace(/[0-9]/g, '');
+    const positionBNumber = Number.parseInt(positionB.replace(/\D/g, ''))
+    const positionBExtra = positionB.replace(/[0-9]/g, '')
 
-    return positionANumber - positionBNumber || positionAExtra.localeCompare(positionBExtra) || a.card_id.localeCompare(b.card_id);
+    return (
+      positionANumber - positionBNumber ||
+      positionAExtra.localeCompare(positionBExtra) ||
+      a.card_id.localeCompare(b.card_id)
+    )
   }
 
   useEffect(() => {
     if (cards && params.id) {
-    const packCards = cards.filter((c) => c.versions.some((v) => v.pack_id === params.id))
-    const newCardsInPack: CardInPack[] = packCards.map((p) => {
-      const cardVersionInPack = p.versions.find((v) => v.pack_id === params.id)
-      return {
-        ...cardVersionInPack,
-        card_id: p.id,
-        pack_id: params.id!,
-        rotated: cardVersionInPack?.rotated || false,
-      }
-    }).sort((a, b) => compareCardsInPack(a, b))
-    setCardsInPack(newCardsInPack)
+      const packCards = cards.filter((c) => c.versions.some((v) => v.pack_id === params.id))
+      const newCardsInPack: CardInPack[] = packCards
+        .map((p) => {
+          const cardVersionInPack = p.versions.find((v) => v.pack_id === params.id)
+          return {
+            ...cardVersionInPack,
+            card_id: p.id,
+            pack_id: params.id!,
+            rotated: cardVersionInPack?.rotated || false,
+          }
+        })
+        .sort((a, b) => compareCardsInPack(a, b))
+      setCardsInPack(newCardsInPack)
     }
   }, [cards, params.id])
 
@@ -93,8 +99,8 @@ export function EditPackCardsView(): JSX.Element {
     try {
       await privateApi.CardInPack.update({
         body: {
-          cardInPack: newCard
-        }
+          cardInPack: newCard,
+        },
       })
       await invalidateData()
       enqueueSnackbar('Successfully posted pack card!', { variant: 'success' })
@@ -124,8 +130,8 @@ export function EditPackCardsView(): JSX.Element {
     try {
       await privateApi.CardInPack.delete({
         body: {
-          cardInPack: cardToDelete
-        }
+          cardInPack: cardToDelete,
+        },
       })
       await invalidateData()
       enqueueSnackbar('Successfully deleted card from pack!', { variant: 'success' })
@@ -187,10 +193,7 @@ export function EditPackCardsView(): JSX.Element {
                 >
                   Edit
                 </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => openDeleteDialog(card)}
-                >
+                <Button variant="contained" onClick={() => openDeleteDialog(card)}>
                   Delete
                 </Button>
               </Box>
@@ -308,5 +311,5 @@ export function EditPackCardsView(): JSX.Element {
         </DialogActions>
       </Dialog>
     </Grid>
-  );
+  )
 }

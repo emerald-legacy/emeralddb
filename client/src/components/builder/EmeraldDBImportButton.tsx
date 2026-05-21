@@ -9,7 +9,7 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 
 const emeraldDBPermalinkPrefix = 'https://www.emeralddb.org/decks/'
 const emeraldDBApiPrefix = 'https://www.emeralddb.org/api/decklists/'

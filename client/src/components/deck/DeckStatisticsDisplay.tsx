@@ -1,6 +1,6 @@
 import { CardWithVersions, Pack, Trait, CardInPack } from '@5rdb/api'
 import { Box, Grid, Paper, Typography, List, ListItem } from '@mui/material'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { BarChart } from '@mui/x-charts/BarChart'
 import { StatisticChartCard } from './StatisticChartCard'
 import { useUiStore } from '../../providers/UiStoreProvider'
@@ -18,33 +18,36 @@ function calculateRequiredPacks(
   allCards: CardWithVersions[],
   allPacks: Pack[],
   format: string,
-  validCardVersionForFormat: (cardId: string, format: string) => Omit<CardInPack, "card_id"> | undefined,
+  validCardVersionForFormat: (
+    cardId: string,
+    format: string
+  ) => Omit<CardInPack, 'card_id'> | undefined,
   cardPackIds?: Record<string, string>
 ): { packName: string; count: number }[] {
-  const packCountMap = new Map<string, number>(); // Map<packId, count>
+  const packCountMap = new Map<string, number>() // Map<packId, count>
 
   Object.entries(cards).forEach(([cardId, quantity]) => {
-    const card = allCards.find((c) => c.id === cardId);
+    const card = allCards.find((c) => c.id === cardId)
     if (card) {
-      const packId = cardPackIds?.[cardId] || validCardVersionForFormat(card.id, format)?.pack_id;
+      const packId = cardPackIds?.[cardId] || validCardVersionForFormat(card.id, format)?.pack_id
       if (packId) {
-        const currentCount = packCountMap.get(packId) || 0;
-        packCountMap.set(packId, currentCount + quantity);
+        const currentCount = packCountMap.get(packId) || 0
+        packCountMap.set(packId, currentCount + quantity)
       }
     }
-  });
+  })
 
-  const requiredPacks: { packName: string; count: number }[] = [];
+  const requiredPacks: { packName: string; count: number }[] = []
   packCountMap.forEach((count, packId) => {
-    const pack = allPacks.find((p) => p.id === packId);
+    const pack = allPacks.find((p) => p.id === packId)
     if (pack) {
-      requiredPacks.push({ packName: pack.name, count });
+      requiredPacks.push({ packName: pack.name, count })
     }
-  });
+  })
 
-  requiredPacks.sort((a, b) => a.packName.localeCompare(b.packName));
+  requiredPacks.sort((a, b) => a.packName.localeCompare(b.packName))
 
-  return requiredPacks;
+  return requiredPacks
 }
 
 function calculateTraitCounts(
@@ -182,7 +185,13 @@ function calculateAverageStat(
   return totalCards > 0 ? totalStat / totalCards : 0
 }
 
-export function DeckStatisticsDisplay({ cards, allCards, allPacks, format, cardPackIds }: DeckStatisticsDisplayProps): JSX.Element {
+export function DeckStatisticsDisplay({
+  cards,
+  allCards,
+  allPacks,
+  format,
+  cardPackIds,
+}: DeckStatisticsDisplayProps): JSX.Element {
   const { traits, validCardVersionForFormat } = useUiStore()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isConflictTraitsExpanded, setIsConflictTraitsExpanded] = useState(false)
@@ -199,13 +208,20 @@ export function DeckStatisticsDisplay({ cards, allCards, allPacks, format, cardP
   const dynastyTraitCounts = calculateTraitCounts(cards, allCards, traits, 'dynasty')
   const conflictTraitCounts = calculateTraitCounts(cards, allCards, traits, 'conflict')
 
-  const dynastyFateCost = calculateFateCostDistributionForDeck(cards, allCards, 'dynasty');
-  const conflictFateCost = calculateFateCostDistributionForDeck(cards, allCards, 'conflict');
+  const dynastyFateCost = calculateFateCostDistributionForDeck(cards, allCards, 'dynasty')
+  const conflictFateCost = calculateFateCostDistributionForDeck(cards, allCards, 'conflict')
 
-  const averageDynastyFateCost = calculateAverageFateCostForDeck(cards, allCards, 'dynasty');
-  const averageConflictFateCost = calculateAverageFateCostForDeck(cards, allCards, 'conflict');
+  const averageDynastyFateCost = calculateAverageFateCostForDeck(cards, allCards, 'dynasty')
+  const averageConflictFateCost = calculateAverageFateCostForDeck(cards, allCards, 'conflict')
 
-  const requiredPacks = calculateRequiredPacks(cards, allCards, allPacks, format, validCardVersionForFormat, cardPackIds);
+  const requiredPacks = calculateRequiredPacks(
+    cards,
+    allCards,
+    allPacks,
+    format,
+    validCardVersionForFormat,
+    cardPackIds
+  )
 
   return (
     <Box p={1}>
@@ -257,11 +273,13 @@ export function DeckStatisticsDisplay({ cards, allCards, allPacks, format, cardP
               {isExpanded ? 'All Dynasty Traits' : 'Top 5 Dynasty Traits'}
             </Typography>
             <List dense>
-              {(isExpanded ? dynastyTraitCounts : dynastyTraitCounts.slice(0, 5)).map(({ trait, count }) => (
-                <ListItem key={trait} sx={{ py: 0 }}>
-                  <strong>{trait}</strong>: {count}
-                </ListItem>
-              ))}
+              {(isExpanded ? dynastyTraitCounts : dynastyTraitCounts.slice(0, 5)).map(
+                ({ trait, count }) => (
+                  <ListItem key={trait} sx={{ py: 0 }}>
+                    <strong>{trait}</strong>: {count}
+                  </ListItem>
+                )
+              )}
             </List>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
               {dynastyTraitCounts.length > 5 && !isExpanded && (
@@ -293,7 +311,10 @@ export function DeckStatisticsDisplay({ cards, allCards, allPacks, format, cardP
               {isConflictTraitsExpanded ? 'All Conflict Traits' : 'Top 5 Conflict Traits'}
             </Typography>
             <List dense>
-              {(isConflictTraitsExpanded ? conflictTraitCounts : conflictTraitCounts.slice(0, 5)).map(({ trait, count }) => (
+              {(isConflictTraitsExpanded
+                ? conflictTraitCounts
+                : conflictTraitCounts.slice(0, 5)
+              ).map(({ trait, count }) => (
                 <ListItem key={trait} sx={{ py: 0 }}>
                   <strong>{trait}</strong>: {count}
                 </ListItem>

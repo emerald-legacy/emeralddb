@@ -7,19 +7,25 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow,
+  Grid,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
-  Typography
-} from "@mui/material";
-import { useNavigate} from 'react-router'
+  Typography,
+} from '@mui/material'
+import { useNavigate } from 'react-router'
 import { Loading } from '../components/Loading'
 import { useUiStore } from '../providers/UiStoreProvider'
-import React, { useState, type JSX } from 'react';
-import { Trait } from "@5rdb/api";
+import React, { useState, type JSX } from 'react'
+import { Trait } from '@5rdb/api'
 import { privateApi } from '../api'
 import { useSnackbar } from 'notistack'
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from '@mui/icons-material/Edit'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 export function EditTraitsView(): JSX.Element {
   const { traits, invalidateData } = useUiStore()
@@ -109,37 +115,32 @@ export function EditTraitsView(): JSX.Element {
                 </Button>
               </Box>
               <Table size="small">
-        <TableHead>
-          <TableCell>
-            Trait ID
-          </TableCell>
-          <TableCell>
-            Trait Display Name
-          </TableCell>
-          <TableCell>
-            Actions
-          </TableCell>
-        </TableHead>
-        <TableBody>
-          {sortedTraits.map((trait, index) => (
-            <TableRow key={trait.id}>
-              <TableCell>{trait.id}</TableCell>
-              <TableCell>{trait.name}</TableCell>
-              <TableCell>
-                <IconButton
-                  color='secondary'
-                  onClick={() => openEditModal(trait, index)}
-                  size="large">
-                  <EditIcon />
-                </IconButton>
-                <IconButton onClick={() => openDeleteDialog(trait)} size="large">
-                  <DeleteIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                <TableHead>
+                  <TableCell>Trait ID</TableCell>
+                  <TableCell>Trait Display Name</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableHead>
+                <TableBody>
+                  {sortedTraits.map((trait, index) => (
+                    <TableRow key={trait.id}>
+                      <TableCell>{trait.id}</TableCell>
+                      <TableCell>{trait.name}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          color="secondary"
+                          onClick={() => openEditModal(trait, index)}
+                          size="large"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton onClick={() => openDeleteDialog(trait)} size="large">
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         </Grid>
@@ -192,5 +193,5 @@ export function EditTraitsView(): JSX.Element {
         </DialogActions>
       </Dialog>
     </Box>
-  );
+  )
 }

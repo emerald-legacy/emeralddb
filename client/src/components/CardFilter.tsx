@@ -1,5 +1,5 @@
-import { useEffect, useReducer, useState, type JSX } from 'react';
-import { styled } from '@mui/material/styles';
+import { useEffect, useReducer, useState, type JSX } from 'react'
+import { styled } from '@mui/material/styles'
 import { CardWithVersions, Trait, RoleRestriction, Format } from '@5rdb/api'
 import {
   Button,
@@ -15,14 +15,8 @@ import {
   Tooltip,
   Typography,
   Collapse,
-} from '@mui/material';
-import {
-  factions,
-  cardTypes,
-  sides,
-  elements,
-  roleRestrictions,
-} from '../utils/enums'
+} from '@mui/material'
+import { factions, cardTypes, sides, elements, roleRestrictions } from '../utils/enums'
 import { CardTypeIcon } from './card/CardTypeIcon'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useUiStore } from '../providers/UiStoreProvider'
@@ -32,7 +26,7 @@ import { isEqual } from 'lodash'
 import { CardValueFilter, ValueFilterType } from './CardValueFilter'
 import { ElementSymbol } from './card/ElementSymbol'
 
-const PREFIX = 'CardFilter';
+const PREFIX = 'CardFilter'
 
 const classes = {
   filter: `${PREFIX}-filter`,
@@ -44,14 +38,10 @@ const classes = {
   filterGridItemBuilder: `${PREFIX}-filterGridItemBuilder`,
   traitTextField: `${PREFIX}-traitTextField`,
   packDialog: `${PREFIX}-packDialog`,
-  packFilter: `${PREFIX}-packFilter`
-};
+  packFilter: `${PREFIX}-packFilter`,
+}
 
-const StyledPaper = styled(Paper)((
-  {
-    theme
-  }
-) => ({
+const StyledPaper = styled(Paper)(({ theme }) => ({
   [`&.${classes.filter}`]: {
     padding: theme.spacing(1),
   },
@@ -99,8 +89,8 @@ const StyledPaper = styled(Paper)((
 
   [`& .${classes.packFilter}`]: {
     minWidth: '60%',
-  }
-}));
+  },
+}))
 
 enum NumericCardValue {
   COST,
@@ -287,7 +277,9 @@ function replaceSpecialCharacters(text: string): string {
 }
 
 function buildTriggeredAbilityVariants(selectedAbility: string): string[] {
-  const abilityType = selectedAbility.replace(/<b>(?:Forced |Conflict |\[conflict-(?:military|political)\] Conflict )?/, '').replace('</b>', '')
+  const abilityType = selectedAbility
+    .replace(/<b>(?:Forced |Conflict |\[conflict-(?:military|political)\] Conflict )?/, '')
+    .replace('</b>', '')
   const variants = [selectedAbility]
 
   if (selectedAbility === `<b>${abilityType}</b>`) {
@@ -309,9 +301,13 @@ function buildTriggeredAbilityVariants(selectedAbility: string): string[] {
   return variants
 }
 
-export function applyFilters(cards: CardWithVersions[], formats: Format[], filter: FilterState): CardWithVersions[] {
+export function applyFilters(
+  cards: CardWithVersions[],
+  formats: Format[],
+  filter: FilterState
+): CardWithVersions[] {
   let filteredCards = cards
-  let chosenFormat = filter.format && formats.find(format => format.id === filter.format)
+  let chosenFormat = filter.format && formats.find((format) => format.id === filter.format)
   if (chosenFormat) {
     let legalPacksOfFormat = chosenFormat.legal_packs || []
     if (filter.banned === 'only' || filter.restricted === 'only') {
@@ -323,8 +319,10 @@ export function applyFilters(cards: CardWithVersions[], formats: Format[], filte
     } else {
       if (filter.illegal === 'false') {
         filteredCards = filteredCards.filter((c) =>
-          c.versions.some((version) =>
-            legalPacksOfFormat.some((pack) => version.pack_id === pack) && (chosenFormat.id != 'emerald' || !version.rotated)
+          c.versions.some(
+            (version) =>
+              legalPacksOfFormat.some((pack) => version.pack_id === pack) &&
+              (chosenFormat.id != 'emerald' || !version.rotated)
           )
         )
       }
@@ -353,14 +351,12 @@ export function applyFilters(cards: CardWithVersions[], formats: Format[], filte
   if (filter.action) {
     const variants = buildTriggeredAbilityVariants(filter.action)
     filteredCards = filteredCards.filter((c) =>
-      variants.some(variant => c.text?.includes(variant))
+      variants.some((variant) => c.text?.includes(variant))
     )
   }
   if (filter.keyword) {
     const keywordRegex = new RegExp(`\\b${filter.keyword}\\b`)
-    filteredCards = filteredCards.filter((c) =>
-      c.text && keywordRegex.test(c.text)
-    )
+    filteredCards = filteredCards.filter((c) => c.text && keywordRegex.test(c.text))
   }
   if (filter.elements && filter.elements.length > 0) {
     filteredCards = filteredCards.filter((c) =>
@@ -391,7 +387,9 @@ export function applyFilters(cards: CardWithVersions[], formats: Format[], filte
         c.id.toLocaleLowerCase().includes(query) ||
         replaceSpecialCharacters(c.text || '').includes(query) ||
         c.traits?.some((trait) => trait.toLowerCase().includes(query)) ||
-        c.versions?.some((version) => replaceSpecialCharacters(version.illustrator || '').includes(query))
+        c.versions?.some((version) =>
+          replaceSpecialCharacters(version.illustrator || '').includes(query)
+        )
     )
   }
   return filteredCards
@@ -481,7 +479,9 @@ function renderTriggeredAbilityInputWithIcon(
             <span className={`icon icon-${selectedOption.icon}`} style={{ marginRight: 2 }} />
             {params.InputProps.startAdornment}
           </>
-        ) : params.InputProps.startAdornment,
+        ) : (
+          params.InputProps.startAdornment
+        ),
       }}
     />
   )
@@ -493,7 +493,6 @@ export function CardFilter(props: {
   fullWidth?: boolean
   deckbuilder?: boolean
 }): JSX.Element {
-
   const { traits, relevantFormats } = useUiStore()
   const [initialFilterState, setInitialFilterState] = useState<FilterState>(
     props.filterState || initialState
@@ -518,29 +517,30 @@ export function CardFilter(props: {
     { id: 'only', name: 'Only' },
   ]
 
-  const triggeredAbilityOptions: { id: string; name: string; searchText: string; icon?: string }[] = [
-    { id: 'action:', name: 'Action', searchText: '<b>Action:</b>' },
-    { id: 'conflict-action:', name: 'Conflict Action', searchText: '<b>Conflict Action:</b>' },
-    {
-      id: 'conflict-military-action:',
-      name: 'Conflict Action',
-      searchText: '<b>[conflict-military] Conflict Action:</b>',
-      icon: 'conflict-military',
-    },
-    {
-      id: 'conflict-political-action:',
-      name: 'Conflict Action',
-      searchText: '<b>[conflict-political] Conflict Action:</b>',
-      icon: 'conflict-political',
-    },
-    { id: 'reaction:', name: 'Reaction', searchText: '<b>Reaction:</b>' },
-    { id: 'forced-reaction:', name: 'Forced Reaction', searchText: '<b>Forced Reaction:</b>' },
-    { id: 'interrupt:', name: 'Interrupt', searchText: '<b>Interrupt:</b>' },
-    { id: 'forced-interrupt:', name: 'Forced Interrupt', searchText: '<b>Forced Interrupt:</b>' },
-    { id: 'duel-challenge:', name: 'Duel Challenge', searchText: '<b>Duel Challenge:</b>' },
-    { id: 'duel-focus:', name: 'Duel Focus', searchText: '<b>Duel Focus:</b>' },
-    { id: 'duel-strike:', name: 'Duel Strike', searchText: '<b>Duel Strike:</b>' },
-  ]
+  const triggeredAbilityOptions: { id: string; name: string; searchText: string; icon?: string }[] =
+    [
+      { id: 'action:', name: 'Action', searchText: '<b>Action:</b>' },
+      { id: 'conflict-action:', name: 'Conflict Action', searchText: '<b>Conflict Action:</b>' },
+      {
+        id: 'conflict-military-action:',
+        name: 'Conflict Action',
+        searchText: '<b>[conflict-military] Conflict Action:</b>',
+        icon: 'conflict-military',
+      },
+      {
+        id: 'conflict-political-action:',
+        name: 'Conflict Action',
+        searchText: '<b>[conflict-political] Conflict Action:</b>',
+        icon: 'conflict-political',
+      },
+      { id: 'reaction:', name: 'Reaction', searchText: '<b>Reaction:</b>' },
+      { id: 'forced-reaction:', name: 'Forced Reaction', searchText: '<b>Forced Reaction:</b>' },
+      { id: 'interrupt:', name: 'Interrupt', searchText: '<b>Interrupt:</b>' },
+      { id: 'forced-interrupt:', name: 'Forced Interrupt', searchText: '<b>Forced Interrupt:</b>' },
+      { id: 'duel-challenge:', name: 'Duel Challenge', searchText: '<b>Duel Challenge:</b>' },
+      { id: 'duel-focus:', name: 'Duel Focus', searchText: '<b>Duel Focus:</b>' },
+      { id: 'duel-strike:', name: 'Duel Strike', searchText: '<b>Duel Strike:</b>' },
+    ]
 
   const keywordOptions: { id: string; name: string; searchText: string }[] = [
     { id: 'ancestral', name: 'Ancestral', searchText: 'Ancestral' },
@@ -677,7 +677,9 @@ export function CardFilter(props: {
             fullWidth
             variant="outlined"
             size="small"
-            label={props.deckbuilder ? 'Search...' : 'Search for card name, ability text, artist...'}
+            label={
+              props.deckbuilder ? 'Search...' : 'Search for card name, ability text, artist...'
+            }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -701,7 +703,8 @@ export function CardFilter(props: {
                     className={
                       props.deckbuilder ? classes.filterGridItemBuilder : classes.filterGridItem
                     }
-                   size={12}>
+                    size={12}
+                  >
                     <ButtonGroup fullWidth className={classes.buttonGroup}>
                       {visibleFactions.map((faction) => (
                         <Tooltip key={faction.id} title={faction.name}>
@@ -732,7 +735,8 @@ export function CardFilter(props: {
                     className={
                       props.deckbuilder ? classes.filterGridItemBuilder : classes.filterGridItem
                     }
-                   size={12}>
+                    size={12}
+                  >
                     <ButtonGroup fullWidth className={classes.buttonGroup}>
                       {visibleCardtypes.map((type) => (
                         <Tooltip key={type.id} title={type.name}>
@@ -762,7 +766,8 @@ export function CardFilter(props: {
                       className={
                         props.deckbuilder ? classes.filterGridItemBuilder : classes.filterGridItem
                       }
-                     size={12}>
+                      size={12}
+                    >
                       <ButtonGroup fullWidth className={classes.buttonGroup}>
                         {elements.map((element) => (
                           <Tooltip key={element.id} title={element.name}>
@@ -798,7 +803,8 @@ export function CardFilter(props: {
                     className={
                       props.deckbuilder ? classes.filterGridItemBuilder : classes.filterGridItem
                     }
-                   size={12}>
+                    size={12}
+                  >
                     <ButtonGroup fullWidth className={classes.buttonGroup}>
                       {visibleSides.map((side) => (
                         <Tooltip key={side.id} title={side.name}>
@@ -905,17 +911,28 @@ export function CardFilter(props: {
                       autoHighlight
                       options={triggeredAbilityOptions}
                       getOptionLabel={(option) => option.name}
-                      value={triggeredAbilityOptions.find((option) => option.searchText === filterState.action) || null}
+                      value={
+                        triggeredAbilityOptions.find(
+                          (option) => option.searchText === filterState.action
+                        ) || null
+                      }
                       renderOption={(props, option) => (
                         <li {...props} key={option.id}>
-                          {option.icon && <span className={`icon icon-${option.icon}`} style={{ marginRight: 8 }} />}
+                          {option.icon && (
+                            <span
+                              className={`icon icon-${option.icon}`}
+                              style={{ marginRight: 8 }}
+                            />
+                          )}
                           {option.name}
                         </li>
                       )}
                       renderInput={(params) =>
                         renderTriggeredAbilityInputWithIcon(
                           params,
-                          triggeredAbilityOptions.find((option) => option.searchText === filterState.action)
+                          triggeredAbilityOptions.find(
+                            (option) => option.searchText === filterState.action
+                          )
                         )
                       }
                       onChange={(e, value) =>
@@ -932,7 +949,11 @@ export function CardFilter(props: {
                       autoHighlight
                       options={keywordOptions}
                       getOptionLabel={(option) => option.name}
-                      value={keywordOptions.find((option) => option.searchText === filterState.keyword) || null}
+                      value={
+                        keywordOptions.find(
+                          (option) => option.searchText === filterState.keyword
+                        ) || null
+                      }
                       renderInput={(params) => (
                         <TextField {...params} size="small" label="Keyword" variant="outlined" />
                       )}
@@ -1040,7 +1061,9 @@ export function CardFilter(props: {
                       autoHighlight
                       options={restrictedBannedOptions}
                       getOptionLabel={(option) => option?.name || ''}
-                      value={restrictedBannedOptions.find((option) => option.id === filterState.restricted)}
+                      value={restrictedBannedOptions.find(
+                        (option) => option.id === filterState.restricted
+                      )}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -1064,7 +1087,9 @@ export function CardFilter(props: {
                       options={restrictedBannedOptions}
                       disabled={!filterState.format}
                       getOptionLabel={(option) => option?.name || ''}
-                      value={restrictedBannedOptions.find((option) => option.id === filterState.banned)}
+                      value={restrictedBannedOptions.find(
+                        (option) => option.id === filterState.banned
+                      )}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -1133,5 +1158,5 @@ export function CardFilter(props: {
         </DialogActions>
       </Dialog>
     </StyledPaper>
-  );
+  )
 }

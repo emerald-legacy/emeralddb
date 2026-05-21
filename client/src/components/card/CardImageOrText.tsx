@@ -1,33 +1,31 @@
-import { Fab } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Fab } from '@mui/material'
+import { styled } from '@mui/material/styles'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { CardInformation } from './CardInformation'
 import ZoomInIcon from '@mui/icons-material/ZoomIn'
-import { CardInPack } from "@5rdb/api";
+import { CardInPack } from '@5rdb/api'
 import { getImageUrl } from '../../utils/imageUrl'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
-const PREFIX = 'CardImageOrText';
+const PREFIX = 'CardImageOrText'
 
 const classes = {
-  fab: `${PREFIX}-fab`
-};
+  fab: `${PREFIX}-fab`,
+}
 
-const Root = styled('div')(({
-  theme
-}) => ({
+const Root = styled('div')(({ theme }) => ({
   [`& .${classes.fab}`]: {
     position: 'absolute',
     bottom: theme.spacing(4),
     right: theme.spacing(0.5),
-  }
-}));
+  },
+}))
 
 export function CardImageOrText(props: {
   cardId: string
   onClick?: (id: string) => void
-  cardVersion: Omit<CardInPack, "card_id"> | undefined
+  cardVersion: Omit<CardInPack, 'card_id'> | undefined
   showFab?: boolean
 }): JSX.Element {
   const { cards } = useUiStore()
@@ -55,15 +53,10 @@ export function CardImageOrText(props: {
         <CardInformation cardWithVersions={card} currentVersion={cardVersion} />
       )}
       {showFab && (
-        <Fab
-          className={classes.fab}
-          color={'secondary'}
-          size="small"
-          onClick={handleClick}
-        >
+        <Fab className={classes.fab} color={'secondary'} size="small" onClick={handleClick}>
           <ZoomInIcon />
         </Fab>
       )}
     </Root>
-  );
+  )
 }

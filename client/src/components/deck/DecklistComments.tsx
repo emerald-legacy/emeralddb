@@ -5,7 +5,7 @@ import { EmptyState } from '../EmptyState'
 import { Button, Grid, TextField, Typography } from '@mui/material'
 import { DecklistCommentWithUser } from '@5rdb/api'
 import { DecklistComment } from './DecklistComment'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { useSnackbar } from 'notistack'
 import ReplyIcon from '@mui/icons-material/Reply'
 import { privateApi } from '../../api'

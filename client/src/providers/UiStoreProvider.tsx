@@ -1,5 +1,5 @@
-import { Pack, Cycle, Trait, CardWithVersions, Format, CardInPack } from "@5rdb/api";
-import { createContext, ReactNode, useContext, useMemo, type JSX } from 'react';
+import { Pack, Cycle, Trait, CardWithVersions, Format, CardInPack } from '@5rdb/api'
+import { createContext, ReactNode, useContext, useMemo, type JSX } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { publicApi } from '../api'
 
@@ -10,7 +10,10 @@ export interface UiStore {
   traits: Trait[]
   formats: Format[]
   relevantFormats: Format[]
-  validCardVersionForFormat: (cardId: string, formatId: string) => Omit<CardInPack, 'card_id'> | undefined
+  validCardVersionForFormat: (
+    cardId: string,
+    formatId: string
+  ) => Omit<CardInPack, 'card_id'> | undefined
   invalidateData: () => Promise<void>
   isLoading: boolean
 }
@@ -43,10 +46,10 @@ async function fetchWithCacheBusting<T>(endpoint: string): Promise<T> {
   const response = await fetch(`${endpoint}?_t=${timestamp}`, {
     cache: 'no-store',
     headers: {
-      'Cache-Control': 'no-cache'
-    }
+      'Cache-Control': 'no-cache',
+    },
   })
-  return await response.json() as T
+  return (await response.json()) as T
 }
 
 export function UiStoreProvider(props: { children: ReactNode }): JSX.Element {
@@ -79,10 +82,7 @@ export function UiStoreProvider(props: { children: ReactNode }): JSX.Element {
   })
 
   // Compute relevant formats
-  const relevantFormats = useMemo(
-    () => formats.filter(format => format.supported),
-    [formats]
-  )
+  const relevantFormats = useMemo(() => formats.filter((format) => format.supported), [formats])
 
   // Check if any query is loading
   const isLoading = formatsLoading
@@ -100,7 +100,7 @@ export function UiStoreProvider(props: { children: ReactNode }): JSX.Element {
       queryClient.refetchQueries({ queryKey: UiStoreQueries.PACKS, exact: true }),
       queryClient.refetchQueries({ queryKey: UiStoreQueries.CYCLES, exact: true }),
       queryClient.refetchQueries({ queryKey: UiStoreQueries.TRAITS, exact: true }),
-      queryClient.refetchQueries({ queryKey: UiStoreQueries.FORMATS, exact: true })
+      queryClient.refetchQueries({ queryKey: UiStoreQueries.FORMATS, exact: true }),
     ])
   }
 
@@ -109,12 +109,12 @@ export function UiStoreProvider(props: { children: ReactNode }): JSX.Element {
     const cache = new Map<string, Map<string, Omit<CardInPack, 'card_id'>>>()
 
     // Build lookup table for each format
-    formats.forEach(format => {
+    formats.forEach((format) => {
       const formatCache = new Map<string, Omit<CardInPack, 'card_id'>>()
       const legalPacks = format.legal_packs || []
 
-      cards.forEach(card => {
-        const validVersion = card.versions.find(v => legalPacks.includes(v.pack_id))
+      cards.forEach((card) => {
+        const validVersion = card.versions.find((v) => legalPacks.includes(v.pack_id))
         if (validVersion) {
           formatCache.set(card.id, validVersion)
         }

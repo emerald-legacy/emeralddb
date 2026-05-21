@@ -1,6 +1,6 @@
 import { getColorForFactionId } from '../../utils/factionUtils'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 export function InfluenceElement(props: { faction: string; influence: number }): JSX.Element {
   if (props.faction === 'shadowlands' || props.faction === 'neutral' || props.influence < 0) {

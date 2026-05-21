@@ -1,5 +1,5 @@
-import React, { useEffect, useState, type JSX } from "react";
-import { styled } from '@mui/material/styles';
+import React, { useEffect, useState, type JSX } from 'react'
+import { styled } from '@mui/material/styles'
 import {
   Button,
   Container,
@@ -14,7 +14,7 @@ import {
   Typography,
   Card,
   CardContent,
-} from "@mui/material";
+} from '@mui/material'
 import { useNavigate, useParams } from 'react-router'
 import { EmptyState } from '../components/EmptyState'
 import { Loading } from '../components/Loading'
@@ -32,18 +32,14 @@ import { useSnackbar } from 'notistack'
 import { toSlugId } from '../utils/slugIdUtils'
 import { getImageUrl } from '../utils/imageUrl'
 
-const PREFIX = 'CardDetailView';
+const PREFIX = 'CardDetailView'
 
 const classes = {
   unselected: `${PREFIX}-unselected`,
-  selected: `${PREFIX}-selected`
-};
+  selected: `${PREFIX}-selected`,
+}
 
-const StyledContainer = styled(Container)((
-  {
-    theme
-  }
-) => ({
+const StyledContainer = styled(Container)(({ theme }) => ({
   [`& .${classes.unselected}`]: {
     borderColor: 'lightgrey',
   },
@@ -52,8 +48,8 @@ const StyledContainer = styled(Container)((
     borderColor: theme.palette.primary.main,
     backgroundColor: theme.palette.secondary.light,
     color: theme.palette.secondary.contrastText,
-  }
-}));
+  },
+}))
 
 export function CardDetailView(): JSX.Element {
   const params = useParams<{ id: string }>()
@@ -72,7 +68,6 @@ export function CardDetailView(): JSX.Element {
   const { enqueueSnackbar } = useSnackbar()
 
   const navigate = useNavigate()
-
 
   useEffect(() => {
     if (data.data) {
@@ -112,7 +107,11 @@ export function CardDetailView(): JSX.Element {
   }
 
   async function confirmDeletion() {
-    const { confirmed } = await confirm({ title: 'Delete Card', description: 'Do you really want to delete this card?', confirmationText: 'Delete' })
+    const { confirmed } = await confirm({
+      title: 'Delete Card',
+      description: 'Do you really want to delete this card?',
+      confirmationText: 'Delete',
+    })
     if (!confirmed) return
     privateApi.Card.delete({
       cardId: card.id,
@@ -133,7 +132,11 @@ export function CardDetailView(): JSX.Element {
   }
 
   async function confirmRename() {
-    const { confirmed } = await confirm({ title: 'Rename Card', description: 'Do you really want to rename this card?', confirmationText: 'Rename' })
+    const { confirmed } = await confirm({
+      title: 'Rename Card',
+      description: 'Do you really want to rename this card?',
+      confirmationText: 'Rename',
+    })
     if (!confirmed) return
     privateApi.Card.rename({
       cardId: card.id,
@@ -155,95 +158,108 @@ export function CardDetailView(): JSX.Element {
   }
 
   return (
-    <StyledContainer style={{paddingTop: '5px', paddingBottom: '20px'}}>
+    <StyledContainer style={{ paddingTop: '5px', paddingBottom: '20px' }}>
       <Card sx={{ marginX: 1 }}>
         <CardContent>
           <Grid container spacing={5}>
-        <Grid size={{ xs: 12, md: 7 }}>
-          <CardInformation
-            cardWithVersions={card}
-            currentVersion={chosenVersion}
-          />
-          {card.versions.length > 1 && (
-            <Grid size={12}>
-              <Tabs
-                TabIndicatorProps={{
-                  style: {
-                    top: 0,
-                  }
-                }}
-                value={chosenVersionIndex}
-                onChange={(_, newValue) =>
-                  setChosenVersionIndex(newValue)
-                }
-                variant="scrollable"
-                scrollButtons="auto"
-              >
-                {card.versions.map((v, index) => (
-                  <Tab
-                    key={v.pack_id}
-                    value={index}
-                    label={<Typography variant="caption">{packs.find(p => p.id === v.pack_id)?.name || 'Unknown Pack'}</Typography>}
-                    className={
-                      chosenVersionIndex === index ? classes.selected : classes.unselected
-                    }
+            <Grid size={{ xs: 12, md: 7 }}>
+              <CardInformation cardWithVersions={card} currentVersion={chosenVersion} />
+              {card.versions.length > 1 && (
+                <Grid size={12}>
+                  <Tabs
+                    TabIndicatorProps={{
+                      style: {
+                        top: 0,
+                      },
+                    }}
+                    value={chosenVersionIndex}
+                    onChange={(_, newValue) => setChosenVersionIndex(newValue)}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                  >
+                    {card.versions.map((v, index) => (
+                      <Tab
+                        key={v.pack_id}
+                        value={index}
+                        label={
+                          <Typography variant="caption">
+                            {packs.find((p) => p.id === v.pack_id)?.name || 'Unknown Pack'}
+                          </Typography>
+                        }
+                        className={
+                          chosenVersionIndex === index ? classes.selected : classes.unselected
+                        }
+                      />
+                    ))}
+                  </Tabs>
+                </Grid>
+              )}
+              <RulingList cardId={card.id} rulings={card.rulings} />
+            </Grid>
+            <Grid
+              container
+              spacing={0}
+              size={{ xs: 12, md: 5 }}
+              display="flex"
+              justifyContent="center"
+              alignContent="flex-start"
+            >
+              {chosenVersion && (
+                <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <img
+                    src={getImageUrl(chosenVersion.image_url)}
+                    style={{ maxWidth: imageWidth, width: '100%', height: 'auto' }}
                   />
-                ))}
-              </Tabs>
+                </Grid>
+              )}
+              {isDataAdmin() && (
+                <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    fullWidth
+                    onClick={() => navigate(`/card/${card.id}/edit`)}
+                    style={{ marginTop: 10, maxWidth: imageWidth }}
+                  >
+                    Edit this Card
+                  </Button>
+                </Grid>
+              )}
+              {isDataAdmin() && (
+                <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    fullWidth
+                    onClick={() => setRenameModalOpen(true)}
+                    style={{ marginTop: 10, maxWidth: imageWidth }}
+                  >
+                    Rename this Card
+                  </Button>
+                </Grid>
+              )}
+              {isDataAdmin() && (
+                <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    fullWidth
+                    onClick={() => setDeletionModalOpen(true)}
+                    style={{ marginTop: 10, maxWidth: imageWidth }}
+                  >
+                    Delete this Card
+                  </Button>
+                </Grid>
+              )}
             </Grid>
-          )}
-          <RulingList cardId={card.id} rulings={card.rulings} />
-        </Grid>
-        <Grid container spacing={0} size={{ xs: 12, md: 5 }} display="flex" justifyContent="center" alignContent="flex-start">
-          {chosenVersion && (
-            <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-              <img src={getImageUrl(chosenVersion.image_url)} style={{ maxWidth: imageWidth, width: '100%', height: 'auto' }} />
-            </Grid>
-          )}
-          {isDataAdmin() && (
-            <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                fullWidth
-                onClick={() => navigate(`/card/${card.id}/edit`)}
-                style={{ marginTop: 10, maxWidth: imageWidth }}
-              >
-                Edit this Card
-              </Button>
-            </Grid>
-          )}
-          {isDataAdmin() && (
-            <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                fullWidth
-                onClick={() => setRenameModalOpen(true)}
-                style={{ marginTop: 10, maxWidth: imageWidth }}
-              >
-                Rename this Card
-              </Button>
-            </Grid>
-          )}
-          {isDataAdmin() && (
-            <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                fullWidth
-                onClick={() => setDeletionModalOpen(true)}
-                style={{ marginTop: 10, maxWidth: imageWidth }}
-              >
-                Delete this Card
-              </Button>
-            </Grid>
-          )}
-        </Grid>
-      </Grid>
+          </Grid>
         </CardContent>
       </Card>
-      <Dialog open={deletionModalOpen} onClose={() => setDeletionModalOpen(false)} disableScrollLock>
+      <Dialog
+        open={deletionModalOpen}
+        onClose={() => setDeletionModalOpen(false)}
+        disableScrollLock
+      >
         <DialogTitle>Delete Card {card.name}</DialogTitle>
         <DialogContent>
           <Grid container spacing={1}>
@@ -323,5 +339,5 @@ export function CardDetailView(): JSX.Element {
         </DialogActions>
       </Dialog>
     </StyledContainer>
-  );
+  )
 }

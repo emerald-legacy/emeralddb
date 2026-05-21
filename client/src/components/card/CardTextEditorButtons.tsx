@@ -1,17 +1,17 @@
 import FormatItalicIcon from '@mui/icons-material/FormatItalic'
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles'
 import FormatBoldIcon from '@mui/icons-material/FormatBold'
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn'
-import { Button, ButtonGroup, Grid } from '@mui/material';
+import { Button, ButtonGroup, Grid } from '@mui/material'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
-const PREFIX = 'CardTextEditorButtons';
+const PREFIX = 'CardTextEditorButtons'
 
 const classes = {
   buttonGroup: `${PREFIX}-buttonGroup`,
-  icon: `${PREFIX}-icon`
-};
+  icon: `${PREFIX}-icon`,
+}
 
 const StyledGrid = styled(Grid)(() => ({
   [`& .${classes.buttonGroup}`]: {
@@ -23,14 +23,12 @@ const StyledGrid = styled(Grid)(() => ({
   [`& .${classes.icon}`]: {
     width: 26,
     height: 13,
-  }
-}));
+  },
+}))
 
 export function CardTextEditorButtons(props: {
   onClick: (tagOrNameIcon: string, isIcon: boolean) => void
 }): JSX.Element {
-
-
   const clickIcon = (iconName: string) => {
     props.onClick(iconName, true)
   }
@@ -112,5 +110,5 @@ export function CardTextEditorButtons(props: {
         </ButtonGroup>
       </Grid>
     </StyledGrid>
-  );
+  )
 }

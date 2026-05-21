@@ -1,5 +1,5 @@
 import { User } from '@5rdb/api'
-import { createContext, ReactNode, useState, useContext, type JSX } from 'react';
+import { createContext, ReactNode, useState, useContext, type JSX } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { privateApi } from '../api'
 import { Queries } from '../components/HeaderBar'

@@ -1,5 +1,5 @@
 import { useUiStore } from '../providers/UiStoreProvider'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { Box, Grid, List, ListItem, TextField, Typography } from '@mui/material'
 import { Loading } from '../components/Loading'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -171,7 +171,8 @@ export function OpLists(): JSX.Element {
               <Grid
                 key={cycle.id}
                 hidden={rotatedCardsOfCycle.length === 0}
-               size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+              >
                 <Box border="1px solid gray" borderRadius="4px" p={2}>
                   <Typography>
                     <b>Cycle: {cycle.name}</b> ({rotatedCardsOfCycle.length})
@@ -185,9 +186,10 @@ export function OpLists(): JSX.Element {
                   </List>
                 </Box>
               </Grid>
-            );})}
+            )
+          })}
         </Grid>
       </Grid>
     </>
-  );
+  )
 }

@@ -1,6 +1,6 @@
-import { Popover, Theme } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { useState, useEffect, type MouseEvent, type JSX } from 'react';
+import { Popover, Theme } from '@mui/material'
+import { styled } from '@mui/material/styles'
+import { useState, useEffect, type MouseEvent, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { CardInformation } from './CardInformation'
 import { CardTypeIcon } from './CardTypeIcon'
@@ -11,23 +11,21 @@ import Looks5Icon from '@mui/icons-material/Looks5'
 import CachedIcon from '@mui/icons-material/Cached'
 import { ElementSymbol } from './ElementSymbol'
 import { EmeraldDBLink } from '../EmeraldDBLink'
-import { CardInPack } from "@5rdb/api";
+import { CardInPack } from '@5rdb/api'
 import { getImageUrl } from '../../utils/imageUrl'
 
-const PREFIX = 'CardLink';
+const PREFIX = 'CardLink'
 
 const classes = {
   popover: `${PREFIX}-popover`,
-  popoverText: `${PREFIX}-popoverText`
-};
+  popoverText: `${PREFIX}-popoverText`,
+}
 
-const Root = styled('span')(({
-  theme
-}) => ({
+const Root = styled('span')(({ theme }) => ({
   [`& .${classes.popoverText}`]: {
     padding: theme.spacing(1),
-  }
-}));
+  },
+}))
 
 export function DeckbuildingRestrictionIcon(props: {
   label: string
@@ -83,8 +81,8 @@ export function DeckbuildingRestrictionIcon(props: {
         sx={{ pointerEvents: 'none' }}
         slotProps={{
           paper: {
-            sx: { pointerEvents: 'none', padding: 1.5 }
-          }
+            sx: { pointerEvents: 'none', padding: 1.5 },
+          },
         }}
       >
         <div>
@@ -92,7 +90,7 @@ export function DeckbuildingRestrictionIcon(props: {
         </div>
       </Popover>
     </>
-  );
+  )
 }
 
 export function RallyIcon(props: { formats: string[] }): JSX.Element {
@@ -108,9 +106,7 @@ export function RallyIcon(props: { formats: string[] }): JSX.Element {
 
 export function RotatedIcon(props: { formats: string[] }): JSX.Element {
   const icon = <CachedIcon style={{ color: 'red', fontSize: 16 }} />
-  return (
-    <DeckbuildingRestrictionIcon label="Not Legal in" inFormats={props.formats} icon={icon} />
-  )
+  return <DeckbuildingRestrictionIcon label="Not Legal in" inFormats={props.formats} icon={icon} />
 }
 
 export function BannedIcon(props: { formats: string[] }): JSX.Element {
@@ -153,10 +149,10 @@ export function CardLink(props: {
 
   const open = Boolean(anchorEl)
 
-  const format = relevantFormats.find(f => f.id === props.format)
+  const format = relevantFormats.find((f) => f.id === props.format)
   let legalVersion: Omit<CardInPack, 'card_id'> | undefined = card.versions[0]
   if (props.packId) {
-    legalVersion = card.versions.find(v => v.pack_id === props.packId) || legalVersion
+    legalVersion = card.versions.find((v) => v.pack_id === props.packId) || legalVersion
   } else if (format) {
     legalVersion = validCardVersionForFormat(card.id, format.id)
     if (legalVersion && format.id === 'emerald' && legalVersion.rotated) {
@@ -166,11 +162,12 @@ export function CardLink(props: {
 
   const cardImage = legalVersion?.image_url
 
-  let bannedFormats = card.banned_in?.filter(f => relevantFormats.some(rf => rf.id === f)) || []
-  let restrictedFormats = card.restricted_in?.filter(f => relevantFormats.some(rf => rf.id === f)) || []
-  let splashBannedFormats = card.splash_banned_in?.filter(f => relevantFormats.some(rf => rf.id === f)) || []
+  let bannedFormats = card.banned_in?.filter((f) => relevantFormats.some((rf) => rf.id === f)) || []
+  let restrictedFormats =
+    card.restricted_in?.filter((f) => relevantFormats.some((rf) => rf.id === f)) || []
+  let splashBannedFormats =
+    card.splash_banned_in?.filter((f) => relevantFormats.some((rf) => rf.id === f)) || []
   let rallyFormats: string[] = []
-
 
   if (props.format) {
     bannedFormats = bannedFormats.filter((format) => format === props.format)
@@ -224,10 +221,8 @@ export function CardLink(props: {
             {' '}
             <span className={`icon icon-unique`} style={{ fontSize: 12 }} />
           </span>
-        )}
-        {' '}
-        {card.name}
-        {' '}
+        )}{' '}
+        {card.name}{' '}
         {card.elements?.map((element) => (
           <ElementSymbol element={element} key={element} withoutName />
         ))}
@@ -256,15 +251,15 @@ export function CardLink(props: {
           paper: {
             sx: {
               pointerEvents: 'none',
-              marginLeft: 1
-            }
-          }
+              marginLeft: 1,
+            },
+          },
         }}
       >
         {cardImage ? (
           <img src={getImageUrl(cardImage)} style={{ width: 300, height: 420 }} alt={card.name} />
         ) : (
-          <CardInformation cardWithVersions={card} currentVersion={legalVersion}/>
+          <CardInformation cardWithVersions={card} currentVersion={legalVersion} />
         )}
       </Popover>
     </span>

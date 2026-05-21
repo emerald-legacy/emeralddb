@@ -1,7 +1,7 @@
 import { Format } from '@5rdb/api'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import { Box, Typography } from '@mui/material';
-import { useState, type JSX } from 'react';
+import { Box, Typography } from '@mui/material'
+import { useState, type JSX } from 'react'
 import { EmeraldDBLink } from '../EmeraldDBLink'
 
 export function FormatWithInfo(props: { format: Format }): JSX.Element {
@@ -18,7 +18,7 @@ export function FormatWithInfo(props: { format: Format }): JSX.Element {
         {props.format.name}{' '}
         {hasInfo && (
           <span onClick={(_) => toggleInfoShown()}>
-            <InfoOutlinedIcon color={infoShown ? 'error' : 'secondary'}/>
+            <InfoOutlinedIcon color={infoShown ? 'error' : 'secondary'} />
           </span>
         )}
       </span>
@@ -41,11 +41,11 @@ export function FormatWithInfo(props: { format: Format }): JSX.Element {
         {props.format.info_link && (
           <Typography>
             <b>More Info: </b>
-              <EmeraldDBLink href={props.format.info_link} openInNewTab>
-                <b>
-                  <u>{props.format.info_link}</u>
-                </b>
-              </EmeraldDBLink>
+            <EmeraldDBLink href={props.format.info_link} openInNewTab>
+              <b>
+                <u>{props.format.info_link}</u>
+              </b>
+            </EmeraldDBLink>
           </Typography>
         )}
       </Box>

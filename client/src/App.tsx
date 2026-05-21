@@ -1,5 +1,10 @@
-import { Theme } from '@mui/material/styles';
-import { ThemeProvider, createTheme, responsiveFontSizes, StyledEngineProvider } from '@mui/material/styles';
+import { Theme } from '@mui/material/styles'
+import {
+  ThemeProvider,
+  createTheme,
+  responsiveFontSizes,
+  StyledEngineProvider,
+} from '@mui/material/styles'
 import { BrowserRouter } from 'react-router'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HeaderBar } from './components/HeaderBar'
@@ -11,7 +16,7 @@ import { ConfirmProvider } from 'material-ui-confirm'
 import { Routes } from './Routes'
 import { SnackbarProvider } from 'notistack'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 // create our material ui theme using up to date typography variables
 let theme = createTheme({
@@ -95,5 +100,5 @@ export default function App(): JSX.Element {
         </QueryClientProvider>
       </ThemeProvider>
     </StyledEngineProvider>
-  );
+  )
 }

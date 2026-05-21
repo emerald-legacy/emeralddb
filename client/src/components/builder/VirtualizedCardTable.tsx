@@ -1,5 +1,5 @@
-import React, { useRef, type JSX } from 'react';
-import { styled } from '@mui/material/styles';
+import React, { useRef, type JSX } from 'react'
+import { styled } from '@mui/material/styles'
 import clsx from 'clsx'
 import TableCell from '@mui/material/TableCell'
 import { useVirtualizer } from '@tanstack/react-virtual'
@@ -7,7 +7,7 @@ import { CardQuantitySelector } from './CardQuantitySelector'
 import { CardLink } from '../card/CardLink'
 import { InfluenceElement } from '../card/InfluenceElement'
 
-const PREFIX = 'VirtualizedCardTable';
+const PREFIX = 'VirtualizedCardTable'
 
 const classes = {
   flexContainer: `${PREFIX}-flexContainer`,
@@ -18,11 +18,9 @@ const classes = {
   noClick: `${PREFIX}-noClick`,
   container: `${PREFIX}-container`,
   header: `${PREFIX}-header`,
-};
+}
 
-const StyledContainer = styled('div')(({
-  theme
-}) => ({
+const StyledContainer = styled('div')(({ theme }) => ({
   height: '100%',
   width: '100%',
   overflow: 'auto',
@@ -64,8 +62,8 @@ const StyledContainer = styled('div')(({
 
   [`& .${classes.noClick}`]: {
     cursor: 'initial',
-  }
-}));
+  },
+}))
 
 export interface ColumnData {
   columnType:
@@ -127,9 +125,7 @@ const cellRenderer = (
       cardId: string
       format: string
     }
-    renderComponent = (
-      <CardLink cardId={nameData.cardId} format={nameData.format} />
-    )
+    renderComponent = <CardLink cardId={nameData.cardId} format={nameData.format} />
   }
   if (columnType === 'traits') {
     const traitsData = cellData as {
@@ -193,7 +189,7 @@ const cellRenderer = (
       variant="body"
       style={{
         height: rowHeight,
-        ...(width > 0 ? { flexGrow: 0, flexShrink: 0, width: `${width}px` } : { flex: 1 })
+        ...(width > 0 ? { flexGrow: 0, flexShrink: 0, width: `${width}px` } : { flex: 1 }),
       }}
     >
       {renderComponent}
@@ -233,7 +229,9 @@ export const VirtualizedCardTable: React.FC<MuiVirtualizedTableProps> = ({
             width={column.width}
             style={{
               height: headerHeight,
-              ...(column.width > 0 ? { flexGrow: 0, flexShrink: 0, width: `${column.width}px` } : { flex: 1 })
+              ...(column.width > 0
+                ? { flexGrow: 0, flexShrink: 0, width: `${column.width}px` }
+                : { flex: 1 }),
             }}
           >
             <span>{column.label}</span>
@@ -281,7 +279,7 @@ export const VirtualizedCardTable: React.FC<MuiVirtualizedTableProps> = ({
         })}
       </div>
     </StyledContainer>
-  );
+  )
 }
 
 export interface TableCardData {

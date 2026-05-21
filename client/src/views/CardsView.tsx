@@ -12,38 +12,34 @@ import {
   Card,
   CardContent,
   Divider,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+} from '@mui/material'
+import { styled } from '@mui/material/styles'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { useNavigate, useLocation } from 'react-router'
 import { useUiStore } from '../providers/UiStoreProvider'
 import { convertTraitList } from '../utils/cardTextUtils'
 import { capitalize } from '../utils/stringUtils'
-import { useState, useEffect, useMemo, useCallback, type JSX } from 'react';
-import { applyFilters, CardFilter, FilterState, initialState } from "../components/CardFilter";
+import { useState, useEffect, useMemo, useCallback, type JSX } from 'react'
+import { applyFilters, CardFilter, FilterState, initialState } from '../components/CardFilter'
 import { CardWithVersions, Pack } from '@5rdb/api'
 import { CardInformation } from '../components/card/CardInformation'
 import { Loading } from '../components/Loading'
 import { CardLink } from '../components/card/CardLink'
 import { CardImageOrText } from '../components/card/CardImageOrText'
-import { Pagination } from '@mui/material';
+import { Pagination } from '@mui/material'
 
-const PREFIX = 'CardsView';
+const PREFIX = 'CardsView'
 
 const classes = {
-  table: `${PREFIX}-table`
-};
+  table: `${PREFIX}-table`,
+}
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')((
-  {
-    theme
-  }
-) => ({
+const Root = styled('div')(({ theme }) => ({
   [`& .${classes.table}`]: {
     marginTop: theme.spacing(1),
-  }
-}));
+  },
+}))
 
 interface NameProps {
   id: string
@@ -75,27 +71,30 @@ enum SortMode {
   PACK_POSITION = 'pack_position',
 }
 
-function createFilterFromUrlSearchParams(params: URLSearchParams, allPacks: Pack[], initialFilter: FilterState): FilterState {
+function createFilterFromUrlSearchParams(
+  params: URLSearchParams,
+  allPacks: Pack[],
+  initialFilter: FilterState
+): FilterState {
   const cycle = params.get('cycle')
   const pack = params.get('pack')
   const query = params.get('query') || ''
   const packs = cycle
     ? allPacks.filter((p) => p.cycle_id === cycle).map((p) => p.id)
     : pack
-    ? [pack]
-    : []
+      ? [pack]
+      : []
 
   return {
     ...initialFilter,
     text: decodeURIComponent(query) || initialFilter.text,
     packs: packs || initialFilter.packs,
-    cycles: cycle ? [cycle] : initialFilter.cycles
+    cycles: cycle ? [cycle] : initialFilter.cycles,
   }
 }
 
 export function CardsView(): JSX.Element {
   const PAGE_SIZE = 60
-
 
   const { cards, packs, cycles, traits, formats, validCardVersionForFormat } = useUiStore()
   const navigate = useNavigate()
@@ -122,7 +121,11 @@ export function CardsView(): JSX.Element {
         urlSearchParams.get('cycle') != previousSearchParams.get('cycle') ||
         urlSearchParams.get('query') != previousSearchParams.get('query')
       ) {
-        const urlParamFilter = createFilterFromUrlSearchParams(urlSearchParams, packs, filter || initialState)
+        const urlParamFilter = createFilterFromUrlSearchParams(
+          urlSearchParams,
+          packs,
+          filter || initialState
+        )
         setFilter(urlParamFilter)
 
         const urlFilteredCards = applyFilters(cards, formats, urlParamFilter)
@@ -157,63 +160,74 @@ export function CardsView(): JSX.Element {
     return cards
   }, [cards, formats, filter])
 
-  const findCardVersion = useCallback((card: CardWithVersions) => {
-    const versionsWithFilteredPacks = filter?.packs
-      ? card.versions.filter(v => filter.packs.includes(v.pack_id))
-      : card.versions
-
-    const validFormatVersion = filter?.format && validCardVersionForFormat(card.id, filter.format)
-
-    const candidateVersions = validFormatVersion
-      ? [validFormatVersion]
-      : versionsWithFilteredPacks.length > 0
-        ? versionsWithFilteredPacks
+  const findCardVersion = useCallback(
+    (card: CardWithVersions) => {
+      const versionsWithFilteredPacks = filter?.packs
+        ? card.versions.filter((v) => filter.packs.includes(v.pack_id))
         : card.versions
 
-    if (filter?.text) {
-      const query = filter.text.toLocaleLowerCase().trim()
-      const artistMatch = candidateVersions.find(v => v.illustrator?.toLocaleLowerCase().includes(query))
-      if (artistMatch) {
-        return artistMatch
+      const validFormatVersion = filter?.format && validCardVersionForFormat(card.id, filter.format)
+
+      const candidateVersions = validFormatVersion
+        ? [validFormatVersion]
+        : versionsWithFilteredPacks.length > 0
+          ? versionsWithFilteredPacks
+          : card.versions
+
+      if (filter?.text) {
+        const query = filter.text.toLocaleLowerCase().trim()
+        const artistMatch = candidateVersions.find((v) =>
+          v.illustrator?.toLocaleLowerCase().includes(query)
+        )
+        if (artistMatch) {
+          return artistMatch
+        }
       }
-    }
 
-    return candidateVersions[0]
-  }, [filter, validCardVersionForFormat])
+      return candidateVersions[0]
+    },
+    [filter, validCardVersionForFormat]
+  )
 
-  const calculatePackIndex = useCallback((card: CardWithVersions): { packIndex: string; cardIndex: string } => {
-    const dummy = {
-      packIndex: '9999',
-      cardIndex: '999',
-    }
-    const cardVersion = findCardVersion(card)
-    if (!cardVersion) {
-      return dummy
-    }
-    const pack = packs.filter((pack) => pack.id === cardVersion.pack_id)[0]
-    if (!pack) {
-      return dummy
-    }
-    const cycle = cycles.filter((cycle) => cycle.id === pack.cycle_id)[0]
-    const cyclePosition = (cycle?.position || 99) * 100
-    const packPosition = pack.position
-    let cardPosition = cardVersion.position || '999'
-    while (cardPosition.length < 3) {
-      cardPosition = '0' + cardPosition
-    }
-    return {
-      packIndex: (cyclePosition + packPosition).toString(),
-      cardIndex: cardPosition,
-    }
-  }, [packs, cycles, findCardVersion])
+  const calculatePackIndex = useCallback(
+    (card: CardWithVersions): { packIndex: string; cardIndex: string } => {
+      const dummy = {
+        packIndex: '9999',
+        cardIndex: '999',
+      }
+      const cardVersion = findCardVersion(card)
+      if (!cardVersion) {
+        return dummy
+      }
+      const pack = packs.filter((pack) => pack.id === cardVersion.pack_id)[0]
+      if (!pack) {
+        return dummy
+      }
+      const cycle = cycles.filter((cycle) => cycle.id === pack.cycle_id)[0]
+      const cyclePosition = (cycle?.position || 99) * 100
+      const packPosition = pack.position
+      let cardPosition = cardVersion.position || '999'
+      while (cardPosition.length < 3) {
+        cardPosition = '0' + cardPosition
+      }
+      return {
+        packIndex: (cyclePosition + packPosition).toString(),
+        cardIndex: cardPosition,
+      }
+    },
+    [packs, cycles, findCardVersion]
+  )
 
-  const sortCardsByPackIndex = useCallback((cardA: CardWithVersions, cardB: CardWithVersions) => {
-    const aIndex = calculatePackIndex(cardA)
-    const bIndex = calculatePackIndex(cardB)
+  const sortCardsByPackIndex = useCallback(
+    (cardA: CardWithVersions, cardB: CardWithVersions) => {
+      const aIndex = calculatePackIndex(cardA)
+      const bIndex = calculatePackIndex(cardB)
 
-    const indexCompare = aIndex.packIndex.localeCompare(bIndex.packIndex)
-    return indexCompare === 0 ? aIndex.cardIndex.localeCompare(bIndex.cardIndex) : indexCompare
-  }, [calculatePackIndex])
+      const indexCompare = aIndex.packIndex.localeCompare(bIndex.packIndex)
+      return indexCompare === 0 ? aIndex.cardIndex.localeCompare(bIndex.cardIndex) : indexCompare
+    },
+    [calculatePackIndex]
+  )
 
   const sortedCards = useMemo(() => {
     const sorted = [...filteredCards]
@@ -232,20 +246,26 @@ export function CardsView(): JSX.Element {
     [sortedCards, startIndexInclusive, endIndexExclusive]
   )
 
-  const handleCardClick = useCallback((param: any, event: any) => {
-    const target = event.target as HTMLElement;
-    if (target.tagName === 'A' || target.closest('a')) {
-      event.stopPropagation();
-      return;
-    }
-    setModalCard(cards.find((card) => card.id === param.row.id));
-    setCardModalOpen(true);
-  }, [cards]);
+  const handleCardClick = useCallback(
+    (param: any, event: any) => {
+      const target = event.target as HTMLElement
+      if (target.tagName === 'A' || target.closest('a')) {
+        event.stopPropagation()
+        return
+      }
+      setModalCard(cards.find((card) => card.id === param.row.id))
+      setCardModalOpen(true)
+    },
+    [cards]
+  )
 
-  const handleImageClick = useCallback((cardId: string) => {
-    setModalCard(cards.find((card) => card.id === cardId));
-    setCardModalOpen(true);
-  }, [cards]);
+  const handleImageClick = useCallback(
+    (cardId: string) => {
+      setModalCard(cards.find((card) => card.id === cardId))
+      setCardModalOpen(true)
+    },
+    [cards]
+  )
 
   // NOW we can do conditional returns after all hooks are called
   if (cards.length === 0) {
@@ -263,7 +283,11 @@ export function CardsView(): JSX.Element {
     return (
       <Dialog open={cardModalOpen} onClose={() => setCardModalOpen(false)} disableScrollLock>
         <DialogContent>
-          <CardInformation cardWithVersions={modalCard} clickable currentVersion={findCardVersion(modalCard)}/>
+          <CardInformation
+            cardWithVersions={modalCard}
+            clickable
+            currentVersion={findCardVersion(modalCard)}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCardModalOpen(false)} variant="contained">
@@ -386,18 +410,18 @@ export function CardsView(): JSX.Element {
         card.military !== null && card.military !== undefined
           ? card.military
           : card.military_bonus !== null && card.military_bonus !== undefined
-          ? card.military_bonus
-          : card.type === 'character' || card.type === 'attachment'
-          ? '-'
-          : ''
+            ? card.military_bonus
+            : card.type === 'character' || card.type === 'attachment'
+              ? '-'
+              : ''
       const pol =
         card.political !== null && card.political !== undefined
           ? card.political
           : card.political_bonus !== null && card.political_bonus !== undefined
-          ? card.political_bonus
-          : card.type === 'character' || card.type === 'attachment'
-          ? '-'
-          : ''
+            ? card.political_bonus
+            : card.type === 'character' || card.type === 'attachment'
+              ? '-'
+              : ''
 
       return {
         id: card.id,
@@ -434,8 +458,7 @@ export function CardsView(): JSX.Element {
             </div>
           )
         },
-        sortComparator: (v1, v2) =>
-          (v1 as NameProps).name.localeCompare((v2 as NameProps).name),
+        sortComparator: (v1, v2) => (v1 as NameProps).name.localeCompare((v2 as NameProps).name),
       },
       {
         field: 'traits',
@@ -543,7 +566,7 @@ export function CardsView(): JSX.Element {
         </Grid>
         <CardModal />
       </Box>
-    );
+    )
   }
 
   if (displayMode === DisplayMode.IMAGES) {
