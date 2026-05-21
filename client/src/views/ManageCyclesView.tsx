@@ -74,11 +74,6 @@ export function ManageCyclesView(): JSX.Element {
   const [cycleSize, setCycleSize] = useState(0)
   const [cyclePosition, setCyclePosition] = useState(0)
 
-  const [rotatePackDialogOpen, setRotatePackDialogOpen] = useState(false)
-  const [rotateCycleDialogOpen, setRotateCycleDialogOpen] = useState(false)
-  const [packToRotate, setPackToRotate] = useState<string | null>(null)
-  const [cycleToRotate, setCycleToRotate] = useState<string | null>(null)
-
   const { enqueueSnackbar } = useSnackbar()
   const confirm = useConfirm()
 
@@ -117,7 +112,7 @@ export function ManageCyclesView(): JSX.Element {
   }
 
   async function createPack() {
-    const { confirmed } = await confirm({ description: 'Do you really want to create this pack?' })
+    const { confirmed } = await confirm({ title: 'Create Pack', description: 'Do you really want to create this pack?', confirmationText: 'Create' })
     if (!confirmed) return
     privateApi.Pack.create({
       body: {
@@ -137,7 +132,7 @@ export function ManageCyclesView(): JSX.Element {
   }
 
   async function createCycle() {
-    const { confirmed } = await confirm({ description: 'Do you really want to create this cycle?' })
+    const { confirmed } = await confirm({ title: 'Create Cycle', description: 'Do you really want to create this cycle?', confirmationText: 'Create' })
     if (!confirmed) return
     privateApi.Cycle.create({
       body: {
@@ -157,20 +152,11 @@ export function ManageCyclesView(): JSX.Element {
       })
   }
 
-  function openRotateCycleDialog(cycleId: string) {
-    setCycleToRotate(cycleId)
-    setRotateCycleDialogOpen(true)
-  }
-
-  function closeRotateCycleDialog() {
-    setRotateCycleDialogOpen(false)
-    setCycleToRotate(null)
-  }
-
-  async function confirmRotateCycle() {
-    if (!cycleToRotate) return
+  async function confirmRotateCycle(cycleId: string) {
+    const { confirmed } = await confirm({ title: 'Confirm Rotation', description: 'Do you really want to rotate out this cycle?', confirmationText: 'Rotate Cycle' })
+    if (!confirmed) return
     try {
-      await privateApi.Cycle.rotate({ cycleId: cycleToRotate })
+      await privateApi.Cycle.rotate({ cycleId })
       window.location.reload()
     } catch (error) {
       console.log(error)
@@ -178,20 +164,11 @@ export function ManageCyclesView(): JSX.Element {
     }
   }
 
-  function openRotatePackDialog(packId: string) {
-    setPackToRotate(packId)
-    setRotatePackDialogOpen(true)
-  }
-
-  function closeRotatePackDialog() {
-    setRotatePackDialogOpen(false)
-    setPackToRotate(null)
-  }
-
-  async function confirmRotatePack() {
-    if (!packToRotate) return
+  async function confirmRotatePack(packId: string) {
+    const { confirmed } = await confirm({ title: 'Confirm Rotation', description: 'Do you really want to rotate out this pack?', confirmationText: 'Rotate Pack' })
+    if (!confirmed) return
     try {
-      await privateApi.Pack.rotate({ packId: packToRotate })
+      await privateApi.Pack.rotate({ packId })
       window.location.reload()
     } catch (error) {
       console.log(error)
@@ -227,7 +204,7 @@ export function ManageCyclesView(): JSX.Element {
                   {cycle.rotated && <CachedIcon style={{ color: 'red', fontSize: 16, marginRight: 8 }} />}
                   {cycle.name}
                 </Typography>
-                <Button variant="contained" color="error" size="small" onClick={() => openRotateCycleDialog(cycle.id)} disabled={cycle.rotated}>
+                <Button variant="contained" color="error" size="small" onClick={() => confirmRotateCycle(cycle.id)} disabled={cycle.rotated}>
                   Rotate Cycle
                 </Button>
               </Box>
@@ -260,7 +237,7 @@ export function ManageCyclesView(): JSX.Element {
                     >
                       Edit Pack Cards
                     </Button>
-                    <Button variant="outlined" color="error" size="small" onClick={() => openRotatePackDialog(pack.id)} disabled={pack.rotated}>
+                    <Button variant="outlined" color="error" size="small" onClick={() => confirmRotatePack(pack.id)} disabled={pack.rotated}>
                       Rotate Pack
                     </Button>
                   </Box>
@@ -352,34 +329,6 @@ export function ManageCyclesView(): JSX.Element {
           </Button>
           <Button variant="contained" color="secondary" onClick={() => createCycle()}>
             Create Cycle
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={rotateCycleDialogOpen} onClose={closeRotateCycleDialog}>
-        <DialogTitle>Confirm Rotation</DialogTitle>
-        <DialogContent>
-          <Typography>Do you really want to rotate out this cycle?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeRotateCycleDialog} variant="outlined" autoFocus>
-            Cancel
-          </Button>
-          <Button onClick={confirmRotateCycle} variant="contained" color="error">
-            Rotate Cycle
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={rotatePackDialogOpen} onClose={closeRotatePackDialog}>
-        <DialogTitle>Confirm Rotation</DialogTitle>
-        <DialogContent>
-          <Typography>Do you really want to rotate out this pack?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeRotatePackDialog} variant="outlined" autoFocus>
-            Cancel
-          </Button>
-          <Button onClick={confirmRotatePack} variant="contained" color="error">
-            Rotate Pack
           </Button>
         </DialogActions>
       </Dialog>

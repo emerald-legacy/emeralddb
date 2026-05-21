@@ -1,6 +1,6 @@
 import { DeckWithVersions, DecklistWithExtraInfo, Decklist as DecklistType } from '@5rdb/api'
 import { styled } from '@mui/material/styles';
-import { Box, Button, Grid, Tab, Tabs, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Button, Grid, Tab, Tabs, Typography } from '@mui/material';
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { useState, type JSX } from 'react';
@@ -93,8 +93,6 @@ export function DecklistTabs(props: {
   const [currentDecklistId, setCurrentDecklistId] = useState(
     latestDecklistForDeck(deck)?.id || undefined
   )
-  const [publishModalOpen, setPublishModalOpen] = useState(false)
-  const [decklistToPublish, setDecklistToPublish] = useState<string | undefined>(undefined)
 
   const confirm = useConfirm()
   const { enqueueSnackbar } = useSnackbar()
@@ -111,10 +109,6 @@ export function DecklistTabs(props: {
       const message = error.data()
       enqueueSnackbar(`The decklist couldn't be published: ${message}!`, { variant: 'error' })
     },
-    onSettled: () => {
-      setPublishModalOpen(false)
-      setDecklistToPublish(undefined)
-    }
   })
 
   const versions = sortedVersionsForDeck(deck)
@@ -128,7 +122,7 @@ export function DecklistTabs(props: {
   }
 
   async function confirmDeletion(decklistId: string) {
-    const { confirmed } = await confirm({ description: 'Do you really want to delete this version of the deck?' })
+    const { confirmed } = await confirm({ title: 'Delete Version', description: 'Do you really want to delete this version of the deck?', confirmationText: 'Delete' })
     if (!confirmed) return
     privateApi.Decklist.delete({ decklistId: decklistId })
       .then(() => {
@@ -143,24 +137,14 @@ export function DecklistTabs(props: {
       })
   }
 
-  function handlePublishClick(decklistId: string) {
-    setDecklistToPublish(decklistId)
-    setPublishModalOpen(true)
-  }
-
-  function handlePublishConfirm() {
-    if (decklistToPublish) {
-      publishMutation.mutate(decklistToPublish)
-    }
-  }
-
-  function handlePublishCancel() {
-    setPublishModalOpen(false)
-    setDecklistToPublish(undefined)
+  async function publishDecklist(decklistId: string) {
+    const { confirmed } = await confirm({ title: 'Publish Decklist', description: 'Do you really want to publish this version of the deck?', confirmationText: 'Publish' })
+    if (!confirmed) return
+    publishMutation.mutate(decklistId)
   }
 
   async function unpublishDecklist(decklistId: string) {
-    const { confirmed } = await confirm({ description: 'Do you really want to unpublish this version of the deck?' })
+    const { confirmed } = await confirm({ title: 'Unpublish Version', description: 'Do you really want to unpublish this version of the deck?', confirmationText: 'Unpublish' })
     if (!confirmed) return
     privateApi.Decklist.unpublish({ decklistId: decklistId })
       .then(() => {
@@ -231,7 +215,7 @@ export function DecklistTabs(props: {
                           <Button
                             variant="outlined"
                             color="primary"
-                            onClick={() => handlePublishClick(v.id)}
+                            onClick={() => publishDecklist(v.id)}
                             fullWidth
                             size="small"
                             startIcon={<ShareIcon />}
@@ -274,20 +258,6 @@ export function DecklistTabs(props: {
           </Grid>
         </Grid>
       </Grid>
-      <Dialog open={publishModalOpen} onClose={handlePublishCancel}>
-        <DialogTitle>Publish Decklist</DialogTitle>
-        <DialogContent>
-          <Typography>Do you really want to publish this version of the deck?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handlePublishCancel} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handlePublishConfirm} color="secondary" variant="contained">
-            Publish
-          </Button>
-        </DialogActions>
-      </Dialog>
     </StyledTabPanel>
   );
 }
