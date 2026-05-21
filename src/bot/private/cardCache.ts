@@ -23,31 +23,7 @@ const cache: Cache = {
   fuzzy: new Fuse([], { isCaseSensitive: false, includeScore: true, ignoreLocation: true }),
 }
 
-export async function fetchValidCache(): Promise<Cache> {
-  if (cache.expiresAt > Date.now()) {
-    return cache
-  }
-
-  cache.registry = await buildRegistry()
-  cache.expiresAt = fiveMinutesFromNow()
-  cache.fuzzy.setCollection(Array.from(cache.registry.keys()))
-
-  return cache
-}
-
 const fiveMinutesFromNow = () => Date.now() + 1000 * 60 * 5
-
-// ---------
-// REGISTRY
-// ---------
-async function buildRegistry(): Promise<Registry> {
-  const [cards, allCardsInPacks] = await Promise.all([getAllCards(), getAllCardsInPacks()])
-
-  // Pre-group by ID to keep this function as O(2n) instead of O(n2)
-  const images = new Map(allCardsInPacks.flatMap(idAndImageSkippingWhenImageIsMissing))
-
-  return new Map(cards.flatMap(nameAndImageSkippingWhenImageIsMissing(images)))
-}
 
 const idAndImageSkippingWhenImageIsMissing = (card: CardPackInput): [string, string][] => {
   if (typeof card.image_url !== 'string') {
@@ -55,17 +31,6 @@ const idAndImageSkippingWhenImageIsMissing = (card: CardPackInput): [string, str
   }
   return [[card.card_id, card.image_url]]
 }
-
-const nameAndImageSkippingWhenImageIsMissing =
-  (images: Map<string, string>) =>
-  (card: CardInput): [string, Card][] => {
-    const image = images.get(card.id)
-    if (typeof image !== 'string') {
-      return []
-    }
-
-    return [[extendedName(card), { image, id: card.id, name: card.name }]]
-  }
 
 const versionNumberRegex = /\((\d+)\)/ // Matches `(2)`, `(42)`, etc
 const extendedName = (card: CardInput) => {
@@ -80,4 +45,39 @@ const extendedName = (card: CardInput) => {
 
   const [, versionNumber] = match
   return `${card.name} ${versionNumber}`
+}
+
+const nameAndImageSkippingWhenImageIsMissing =
+  (images: Map<string, string>) =>
+  (card: CardInput): [string, Card][] => {
+    const image = images.get(card.id)
+    if (typeof image !== 'string') {
+      return []
+    }
+
+    return [[extendedName(card), { image, id: card.id, name: card.name }]]
+  }
+
+// ---------
+// REGISTRY
+// ---------
+async function buildRegistry(): Promise<Registry> {
+  const [cards, allCardsInPacks] = await Promise.all([getAllCards(), getAllCardsInPacks()])
+
+  // Pre-group by ID to keep this function as O(2n) instead of O(n2)
+  const images = new Map(allCardsInPacks.flatMap(idAndImageSkippingWhenImageIsMissing))
+
+  return new Map(cards.flatMap(nameAndImageSkippingWhenImageIsMissing(images)))
+}
+
+export async function fetchValidCache(): Promise<Cache> {
+  if (cache.expiresAt > Date.now()) {
+    return cache
+  }
+
+  cache.registry = await buildRegistry()
+  cache.expiresAt = fiveMinutesFromNow()
+  cache.fuzzy.setCollection(Array.from(cache.registry.keys()))
+
+  return cache
 }

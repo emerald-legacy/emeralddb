@@ -37,6 +37,17 @@ export default async (): Promise<Service> => {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
   })
 
+  async function asyncCloseServer(server: Server) {
+    return new Promise<void>((resolve, reject) => {
+      server.close((err) => {
+        if (err) {
+          return reject(err)
+        }
+        resolve()
+      })
+    })
+  }
+
   let server: Server | undefined
   return {
     async run() {
@@ -52,15 +63,4 @@ export default async (): Promise<Service> => {
       }
     },
   }
-}
-
-async function asyncCloseServer(server: Server) {
-  return new Promise<void>((resolve, reject) => {
-    server.close((err) => {
-      if (err) {
-        return reject(err)
-      }
-      resolve()
-    })
-  })
 }

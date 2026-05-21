@@ -316,6 +316,10 @@ function validateDecklist(
   return validationErrors
 }
 
+export const cardsThatModifyInfluence: { id: string; modifier: number }[] = [
+  { id: 'yatakabune-port', modifier: 4 },
+]
+
 function createDeckStatistics(
   cards: Record<string, number>,
   format: Format,
@@ -437,7 +441,3 @@ export async function isDeckValid(
     errors: validationErrors,
   }
 }
-
-export const cardsThatModifyInfluence: { id: string; modifier: number }[] = [
-  { id: 'yatakabune-port', modifier: 4 },
-]
