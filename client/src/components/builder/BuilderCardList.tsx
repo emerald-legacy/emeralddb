@@ -80,6 +80,62 @@ const displayModeNames = [
   { mode: DisplayMode.IMAGES, name: 'Card Images' },
 ]
 
+function VirtualizedCardImages(props: {
+  tableData: TableCardData[]
+  isSmOrSmaller: boolean
+  format: string
+  validCardVersionForFormat: (cardId: string, formatId: string) => any
+  onCardClick: (cardId: string) => void
+}): JSX.Element {
+  return (
+    <Box sx={{ height: '100%', overflow: 'auto', mt: 1 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 1,
+          padding: 1,
+        }}
+      >
+        {props.tableData.map((card) => (
+          <Box
+            key={card.nameFactionType.cardId}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <CardImageOrText
+              cardId={card.nameFactionType.cardId}
+              cardVersion={props.validCardVersionForFormat(
+                card.nameFactionType.cardId,
+                props.format
+              )}
+              onClick={props.onCardClick}
+            />
+            <Box
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '5px',
+                marginBottom: '5px',
+              }}
+            >
+              <CardQuantitySelector
+                deckLimit={card.quantityForId.deckLimit}
+                quantity={card.quantityForId.quantity}
+                onQuantityChange={card.quantityForId.onQuantityChange}
+              />
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  )
+}
+
 export function BuilderCardList(props: {
   prefilteredCards: CardWithVersions[]
   selectedCards: Record<string, number>
@@ -104,23 +160,6 @@ export function BuilderCardList(props: {
   const [cardModalOpen, setCardModalOpen] = useState(false)
 
   const defaultDeckLimit = props.format === 'skirmish' || props.format === 'obsidian' ? 2 : 3
-
-  const filteredAndSortedCards = useMemo(() => {
-    let filtered = props.prefilteredCards
-    if (filter) {
-      filtered = applyFilters(props.prefilteredCards, relevantFormats, filter)
-    }
-    return sortCards(filtered)
-  }, [props.prefilteredCards, relevantFormats, filter, sortMode, order])
-
-  function changeCardQuantity(cardId: string, quantity: number) {
-    if (quantity > 0) {
-      selectedCards[cardId] = quantity
-    } else {
-      delete selectedCards[cardId]
-    }
-    props.onCardChange(selectedCards)
-  }
 
   function sortCards(cards: CardWithVersions[]): CardWithVersions[] {
     return cards.sort((cardA, cardB) => {
@@ -166,6 +205,23 @@ export function BuilderCardList(props: {
         return criteriumB.localeCompare(criteriumA)
       }
     })
+  }
+
+  const filteredAndSortedCards = useMemo(() => {
+    let filtered = props.prefilteredCards
+    if (filter) {
+      filtered = applyFilters(props.prefilteredCards, relevantFormats, filter)
+    }
+    return sortCards(filtered)
+  }, [props.prefilteredCards, relevantFormats, filter, sortMode, order])
+
+  function changeCardQuantity(cardId: string, quantity: number) {
+    if (quantity > 0) {
+      selectedCards[cardId] = quantity
+    } else {
+      delete selectedCards[cardId]
+    }
+    props.onCardChange(selectedCards)
   }
 
   const handleImageClick = (cardId: string) => {
@@ -441,61 +497,5 @@ export function BuilderCardList(props: {
       </Paper>
       <CardModal />
     </>
-  )
-}
-
-function VirtualizedCardImages(props: {
-  tableData: TableCardData[]
-  isSmOrSmaller: boolean
-  format: string
-  validCardVersionForFormat: (cardId: string, formatId: string) => any
-  onCardClick: (cardId: string) => void
-}): JSX.Element {
-  return (
-    <Box sx={{ height: '100%', overflow: 'auto', mt: 1 }}>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 1,
-          padding: 1,
-        }}
-      >
-        {props.tableData.map((card) => (
-          <Box
-            key={card.nameFactionType.cardId}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <CardImageOrText
-              cardId={card.nameFactionType.cardId}
-              cardVersion={props.validCardVersionForFormat(
-                card.nameFactionType.cardId,
-                props.format
-              )}
-              onClick={props.onCardClick}
-            />
-            <Box
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: '5px',
-                marginBottom: '5px',
-              }}
-            >
-              <CardQuantitySelector
-                deckLimit={card.quantityForId.deckLimit}
-                quantity={card.quantityForId.quantity}
-                onQuantityChange={card.quantityForId.onQuantityChange}
-              />
-            </Box>
-          </Box>
-        ))}
-      </Box>
-    </Box>
   )
 }

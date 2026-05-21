@@ -23,27 +23,6 @@ const classes = {
   deleteButton: `${PREFIX}-deleteButton`,
 }
 
-const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
-  [`& .${classes.newDeckButton}`]: {
-    marginBottom: 3,
-  },
-
-  [`& .${classes.unselectedList}`]: {
-    borderColor: 'lightgrey',
-  },
-
-  [`& .${classes.selectedList}`]: {
-    borderColor: theme.palette.primary.main,
-    backgroundColor: theme.palette.secondary.light,
-    color: theme.palette.secondary.contrastText,
-  },
-
-  [`& .${classes.deleteButton}`]: {
-    backgroundColor: theme.palette.error.main,
-    color: theme.palette.error.contrastText,
-  },
-}))
-
 interface TabPanelProps {
   children?: React.ReactNode
   index: string
@@ -65,6 +44,27 @@ function TabPanel(props: TabPanelProps): JSX.Element {
     </div>
   )
 }
+
+const StyledTabPanel = styled(TabPanel)(({ theme }) => ({
+  [`& .${classes.newDeckButton}`]: {
+    marginBottom: 3,
+  },
+
+  [`& .${classes.unselectedList}`]: {
+    borderColor: 'lightgrey',
+  },
+
+  [`& .${classes.selectedList}`]: {
+    borderColor: theme.palette.primary.main,
+    backgroundColor: theme.palette.secondary.light,
+    color: theme.palette.secondary.contrastText,
+  },
+
+  [`& .${classes.deleteButton}`]: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+  },
+}))
 
 export function sortedVersionsForDeck(deck: DeckWithVersions): DecklistWithExtraInfo[] {
   return deck.versions.sort(

@@ -21,13 +21,6 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
   const asciiDocUrl =
     'https://raw.githubusercontent.com/Emerald-Legacy/rules-documents/main/docs/Rules%20Reference%20Guide.adoc'
 
-  useEffect(() => {
-    const myRequest = new Request(asciiDocUrl)
-    fetch(myRequest)
-      .then((resp) => resp.text())
-      .then((text) => reformatContent(text))
-  }, [])
-
   const reformatContent = (asciiDoc: string) => {
     // @ts-ignore
     const asciiDoctor = asciidoctor()
@@ -55,6 +48,13 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
     setToc(tableOfContents)
     setContent(document)
   }
+
+  useEffect(() => {
+    const myRequest = new Request(asciiDocUrl)
+    fetch(myRequest)
+      .then((resp) => resp.text())
+      .then((text) => reformatContent(text))
+  }, [])
 
   const TableOfContents = () => <div dangerouslySetInnerHTML={{ __html: toc }} />
 
