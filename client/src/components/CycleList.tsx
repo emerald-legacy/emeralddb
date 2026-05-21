@@ -1,12 +1,4 @@
-import {
-  Checkbox,
-  Collapse,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material'
+import { Checkbox, Collapse, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { useUiStore } from '../providers/UiStoreProvider'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
