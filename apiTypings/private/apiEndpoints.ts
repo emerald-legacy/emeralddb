@@ -151,6 +151,10 @@ export interface Decklists$unpublish {
   request: { params: { decklistId: string } }
 }
 
+export interface Ruling$findAll {
+  response: Ruling[]
+}
+
 export interface Ruling$create {
   request: { body: Omit<Ruling, 'id'> }
   response: Ruling
