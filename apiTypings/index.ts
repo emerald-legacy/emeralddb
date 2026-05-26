@@ -53,6 +53,7 @@ export type {
   Decklists$publish,
   Decklists$unpublish,
   Decklists$validate,
+  Ruling$findAll,
   Ruling$create,
   Ruling$delete,
   Ruling$update,
