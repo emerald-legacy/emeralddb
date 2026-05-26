@@ -9,9 +9,8 @@ import { getColorForFactionId } from '../utils/factionUtils'
 import { DecklistComments } from '../components/deck/DecklistComments'
 import { DeckStatisticsDisplay } from '../components/deck/DeckStatisticsDisplay'
 import { useUiStore } from '../providers/UiStoreProvider'
-import { Pack } from '@5rdb/api'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 export function DeckDetailView(): JSX.Element {
   const params = useParams<{ id: string }>()
@@ -60,7 +59,10 @@ export function DeckDetailView(): JSX.Element {
                     {decklist.description ? (
                       <Typography>
                         {decklist.description.split('\n').map((line, key) => (
-                          <span key={key}>{line}<br /></span>
+                          <span key={key}>
+                            {line}
+                            <br />
+                          </span>
                         ))}
                       </Typography>
                     ) : (
@@ -80,7 +82,13 @@ export function DeckDetailView(): JSX.Element {
             <Grid size={12}>
               <Card>
                 <CardContent>
-                  <DeckStatisticsDisplay cards={decklist.cards} allCards={cards} allPacks={packs} format={decklist.format} cardPackIds={decklist.card_pack_ids} />
+                  <DeckStatisticsDisplay
+                    cards={decklist.cards}
+                    allCards={cards}
+                    allPacks={packs}
+                    format={decklist.format}
+                    cardPackIds={decklist.card_pack_ids}
+                  />
                 </CardContent>
               </Card>
             </Grid>
@@ -88,5 +96,5 @@ export function DeckDetailView(): JSX.Element {
         </Grid>
       </Grid>
     </Box>
-  );
+  )
 }

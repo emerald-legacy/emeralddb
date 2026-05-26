@@ -14,7 +14,7 @@ export function getToken(): string | null {
 
 export function hasAuth0Token(): boolean {
   for (let i = 0; i < window.localStorage.length; i++) {
-    if (window.localStorage.key(i)?.includes("auth0")) {
+    if (window.localStorage.key(i)?.includes('auth0')) {
       return true
     }
   }

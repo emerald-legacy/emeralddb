@@ -1,7 +1,7 @@
 import { factions } from '../../utils/enums'
 import { getColorForFactionId } from '../../utils/factionUtils'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 export function CardFactionIcon(props: { faction?: string; colored?: boolean }): JSX.Element {
   if (!factions.some((faction) => faction.id === props.faction)) {

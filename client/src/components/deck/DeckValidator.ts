@@ -181,11 +181,10 @@ function validateDecklist(
       }
     })
   if (
-    uniq(allDeckCards.map((c) => c.faction))
-      .some(
-        (faction) =>
-          faction !== 'neutral' && faction !== stats.primaryClan && faction !== stats.secondaryClan
-      )
+    uniq(allDeckCards.map((c) => c.faction)).some(
+      (faction) =>
+        faction !== 'neutral' && faction !== stats.primaryClan && faction !== stats.secondaryClan
+    )
   ) {
     validationErrors.push(`Too many splash clans.`)
   }
@@ -316,13 +315,17 @@ function validateDecklist(
   return validationErrors
 }
 
+export const cardsThatModifyInfluence: { id: string; modifier: number }[] = [
+  { id: 'yatakabune-port', modifier: 4 },
+]
+
 export function createDeckStatistics(
   cards: Record<string, number>,
   formatId: string,
   allCardsWithVersions: CardWithVersions[],
   formats: Format[]
 ): DeckStatistics {
-  const format = formats.find(f => f.id === formatId)
+  const format = formats.find((f) => f.id === formatId)
   const { strongholds, provinces, roles, conflictCards, dynastyCards, allDeckCards } =
     splitCardsToDecks(cards || {}, allCardsWithVersions)
   const allIllegalCardIds = allCardsWithVersions
@@ -333,28 +336,28 @@ export function createDeckStatistics(
     .map((c) => c.id)
   const dynastyCardsWrapper = splitDynastyCards(dynastyCards)
   const conflictCardsWrapper = splitConflictCards(conflictCards)
-  const dynastyFateCost: { [cost: string]: number } = {};
+  const dynastyFateCost: { [cost: string]: number } = {}
   dynastyCards.forEach((card) => {
-    const cost = card.cost || 'X';
+    const cost = card.cost || 'X'
     if (dynastyFateCost[cost]) {
-      dynastyFateCost[cost] += card.quantity;
+      dynastyFateCost[cost] += card.quantity
     } else {
-      dynastyFateCost[cost] = card.quantity;
+      dynastyFateCost[cost] = card.quantity
     }
-  });
+  })
 
-  const conflictFateCost: { [cost: string]: number } = {};
+  const conflictFateCost: { [cost: string]: number } = {}
   conflictCards.forEach((card) => {
-    const cost = card.cost || 'X';
+    const cost = card.cost || 'X'
     if (conflictFateCost[cost]) {
-      conflictFateCost[cost] += card.quantity;
+      conflictFateCost[cost] += card.quantity
     } else {
-      conflictFateCost[cost] = card.quantity;
+      conflictFateCost[cost] = card.quantity
     }
-  });
+  })
   const stronghold = strongholds.length > 0 ? strongholds[0] : null
   const role = roles.length > 0 ? roles[0] : null
-  const baseInfluence = formatId === 'skirmish' ? 6 : stronghold?.influence_pool ?? 0
+  const baseInfluence = formatId === 'skirmish' ? 6 : (stronghold?.influence_pool ?? 0)
   const extraInfluenceFromRole = role
     ? role.id.includes('support')
       ? 8
@@ -396,7 +399,6 @@ export function createDeckStatistics(
       ? deckMinimum + numberOfRallyCards
       : deckMinimum
 
-  // @ts-ignore
   const stats: DeckStatistics = {
     maxInfluence: maxInfluence,
     usedInfluence: usedInfluence,
@@ -428,7 +430,3 @@ export function createDeckStatistics(
 
   return stats
 }
-
-export const cardsThatModifyInfluence: { id: string; modifier: number }[] = [
-  { id: 'yatakabune-port', modifier: 4 },
-]

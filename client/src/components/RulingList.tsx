@@ -1,5 +1,5 @@
 import { Ruling } from '@5rdb/api'
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles'
 import {
   Grid,
   Typography,
@@ -10,28 +10,24 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-} from '@mui/material';
+} from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { privateApi } from '../api'
 import { useCurrentUser } from '../providers/UserProvider'
 
-const PREFIX = 'RulingList';
+const PREFIX = 'RulingList'
 
 const classes = {
   editButton: `${PREFIX}-editButton`,
   createButton: `${PREFIX}-createButton`,
   deleteButton: `${PREFIX}-deleteButton`,
-  input: `${PREFIX}-input`
-};
+  input: `${PREFIX}-input`,
+}
 
-const StyledGrid = styled(Grid)((
-  {
-    theme
-  }
-) => ({
+const StyledGrid = styled(Grid)(({ theme }) => ({
   [`& .${classes.editButton}`]: {
     backgroundColor: theme.palette.warning.light,
     marginRight: theme.spacing(1),
@@ -48,11 +44,10 @@ const StyledGrid = styled(Grid)((
 
   [`& .${classes.input}`]: {
     marginBottom: theme.spacing(2),
-  }
-}));
+  },
+}))
 
 export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.Element {
-
   const { isRulesAdmin } = useCurrentUser()
   const confirm = useConfirm()
   const [rulingModalOpen, setRulingModalOpen] = useState(false)
@@ -81,69 +76,69 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
     setRulingModalOpen(true)
   }
 
-  function confirmDeletion(ruling: Ruling) {
-    confirm({ description: 'Do you really want to delete this ruling?' })
+  async function confirmDeletion(ruling: Ruling) {
+    const { confirmed } = await confirm({
+      title: 'Delete Ruling',
+      description: 'Do you really want to delete this ruling?',
+      confirmationText: 'Delete',
+    })
+    if (!confirmed) return
+    privateApi.Ruling.delete({ rulingId: ruling.id })
       .then(() => {
-        privateApi.Ruling.delete({ rulingId: ruling.id })
-          .then(() => {
-            window.location.reload()
-          })
-          .catch((error) => {
-            console.log(error)
-            enqueueSnackbar("The ruling couldn't be deleted!", { variant: 'error' })
-          })
+        window.location.reload()
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        console.log(error)
+        enqueueSnackbar("The ruling couldn't be deleted!", { variant: 'error' })
       })
   }
 
-  function createOrUpdateRuling() {
+  async function createOrUpdateRuling() {
     if (rulingId === -1) {
-      confirm({ description: 'Do you really want to create this ruling?' })
+      const { confirmed } = await confirm({
+        title: 'Create Ruling',
+        description: 'Do you really want to create this ruling?',
+        confirmationText: 'Create',
+      })
+      if (!confirmed) return
+      privateApi.Ruling.create({
+        body: {
+          card_id: props.cardId,
+          text: rulingText,
+          source: rulingSource,
+          link: rulingLink,
+        },
+      })
         .then(() => {
-          privateApi.Ruling.create({
-            body: {
-              card_id: props.cardId,
-              text: rulingText,
-              source: rulingSource,
-              link: rulingLink,
-            },
-          })
-            .then(() => {
-              window.location.reload()
-            })
-            .catch((error) => {
-              console.log(error)
-              enqueueSnackbar("The ruling couldn't be created!", { variant: 'error' })
-            })
+          window.location.reload()
         })
-        .catch(() => {
-          // Cancel confirmation dialog => do nothing
+        .catch((error) => {
+          console.log(error)
+          enqueueSnackbar("The ruling couldn't be created!", { variant: 'error' })
         })
     } else {
-      confirm({ description: 'Do you really want to update this ruling?' })
+      const { confirmed } = await confirm({
+        title: 'Update Ruling',
+        description: 'Do you really want to update this ruling?',
+        confirmationText: 'Update',
+      })
+      if (!confirmed) return
+      privateApi.Ruling.update({
+        rulingId: rulingId,
+        body: {
+          id: rulingId,
+          card_id: props.cardId,
+          text: rulingText,
+          source: rulingSource,
+          link: rulingLink,
+        },
+      })
         .then(() => {
-          privateApi.Ruling.update({
-            rulingId: rulingId,
-            body: {
-              id: rulingId,
-              card_id: props.cardId,
-              text: rulingText,
-              source: rulingSource,
-              link: rulingLink,
-            },
-          })
-            .then(() => {
-              window.location.reload()
-            })
-            .catch((error) => {
-              console.log(error)
-              enqueueSnackbar("The ruling couldn't be created!", { variant: 'error' })
-            })
+          window.location.reload()
         })
-        .catch(() => {
-          // Cancel confirmation dialog => do nothing
+        .catch((error) => {
+          console.log(error)
+          enqueueSnackbar("The ruling couldn't be created!", { variant: 'error' })
         })
     }
   }
@@ -173,9 +168,7 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
             <ReactMarkdown>
               {`${replaceLinkTo5rdb(ruling.text)} 
 
- ~ [${ruling.source}](${replaceLinkTo5rdb(
-                ruling.link
-              )})`}
+ ~ [${ruling.source}](${replaceLinkTo5rdb(ruling.link)})`}
             </ReactMarkdown>
           </Box>
           {isRulesAdmin() && (
@@ -210,7 +203,9 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
         </Button>
       )}
       <Dialog open={rulingModalOpen} onClose={() => setRulingModalOpen(false)}>
-        <DialogTitle sx={{ paddingBottom: 2 }}>{rulingId === -1 ? 'Create New Ruling' : 'Edit Ruling'}</DialogTitle>
+        <DialogTitle sx={{ paddingBottom: 2 }}>
+          {rulingId === -1 ? 'Create New Ruling' : 'Edit Ruling'}
+        </DialogTitle>
         <DialogContent>
           <Grid container spacing={1}>
             <Grid size={12}>
@@ -257,7 +252,11 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
         <DialogActions>
           <Grid container spacing={1} justifyContent="flex-end">
             <Grid>
-              <Button onClick={() => setRulingModalOpen(false)} color="secondary" variant="contained">
+              <Button
+                onClick={() => setRulingModalOpen(false)}
+                color="secondary"
+                variant="contained"
+              >
                 Close
               </Button>
             </Grid>
@@ -270,5 +269,5 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
         </DialogActions>
       </Dialog>
     </StyledGrid>
-  );
+  )
 }

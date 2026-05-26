@@ -1,5 +1,5 @@
-import React, { type JSX } from 'react';
-import { Box, Grid, Paper, Typography } from '@mui/material'
+import { type JSX } from 'react'
+import { Grid, Paper, Typography } from '@mui/material'
 import { BarChart } from '@mui/x-charts/BarChart'
 
 interface StatisticChartCardProps {
@@ -28,7 +28,13 @@ export function StatisticChartCard({
         {data.length > 0 ? (
           <BarChart
             xAxis={[{ scaleType: 'band', data: data.map((d) => d[dataKey]), hideTooltip: true }]}
-            series={[{ data: data.map((d) => d.count), valueFormatter: (value) => `${value}`, color: color }]}
+            series={[
+              {
+                data: data.map((d) => d.count),
+                valueFormatter: (value) => `${value}`,
+                color: color,
+              },
+            ]}
             height={160}
             slots={{ legend: () => null }}
             slotProps={{

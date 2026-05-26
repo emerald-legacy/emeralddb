@@ -8,6 +8,11 @@ import {
 import { Request, Response } from 'express'
 import { Decklist, Decklists$find, DecklistWithUser, DecklistWithExtraInfo } from '@5rdb/api'
 
+export async function addUsernameToDecklist(decklist: Decklist): Promise<DecklistWithUser> {
+  const user = await getUser(decklist.user_id)
+  return { ...decklist, username: user.name }
+}
+
 export async function handler(
   req: Request<Decklists$find['request']['params']>,
   res: Response<Decklists$find['response']>
@@ -29,11 +34,6 @@ export async function handler(
     )[0]
   }
   return addUsernameToDecklist(decklist)
-}
-
-export async function addUsernameToDecklist(decklist: Decklist): Promise<DecklistWithUser> {
-  const user = await getUser(decklist.user_id)
-  return { ...decklist, username: user.name }
 }
 
 export async function addExtraInfoToDecklist(decklist: Decklist): Promise<DecklistWithExtraInfo> {

@@ -1,33 +1,29 @@
-import { Checkbox, Collapse, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Checkbox, Collapse, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
+import { styled } from '@mui/material/styles'
 import { useUiStore } from '../providers/UiStoreProvider'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { Cycle, Pack } from '@5rdb/api'
 import { EmeraldDBLink } from './EmeraldDBLink'
 import CachedIcon from '@mui/icons-material/Cached'
 
-const PREFIX = 'CycleList';
+const PREFIX = 'CycleList'
 
 const classes = {
   cycle: `${PREFIX}-cycle`,
-  pack: `${PREFIX}-pack`
-};
+  pack: `${PREFIX}-pack`,
+}
 
-const StyledList = styled(List)((
-  {
-    theme
-  }
-) => ({
+const StyledList = styled(List)(({ theme }) => ({
   [`& .${classes.cycle}`]: {
     paddingLeft: theme.spacing(4),
   },
 
   [`& .${classes.pack}`]: {
     paddingLeft: theme.spacing(6),
-  }
-}));
+  },
+}))
 
 type CycleWithPacks = Cycle & {
   packs: Pack[]
@@ -49,7 +45,6 @@ export function CycleList(props: {
   const [checkedPackIds, setCheckedPackIds] = useState<string[]>(props.selectedPacks || [])
   const [allChecked, setAllChecked] = useState(false)
   const [expandedElements, setExpandedElements] = useState(['root'])
-
 
   if (
     !allChecked &&
@@ -235,12 +230,12 @@ export function CycleList(props: {
           </List>
         </Collapse>
       </div>
-    );
+    )
   }
 
   function createRootElement(): JSX.Element {
     return (
-      <List dense>
+      <StyledList dense>
         <ListItemButton onClick={() => toggleElementExpanded('root')}>
           {props.withCheckbox && (
             <ListItemIcon>
@@ -269,7 +264,7 @@ export function CycleList(props: {
             {cyclesWithPacks.map((cycle) => createCycleElement(cycle))}
           </List>
         </Collapse>
-      </List>
+      </StyledList>
     )
   }
 

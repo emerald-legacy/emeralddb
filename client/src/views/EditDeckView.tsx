@@ -7,7 +7,7 @@ import { RequestError } from '../components/RequestError'
 import { useDeck } from '../hooks/useDeck'
 import { useCurrentUser } from '../providers/UserProvider'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 export function EditDeckView(): JSX.Element {
   const params = useParams<{ id: string }>()

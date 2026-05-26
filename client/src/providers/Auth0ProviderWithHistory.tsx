@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, type JSX } from 'react';
+import React, { createContext, ReactNode, type JSX } from 'react'
 import { useNavigate } from 'react-router'
 import { Auth0Provider } from '@auth0/auth0-react'
 import { useAuth0Config } from '../hooks/useAuth0Config'
@@ -24,7 +24,7 @@ export function Auth0ProviderWithHistory(props: {
 
   const onRedirectCallback = (appState?: { returnTo?: string }) => {
     let location = appState?.returnTo || window.location.pathname
-    navigate(location + "cards")
+    navigate(location + 'cards')
   }
 
   const redirectUri = window.location.origin.includes('localhost')

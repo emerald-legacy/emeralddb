@@ -1,6 +1,6 @@
 import { Box, Button, Grid, IconButton, TextField, Typography } from '@mui/material'
 import { DecklistCommentWithChildren } from './DecklistComments'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { privateApi } from '../../api'
 import { useSnackbar } from 'notistack'
 import ReplyIcon from '@mui/icons-material/Reply'
@@ -62,20 +62,20 @@ export function DecklistComment(props: {
       .finally(() => setIsSaving(false))
   }
 
-  function confirmDeletion() {
-    confirm({ description: 'Do you really want to delete this comment?' })
+  async function confirmDeletion() {
+    const { confirmed } = await confirm({
+      title: 'Delete Comment',
+      description: 'Do you really want to delete this comment?',
+      confirmationText: 'Delete',
+    })
+    if (!confirmed) return
+    privateApi.Comment.delete({ id: props.comment.id })
       .then(() => {
-        privateApi.Comment.delete({ id: props.comment.id })
-          .then(() => {
-            props.onCommentsChange()
-            enqueueSnackbar('Successfully deleted comment!', { variant: 'success' })
-          })
-          .catch(() => {
-            enqueueSnackbar("The comment couldn't be deleted!", { variant: 'error' })
-          })
+        props.onCommentsChange()
+        enqueueSnackbar('Successfully deleted comment!', { variant: 'success' })
       })
       .catch(() => {
-        // Cancel confirmation dialog => do nothing
+        enqueueSnackbar("The comment couldn't be deleted!", { variant: 'error' })
       })
   }
 

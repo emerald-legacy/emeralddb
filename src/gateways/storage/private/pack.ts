@@ -32,7 +32,6 @@ export async function getPack(packId: string): Promise<Pack> {
 }
 
 export async function insertOrUpdatePack(pack: Pack): Promise<Pack> {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { size: _size, ...packWithoutSize } = pack
   const insert = pg(TABLE).insert({ ...packWithoutSize })
   const update = pg.queryBuilder().update({ ...packWithoutSize })

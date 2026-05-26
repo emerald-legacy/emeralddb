@@ -1,6 +1,6 @@
-import { Card, CardInPack, CardWithVersions } from "@5rdb/api";
-import { styled } from '@mui/material/styles';
-import { Box, Typography, Grid } from '@mui/material';
+import { Card, CardInPack, CardWithVersions } from '@5rdb/api'
+import { styled } from '@mui/material/styles'
+import { Box, Typography, Grid } from '@mui/material'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { convertTraitList } from '../../utils/cardTextUtils'
 import { getColorForFactionId } from '../../utils/factionUtils'
@@ -9,9 +9,9 @@ import { CardText } from './CardText'
 import { ElementSymbol } from './ElementSymbol'
 import { useNavigate } from 'react-router'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
-const PREFIX = 'CardInformation';
+const PREFIX = 'CardInformation'
 
 const classes = {
   clanMon: `${PREFIX}-clanMon`,
@@ -19,8 +19,8 @@ const classes = {
   stats: `${PREFIX}-stats`,
   packInfo: `${PREFIX}-packInfo`,
   crossedOutStats: `${PREFIX}-crossedOutStats`,
-  block: `${PREFIX}-block`
-};
+  block: `${PREFIX}-block`,
+}
 
 const StyledBox = styled(Box)(() => ({
   [`& .${classes.clanMon}`]: {
@@ -49,15 +49,14 @@ const StyledBox = styled(Box)(() => ({
 
   [`& .${classes.block}`]: {
     marginBottom: 10,
-  }
-}));
+  },
+}))
 
 export function FormattedValueOrCrossedOut(props: {
   value: string | undefined
   label: string
   icon?: string
 }): JSX.Element {
-
   if (props.value === undefined || props.value === null) {
     return (
       <Typography className={classes.crossedOutStats}>
@@ -68,7 +67,7 @@ export function FormattedValueOrCrossedOut(props: {
     return (
       <Typography className={classes.stats}>
         <b>{props.label}:</b> {props.value}
-        {props.icon && <span className={`icon icon-${props.icon}`}/>}
+        {props.icon && <span className={`icon icon-${props.icon}`} />}
       </Typography>
     )
   }
@@ -139,7 +138,6 @@ const InfluenceElement = (props: { influence: number | undefined }) => {
 }
 
 const ElementsElement = (props: { elements: string[] }) => {
-
   return (
     <Typography className={classes.stats}>
       <b>Elements: </b>
@@ -252,9 +250,7 @@ export function CardInformation(props: {
         </Grid>
       </Grid>
       <Grid container className={classes.block}>
-        <Grid size={12}>
-          {getCardStatInfo(card)}
-        </Grid>
+        <Grid size={12}>{getCardStatInfo(card)}</Grid>
       </Grid>
       <Grid container>
         <Grid size={12}>
@@ -300,5 +296,5 @@ export function CardInformation(props: {
         </Grid>
       )}
     </StyledBox>
-  );
+  )
 }

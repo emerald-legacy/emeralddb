@@ -32,21 +32,6 @@ function toDateInputValue(released_at: unknown): string {
   }
 }
 
-export function EditPackView(): JSX.Element {
-  const { packs, cycles } = useUiStore()
-  const params = useParams<{ id: string }>()
-
-  if (!packs || !cycles) {
-    return <Loading />
-  }
-  const pack = packs.find((p) => p.id === params.id)
-  if (!pack) {
-    return <RequestError requestError="No pack for that ID!" />
-  }
-
-  return <EditPackForm pack={pack} cycles={cycles} />
-}
-
 function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
   const { pack, cycles } = props
   const navigate = useNavigate()
@@ -141,10 +126,7 @@ function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
             />
             <FormControlLabel
               control={
-                <Checkbox
-                  checked={rotated}
-                  onChange={(e) => setRotated(e.target.checked)}
-                />
+                <Checkbox checked={rotated} onChange={(e) => setRotated(e.target.checked)} />
               }
               label="Rotated out"
             />
@@ -152,11 +134,7 @@ function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
         </CardContent>
       </Card>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-        <Button
-          variant="outlined"
-          onClick={() => navigate('/admin/cycles')}
-          disabled={saving}
-        >
+        <Button variant="outlined" onClick={() => navigate('/admin/cycles')} disabled={saving}>
           Cancel
         </Button>
         <Button
@@ -170,4 +148,19 @@ function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
       </Box>
     </Box>
   )
+}
+
+export function EditPackView(): JSX.Element {
+  const { packs, cycles } = useUiStore()
+  const params = useParams<{ id: string }>()
+
+  if (!packs || !cycles) {
+    return <Loading />
+  }
+  const pack = packs.find((p) => p.id === params.id)
+  if (!pack) {
+    return <RequestError requestError="No pack for that ID!" />
+  }
+
+  return <EditPackForm pack={pack} cycles={cycles} />
 }

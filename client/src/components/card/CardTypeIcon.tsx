@@ -10,7 +10,7 @@ import GavelIcon from '@mui/icons-material/Gavel'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import FlagIcon from '@mui/icons-material/Flag'
 
-import type { JSX } from "react";
+import type { JSX } from 'react'
 
 const icons = [
   { type: 'attachment', icon: AttachFileIcon },

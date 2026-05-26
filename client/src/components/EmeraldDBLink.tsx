@@ -1,4 +1,4 @@
-import type { ReactNode, MouseEvent, JSX } from 'react';
+import type { ReactNode, MouseEvent, JSX } from 'react'
 import { useNavigate } from 'react-router'
 import { styled } from '@mui/material/styles'
 
@@ -7,8 +7,8 @@ const StyledLink = styled('a')({
   textDecoration: 'none',
   display: 'inline',
   '&:hover': {
-    textDecoration: 'underline'
-  }
+    textDecoration: 'underline',
+  },
 })
 
 export function EmeraldDBLink(props: {
@@ -26,9 +26,7 @@ export function EmeraldDBLink(props: {
     navigate(route)
   }
 
-  function onLinkClick(
-    event: MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>
-  ) {
+  function onLinkClick(event: MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) {
     if (!props.openInNewTab) {
       event.preventDefault()
     }
@@ -49,7 +47,7 @@ export function EmeraldDBLink(props: {
       onMouseLeave={props.onMouseLeave}
       target={props.openInNewTab ? '_blank' : '_self'}
       style={{
-        cursor: props.notClickable ? 'default' : 'pointer'
+        cursor: props.notClickable ? 'default' : 'pointer',
       }}
     >
       {props.children}

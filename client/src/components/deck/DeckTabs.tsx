@@ -1,9 +1,9 @@
 import { DeckWithVersions } from '@5rdb/api'
-import { styled } from '@mui/material/styles';
-import { Box, Typography, Button, Grid, useMediaQuery, Tooltip } from '@mui/material';
+import { styled } from '@mui/material/styles'
+import { Box, Typography, Button, Grid, useMediaQuery, Tooltip } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { privateApi } from '../../api'
 import { CardFactionIcon } from '../card/CardFactionIcon'
 import { DecklistTabs, latestDecklistForDeck } from './DecklistTabs'
@@ -11,24 +11,18 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import LinkIcon from '@mui/icons-material/Link'
 import { EmeraldDBLink } from '../EmeraldDBLink'
-import { getFactionName } from '../../utils/factionUtils';
-import { useUiStore } from "../../providers/UiStoreProvider";
-
-const PREFIX = 'DeckTabs';
+import { getFactionName } from '../../utils/factionUtils'
+const PREFIX = 'DeckTabs'
 
 const classes = {
   unselectedDeck: `${PREFIX}-unselectedDeck`,
   selectedDeck: `${PREFIX}-selectedDeck`,
   newDeckButton: `${PREFIX}-newDeckButton`,
   format: `${PREFIX}-format`,
-  deleteButton: `${PREFIX}-deleteButton`
-};
+  deleteButton: `${PREFIX}-deleteButton`,
+}
 
-const StyledGrid = styled(Grid)((
-  {
-    theme
-  }
-) => ({
+const StyledGrid = styled(Grid)(({ theme }) => ({
   [`& .${classes.unselectedDeck}`]: {
     borderColor: 'lightgrey',
   },
@@ -51,16 +45,14 @@ const StyledGrid = styled(Grid)((
   [`& .${classes.deleteButton}`]: {
     backgroundColor: theme.palette.error.main,
     color: theme.palette.error.contrastText,
-  }
-}));
+  },
+}))
 
 export function DeckTabs(props: {
   decks: DeckWithVersions[]
   onDeckUpdated: () => void
 }): JSX.Element {
   const { decks } = props
-  const { formats } = useUiStore()
-
   const confirm = useConfirm()
   const { enqueueSnackbar } = useSnackbar()
   const [currentDeckId, setCurrentDeckId] = useState<string | undefined>()
@@ -74,22 +66,22 @@ export function DeckTabs(props: {
     }
   }
 
-  function confirmDeletion(deckId: string) {
-    confirm({ description: 'Do you really want to delete this deck and all of its decklists?' })
+  async function confirmDeletion(deckId: string) {
+    const { confirmed } = await confirm({
+      title: 'Delete Deck',
+      description: 'Do you really want to delete this deck and all of its decklists?',
+      confirmationText: 'Delete',
+    })
+    if (!confirmed) return
+    privateApi.Deck.delete({ deckId: deckId })
       .then(() => {
-        privateApi.Deck.delete({ deckId: deckId })
-          .then(() => {
-            props.onDeckUpdated()
-            setCurrentDeckId(undefined)
-            enqueueSnackbar('The deck was deleted successfully!', { variant: 'success' })
-          })
-          .catch((error) => {
-            console.log(error)
-            enqueueSnackbar("The deck couldn't be deleted!", { variant: 'error' })
-          })
+        props.onDeckUpdated()
+        setCurrentDeckId(undefined)
+        enqueueSnackbar('The deck was deleted successfully!', { variant: 'success' })
       })
-      .catch(() => {
-        // Cancel confirmation dialog => do nothing
+      .catch((error) => {
+        console.log(error)
+        enqueueSnackbar("The deck couldn't be deleted!", { variant: 'error' })
       })
   }
 
@@ -132,15 +124,14 @@ export function DeckTabs(props: {
                 >
                   <Grid container spacing={1} alignItems="center">
                     <Grid size={4}>
-                      <Typography>
-                        {latestList?.name || 'Empty Deck'}
-                      </Typography>
+                      <Typography>{latestList?.name || 'Empty Deck'}</Typography>
                     </Grid>
                     <Grid size={2}>
                       <Tooltip
                         title={`Main: ${getFactionName(latestList?.primary_clan) || 'N/A'} / Splash: ${
                           getFactionName(latestList?.secondary_clan) || 'N/A'
-                        }`}>
+                        }`}
+                      >
                         <span>
                           {latestList?.primary_clan && (
                             <CardFactionIcon faction={latestList.primary_clan} colored />
@@ -167,60 +158,61 @@ export function DeckTabs(props: {
                   </Grid>
                 </Box>
               </Grid>
-            );
+            )
           })}
         </Grid>
       </Grid>
       <Grid size={{ xs: 12, lg: 9, xl: 8 }}>
         <Grid container>
-          {currentDeckId && (() => {
-            const currentDeck = sortedDecks.find(d => d.id === currentDeckId)
-            const latestDecklistId = latestDecklistForDeck(currentDeck!)?.id
-            return (
-              <Grid size={12}>
-                <Grid container spacing={1} justifyContent="flex-end">
-                  <Grid size={4}>
-                    <EmeraldDBLink href={`/builder/${currentDeckId}/edit`}>
+          {currentDeckId &&
+            (() => {
+              const currentDeck = sortedDecks.find((d) => d.id === currentDeckId)
+              const latestDecklistId = latestDecklistForDeck(currentDeck!)?.id
+              return (
+                <Grid size={12}>
+                  <Grid container spacing={1} justifyContent="flex-end">
+                    <Grid size={4}>
+                      <EmeraldDBLink href={`/builder/${currentDeckId}/edit`}>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          fullWidth
+                          className={classes.newDeckButton}
+                          startIcon={<EditIcon />}
+                        >
+                          Edit Deck
+                        </Button>
+                      </EmeraldDBLink>
+                    </Grid>
+                    <Grid size={4}>
+                      <EmeraldDBLink href={`/decks/${latestDecklistId}`}>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          fullWidth
+                          className={classes.newDeckButton}
+                          startIcon={<LinkIcon />}
+                          disabled={!latestDecklistId}
+                        >
+                          Link (Latest Version)
+                        </Button>
+                      </EmeraldDBLink>
+                    </Grid>
+                    <Grid size={4}>
                       <Button
                         variant="contained"
-                        color="secondary"
+                        className={classes.deleteButton}
                         fullWidth
-                        className={classes.newDeckButton}
-                        startIcon={<EditIcon />}
+                        onClick={() => confirmDeletion(currentDeckId)}
+                        startIcon={<DeleteIcon />}
                       >
-                        Edit Deck
+                        Delete This Deck
                       </Button>
-                    </EmeraldDBLink>
-                  </Grid>
-                  <Grid size={4}>
-                    <EmeraldDBLink href={`/decks/${latestDecklistId}`}>
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        fullWidth
-                        className={classes.newDeckButton}
-                        startIcon={<LinkIcon />}
-                        disabled={!latestDecklistId}
-                      >
-                        Link (Latest Version)
-                      </Button>
-                    </EmeraldDBLink>
-                  </Grid>
-                  <Grid size={4}>
-                    <Button
-                      variant="contained"
-                      className={classes.deleteButton}
-                      fullWidth
-                      onClick={() => confirmDeletion(currentDeckId)}
-                      startIcon={<DeleteIcon />}
-                    >
-                      Delete This Deck
-                    </Button>
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
-            )
-          })()}
+              )
+            })()}
           <Grid size={12}>
             {sortedDecks.map((deck) => (
               <DecklistTabs
@@ -234,5 +226,5 @@ export function DeckTabs(props: {
         </Grid>
       </Grid>
     </StyledGrid>
-  );
+  )
 }

@@ -13,12 +13,12 @@ import {
   useMediaQuery,
   Container,
   List,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+} from '@mui/material'
+import { styled } from '@mui/material/styles'
 import { UserMenu } from './usermenu/UserMenu'
 import { useNavigate } from 'react-router'
 import { useCurrentUser } from '../providers/UserProvider'
-import { useState, type JSX } from 'react';
+import { useState, type JSX } from 'react'
 import { CycleList } from './CycleList'
 import SearchIcon from '@mui/icons-material/Search'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -26,14 +26,14 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import MenuIcon from '@mui/icons-material/Menu'
 import { EmeraldDBLink } from './EmeraldDBLink'
 
-const PREFIX = 'HeaderBar';
+const PREFIX = 'HeaderBar'
 
 const classes = {
   title: `${PREFIX}-title`,
   adminButton: `${PREFIX}-adminButton`,
   logo: `${PREFIX}-logo`,
-  searchField: `${PREFIX}-searchField`
-};
+  searchField: `${PREFIX}-searchField`,
+}
 
 const StyledAppBar = styled(AppBar)(() => ({
   [`& .${classes.title}`]: {
@@ -67,8 +67,8 @@ const StyledAppBar = styled(AppBar)(() => ({
     },
     minWidth: 50,
     maxWidth: 180,
-  }
-}));
+  },
+}))
 
 export enum Queries {
   USER = 'USER',
@@ -79,7 +79,6 @@ export enum Queries {
 }
 
 export function HeaderBar(props: { audience: string; scope: string }): JSX.Element {
-
   const navigate = useNavigate()
   const { isDataAdmin } = useCurrentUser()
   const [cardAnchorEl, setCardAnchorEl] = useState<null | HTMLElement>(null)
@@ -124,7 +123,11 @@ export function HeaderBar(props: { audience: string; scope: string }): JSX.Eleme
               <Grid container>
                 <Grid size={{ xs: 11, sm: 11, md: 2, lg: 3, xl: 2 }}>
                   <EmeraldDBLink href={'/'} onClick={() => closeModalsAndPopUps()}>
-                    <img src="/static/logo.webp" className={classes.logo} alt="Emerald Legacy Logo" />
+                    <img
+                      src="/static/logo.webp"
+                      className={classes.logo}
+                      alt="Emerald Legacy Logo"
+                    />
                   </EmeraldDBLink>
                 </Grid>
                 {isMdOrSmaller && (
@@ -132,7 +135,8 @@ export function HeaderBar(props: { audience: string; scope: string }): JSX.Eleme
                     <IconButton
                       color="inherit"
                       onClick={() => setIsMobileOpen(!isMobileOpen)}
-                      size="large">
+                      size="large"
+                    >
                       <MenuIcon />
                     </IconButton>
                   </Grid>
@@ -324,5 +328,5 @@ export function HeaderBar(props: { audience: string; scope: string }): JSX.Eleme
         </Container>
       </Toolbar>
     </StyledAppBar>
-  );
+  )
 }

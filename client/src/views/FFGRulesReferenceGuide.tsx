@@ -8,27 +8,23 @@ import {
   DialogContent,
   DialogActions,
   Button,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { useEffect, useState, type JSX } from 'react';
+} from '@mui/material'
+import { styled } from '@mui/material/styles'
+import { useEffect, useState, type JSX } from 'react'
 import TocIcon from '@mui/icons-material/Toc'
 
-const PREFIX = 'FFGRulesReferenceGuide';
+const PREFIX = 'FFGRulesReferenceGuide'
 
 const classes = {
   li: `${PREFIX}-li`,
   level1: `${PREFIX}-level1`,
   level2: `${PREFIX}-level2`,
   level3: `${PREFIX}-level3`,
-  fab: `${PREFIX}-fab`
-};
+  fab: `${PREFIX}-fab`,
+}
 
 // TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
-const Root = styled('div')((
-  {
-    theme
-  }
-) => ({
+const Root = styled('div')(({ theme }) => ({
   [`& .${classes.li}`]: {
     listStyle: 'none',
   },
@@ -51,8 +47,8 @@ const Root = styled('div')((
     position: 'absolute',
     bottom: theme.spacing(0.5),
     right: theme.spacing(0.5),
-  }
-}));
+  },
+}))
 
 interface Heading {
   href: string
@@ -88,7 +84,6 @@ function AnchoredHeading(props: {
 }
 
 export function FFGRulesReferenceGuide(): JSX.Element {
-
   const currentHost = window.location.host
   const currentProtocol = window.location.protocol
   const host = currentProtocol + '//' + currentHost
@@ -117,8 +112,8 @@ export function FFGRulesReferenceGuide(): JSX.Element {
               heading.level === '1'
                 ? classes.level1
                 : heading.level === '2'
-                ? classes.level2
-                : classes.level3
+                  ? classes.level2
+                  : classes.level3
             }`}
           >
             <a
@@ -6609,5 +6604,5 @@ export function FFGRulesReferenceGuide(): JSX.Element {
         </Grid>
       </Grid>
     </Root>
-  );
+  )
 }

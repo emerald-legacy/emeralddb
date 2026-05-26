@@ -28,6 +28,7 @@ import * as updateCard from './handlers/updateCard'
 import * as renameCard from './handlers/renameCard'
 import * as deleteCard from './handlers/deleteCard'
 import * as createCard from './handlers/createCard'
+import * as getAllRulings from './handlers/getAllRulings'
 import * as updateRuling from './handlers/updateRuling'
 import * as createRuling from './handlers/createRuling'
 import * as deleteDeck from './handlers/deleteDeck'
@@ -86,6 +87,7 @@ export default (): Router => {
   api.post('/decklists/validate', w(validateDecklist.handler))
   api.delete('/decklists/:decklistId', authorizedOnly, w(deleteDecklist.handler))
   api.put('/decklists', authorizedOnly, w(createDecklist.handler))
+  api.get('/rulings', w(getAllRulings.handler))
   api.put('/rulings', authorizedOnly, w(rulesAdminOnly), w(createRuling.handler))
   api.post('/rulings/:rulingId', authorizedOnly, w(rulesAdminOnly), w(updateRuling.handler))
   api.delete('/rulings/:rulingId', authorizedOnly, w(rulesAdminOnly), w(deleteRuling.handler))

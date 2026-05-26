@@ -1,26 +1,22 @@
-import { Button, ButtonGroup, Grid, TextField } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { useEffect, useState, type JSX } from 'react';
+import { Button, ButtonGroup, Grid, TextField } from '@mui/material'
+import { styled } from '@mui/material/styles'
+import { useEffect, useState, type JSX } from 'react'
 
-const PREFIX = 'CardValueFilter';
+const PREFIX = 'CardValueFilter'
 
 const classes = {
   buttonGroup: `${PREFIX}-buttonGroup`,
-  button: `${PREFIX}-button`
-};
+  button: `${PREFIX}-button`,
+}
 
-const StyledGrid = styled(Grid)((
-  {
-    theme
-  }
-) => ({
+const StyledGrid = styled(Grid)(() => ({
   [`& .${classes.button}`]: {
     height: 24,
     width: 24,
     minWidth: '24px !important',
     padding: 2,
-  }
-}));
+  },
+}))
 
 export enum ValueFilterType {
   GREATER,
@@ -35,14 +31,11 @@ export function CardValueFilter(props: {
   const [filterType, setFilterType] = useState<ValueFilterType>(ValueFilterType.EQUAL)
   const [filterString, setFilterString] = useState('')
 
-
   useEffect(() => props.onFilterChange(filterType, filterString), [filterType, filterString])
 
   return (
     <StyledGrid container alignItems="center" spacing={1}>
-      <Grid sx={{ width: 44, flexShrink: 0 }}>
-        {props.valueLabel}
-      </Grid>
+      <Grid sx={{ width: 44, flexShrink: 0 }}>{props.valueLabel}</Grid>
       <Grid sx={{ flexShrink: 0 }}>
         <ButtonGroup size="small" className={classes.buttonGroup} variant="contained">
           <Button
@@ -77,5 +70,5 @@ export function CardValueFilter(props: {
         />
       </Grid>
     </StyledGrid>
-  );
+  )
 }
