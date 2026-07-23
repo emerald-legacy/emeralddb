@@ -15,7 +15,7 @@ import { Card, Cards$delete } from '@5rdb/api'
 
 export const schema = {
   body: Joi.object<Cards$delete['request']['body']>({
-    replacementCardId: Joi.string(),
+    replacementCardId: Joi.string().allow(''),
   }),
 }
 
