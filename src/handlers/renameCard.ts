@@ -64,6 +64,15 @@ export async function handler(
     res.status(400).send(`Card with id ${req.body.existingCardId} doesn't exist.`)
     return
   }
+
+  if (req.body.newCardId === req.body.existingCardId) {
+    return insertOrUpdateCard({
+      ...existingCard,
+      name: req.body.name,
+      name_extra: req.body.nameExtra,
+    })
+  }
+
   if (await getCard(req.body.newCardId)) {
     res.status(400).send(`Card with id ${req.body.newCardId} already exists.`)
     return
