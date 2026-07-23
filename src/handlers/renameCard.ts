@@ -20,7 +20,7 @@ export const schema = {
     existingCardId: Joi.string().required(),
     newCardId: Joi.string().required(),
     name: Joi.string().required(),
-    nameExtra: Joi.string(),
+    nameExtra: Joi.string().allow(''),
   }),
 }
 
