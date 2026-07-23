@@ -7,8 +7,8 @@ export const schema = {
   body: Joi.object<Ruling$create['request']['body']>({
     card_id: Joi.string().required(),
     text: Joi.string().required(),
-    source: Joi.string().required(),
-    link: Joi.string().required(),
+    source: Joi.string().allow(''),
+    link: Joi.string().allow(''),
   }),
 }
 
