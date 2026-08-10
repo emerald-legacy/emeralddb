@@ -6,11 +6,11 @@ import { Ruling, Ruling$update } from '@5rdb/api'
 
 export const schema = {
   body: Joi.object<Ruling$update['request']['body']>({
-    id: Joi.string().required(),
+    id: Joi.number().required(),
     card_id: Joi.string().required(),
     text: Joi.string().required(),
-    source: Joi.string().required(),
-    link: Joi.string().required(),
+    source: Joi.string().allow(''),
+    link: Joi.string().allow(''),
   }),
 }
 

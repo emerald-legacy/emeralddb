@@ -1,17 +1,18 @@
 import { insertDecklist } from '../gateways/storage/index'
 import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
-import { Decklist, Decklists$create } from '@5rdb/api'
+import { Decklist } from '@5rdb/api'
 import { resolveCardPackIds } from './resolveCardPackIds'
 
 export const schema = {
-  body: Joi.object<Decklists$create['request']['body']>({
+  body: Joi.object<Decklist>({
+    id: Joi.string().allow(''),
     deck_id: Joi.string().required(),
     format: Joi.string().required(),
     name: Joi.string().required(),
-    primary_clan: Joi.string(),
-    secondary_clan: Joi.string(),
-    description: Joi.string(),
+    primary_clan: Joi.string().allow(''),
+    secondary_clan: Joi.string().allow(''),
+    description: Joi.string().allow(''),
     version_number: Joi.string().required(),
     cards: Joi.object().pattern(Joi.string(), Joi.number().min(1).max(3)).required(),
     card_pack_ids: Joi.object().pattern(Joi.string(), Joi.string()),
