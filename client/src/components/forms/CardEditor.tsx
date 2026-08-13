@@ -18,11 +18,32 @@ import { MultiCheckbox } from '../card/FormatCheckbox'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import SaveIcon from '@mui/icons-material/Save'
 import { useConfirm } from 'material-ui-confirm'
+import { useSnackbar } from 'notistack'
 import { privateApi } from '../../api'
 import { useNavigate } from 'react-router'
 import { toSlugId } from '../../utils/slugIdUtils'
 
 const Root = styled('form')(() => ({}))
+
+// The API answers a rejected card with either a string, a list of validation errors or
+// { message: [...] }. Flatten all of them so the editor can show what went wrong.
+function serverErrorMessage(error: any): string {
+  const data = error?.response?.data
+  if (typeof data === 'string' && data.length > 0) {
+    return data
+  }
+  if (Array.isArray(data)) {
+    return data.join(', ')
+  }
+  const message = data?.message
+  if (Array.isArray(message)) {
+    return message.join(', ')
+  }
+  if (typeof message === 'string' && message.length > 0) {
+    return message
+  }
+  return error?.message ?? 'unknown error'
+}
 
 export function CardEditor(props: { existingCard?: CardType; editMode?: boolean }): JSX.Element {
   const navigate = useNavigate()
@@ -63,6 +84,7 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
   const [influenceRequired, setInfluenceRequired] = useState(isSplashable)
 
   const confirm = useConfirm()
+  const { enqueueSnackbar } = useSnackbar()
 
   const setIdFromNameAndExtra = (name: string | undefined, name_extra: string | undefined) => {
     const baseName = name || ''
@@ -326,6 +348,9 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
           })
           .catch((error) => {
             console.log(error)
+            enqueueSnackbar(`The card couldn't be saved: ${serverErrorMessage(error)}`, {
+              variant: 'error',
+            })
           })
       }
     } else {
@@ -344,7 +369,9 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
         })
         .catch((error) => {
           console.log(error)
-          // TODO: Show error
+          enqueueSnackbar(`The card couldn't be created: ${serverErrorMessage(error)}`, {
+            variant: 'error',
+          })
         })
     }
   }
