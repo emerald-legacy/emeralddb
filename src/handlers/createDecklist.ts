@@ -5,18 +5,23 @@ import { Decklist } from '@5rdb/api'
 import { resolveCardPackIds } from './resolveCardPackIds'
 
 export const schema = {
-  body: Joi.object<Decklist>({
+  body: Joi.object<Decklist & { username?: string }>({
     id: Joi.string().allow(''),
     deck_id: Joi.string().required(),
     format: Joi.string().required(),
     name: Joi.string().required(),
-    primary_clan: Joi.string().allow(''),
-    secondary_clan: Joi.string().allow(''),
-    description: Joi.string().allow(''),
+    primary_clan: Joi.string().allow('', null),
+    secondary_clan: Joi.string().allow('', null),
+    description: Joi.string().allow('', null),
     version_number: Joi.string().required(),
     cards: Joi.object().pattern(Joi.string(), Joi.number().min(1).max(3)).required(),
     card_pack_ids: Joi.object().pattern(Joi.string(), Joi.string()),
-    published_date: Joi.date(),
+    published_date: Joi.date().allow(null),
+    // Server-owned fields. Clients echo them back when saving a new version of an existing
+    // decklist, so accept and drop them instead of rejecting the whole request.
+    created_at: Joi.any().strip(),
+    user_id: Joi.any().strip(),
+    username: Joi.any().strip(),
   }),
 }
 

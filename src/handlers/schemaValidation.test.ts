@@ -315,3 +315,76 @@ test('createDecklistComment accepts a reply (with parent_comment_id)', (t) => {
 test('updateDecklistComment accepts { comment }', (t) => {
   assertAccepted(t, updateCommentSchema, { comment: 'edited' })
 })
+
+// --- null-valued optional fields -------------------------------------------
+// Optional columns are NULL in the database, so a client that loads an entity and
+// saves it back sends null. Joi rejects null unless it is explicitly allowed.
+
+test('createDecklist accepts a saved-back decklist (null clans, server-owned fields)', (t) => {
+  assertAccepted(t, createDecklistSchema, {
+    id: 'dl1',
+    deck_id: 'd1',
+    format: 'emerald',
+    name: 'My Deck',
+    primary_clan: null,
+    secondary_clan: null,
+    description: null,
+    version_number: '0.2',
+    cards: { 'daidoji-hiroteru': 3 },
+    card_pack_ids: { 'daidoji-hiroteru': 'core' },
+    published_date: undefined,
+    created_at: '2026-01-01T00:00:00.000Z',
+    user_id: 'auth0|123',
+    username: 'someone',
+  })
+})
+
+test('createDecklist strips the server-owned user_id', (t) => {
+  const req = {
+    body: {
+      deck_id: 'd1',
+      format: 'emerald',
+      name: 'My Deck',
+      version_number: '0.2',
+      cards: { 'daidoji-hiroteru': 3 },
+      user_id: 'auth0|attacker',
+      created_at: '2026-01-01T00:00:00.000Z',
+    },
+    query: {},
+  } as any
+  const res = { status: () => res, send: () => res } as any
+  let nextCalls = 0
+  validate(createDecklistSchema)(req, res, (() => {
+    nextCalls += 1
+  }) as any)
+  t.is(nextCalls, 1)
+  t.false('user_id' in req.body)
+  t.false('created_at' in req.body)
+})
+
+test('updateRuling accepts null source and link', (t) => {
+  assertAccepted(t, updateRulingSchema, {
+    id: 5,
+    card_id: 'c',
+    text: 'ruling',
+    source: null,
+    link: null,
+  })
+})
+
+test('createRuling accepts null source and link', (t) => {
+  assertAccepted(t, createRulingSchema, { card_id: 'c', text: 'ruling', source: null, link: null })
+})
+
+test('createPack accepts null optional fields', (t) => {
+  assertAccepted(t, createPackSchema, {
+    id: 'pack1',
+    name: 'Pack',
+    position: 1,
+    cycle_id: 'core',
+    publisher_id: null,
+    released_at: null,
+    rotated: null,
+    size: null,
+  })
+})

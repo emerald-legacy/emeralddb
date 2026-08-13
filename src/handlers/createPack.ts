@@ -9,9 +9,10 @@ export const schema = {
     name: Joi.string().required(),
     position: Joi.number().required(),
     cycle_id: Joi.string().required(),
-    publisher_id: Joi.string(),
-    released_at: Joi.date(),
-    rotated: Joi.boolean(),
+    publisher_id: Joi.string().allow('', null),
+    released_at: Joi.date().allow(null),
+    rotated: Joi.boolean().allow(null),
+    size: Joi.number().allow(null),
   }),
 }
 

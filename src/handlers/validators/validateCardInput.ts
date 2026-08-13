@@ -49,7 +49,8 @@ export async function validateCardInput(card: Card): Promise<string[]> {
   if (card.side === 'conflict') {
     if (
       card.faction === 'shadowlands' &&
-      (card.influence_cost !== undefined || card.influence_cost !== null)
+      card.influence_cost !== undefined &&
+      card.influence_cost !== null
     ) {
       errors.push(`A shadowlands conflict card cannot have a value in 'influence_cost'`)
     }

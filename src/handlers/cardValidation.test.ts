@@ -138,3 +138,96 @@ test('update: empty text and empty role_restrictions array are accepted', (t) =>
   t.is(nextCalls, 1)
   t.deepEqual(statusCalls, [])
 })
+
+// --- null-valued optional fields -------------------------------------------
+// Optional card columns are NULL in the database, so the editor sends null when a field is
+// cleared. Joi rejects null unless it is explicitly allowed.
+
+// The exact payload from the CardEditor dialog that returned 400.
+const cardEditorPayload = {
+  allowed_clans: ['crane'],
+  banned_in: [],
+  cost: '5',
+  deck_limit: 3,
+  elements: [],
+  faction: 'crane',
+  fate: null,
+  glory: 2,
+  honor: null,
+  id: 'daidoji-hiroteru',
+  influence_cost: null,
+  influence_pool: null,
+  is_unique: true,
+  military: '4',
+  military_bonus: null,
+  name: 'Daidōji Hiroteru',
+  name_extra: null,
+  political: '2',
+  political_bonus: null,
+  restricted_in: [],
+  role_restrictions: [],
+  side: 'dynasty',
+  splash_banned_in: [],
+  strength: null,
+  strength_bonus: null,
+  text: 'While this character is dishonored...',
+  traits: ['bushi', 'shinobi', 'commander'],
+  type: 'character',
+}
+
+test('update: the CardEditor payload with null optional fields is accepted', (t) => {
+  const { statusCalls, nextCalls } = runValidation(updateSchema, cardEditorPayload)
+  t.is(nextCalls, 1)
+  t.deepEqual(statusCalls, [])
+})
+
+test('create: the CardEditor payload with null optional fields is accepted', (t) => {
+  const { statusCalls, nextCalls } = runValidation(createSchema, cardEditorPayload)
+  t.is(nextCalls, 1)
+  t.deepEqual(statusCalls, [])
+})
+
+test('update: a character without military/political values is accepted (dash on the card)', (t) => {
+  const { statusCalls, nextCalls } = runValidation(updateSchema, {
+    ...cardEditorPayload,
+    military: null,
+    political: null,
+  })
+  t.is(nextCalls, 1)
+  t.deepEqual(statusCalls, [])
+})
+
+test('update: null in a required field is still rejected', (t) => {
+  const { statusCalls, nextCalls } = runValidation(updateSchema, {
+    ...cardEditorPayload,
+    faction: null,
+  })
+  t.is(nextCalls, 0)
+  t.deepEqual(statusCalls, [400])
+})
+
+test('update: an unknown key is still rejected', (t) => {
+  const { statusCalls, nextCalls } = runValidation(updateSchema, {
+    ...cardEditorPayload,
+    unexpected: 'x',
+  })
+  t.is(nextCalls, 0)
+  t.deepEqual(statusCalls, [400])
+})
+
+test('rename: a null nameExtra is accepted', (t) => {
+  const { statusCalls, nextCalls } = runValidation(renameSchema, {
+    existingCardId: 'a',
+    newCardId: 'b',
+    name: 'B',
+    nameExtra: null,
+  })
+  t.is(nextCalls, 1)
+  t.deepEqual(statusCalls, [])
+})
+
+test('delete: a null replacementCardId is accepted', (t) => {
+  const { statusCalls, nextCalls } = runValidation(deleteSchema, { replacementCardId: null })
+  t.is(nextCalls, 1)
+  t.deepEqual(statusCalls, [])
+})
