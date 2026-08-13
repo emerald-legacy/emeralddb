@@ -9,8 +9,8 @@ export const schema = {
     id: Joi.number().required(),
     card_id: Joi.string().required(),
     text: Joi.string().required(),
-    source: Joi.string().allow(''),
-    link: Joi.string().allow(''),
+    source: Joi.string().allow('', null),
+    link: Joi.string().allow('', null),
   }),
 }
 

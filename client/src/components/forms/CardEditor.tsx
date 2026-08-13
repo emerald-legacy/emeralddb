@@ -25,6 +25,10 @@ import { toSlugId } from '../../utils/slugIdUtils'
 
 const Root = styled('form')(() => ({}))
 
+// Optional card fields are nullable columns. The editor sends null (not undefined) for cleared
+// fields so that an update actually resets the column instead of keeping the previous value.
+type CardBody = { [K in keyof CardType]: CardType[K] | null }
+
 // The API answers a rejected card with either a string, a list of validation errors or
 // { message: [...] }. Flatten all of them so the editor can show what went wrong.
 function serverErrorMessage(error: any): string {
@@ -277,38 +281,46 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
     return changes
   }
 
-  function assembleCard(): CardType {
-    const card: CardType = {
+  // An empty stat means "no value" and is rendered as a crossed-out label on the card, so it has to
+  // be stored as NULL. An empty text field yields '' and a cleared number field yields NaN; both
+  // are sent as explicit null, because a field left out of the body would keep its old DB value.
+  const emptyToNull = (value: string | undefined | null) =>
+    value === null || value === undefined || value.trim() === '' ? null : value
+
+  const nanToNull = (value: number | undefined | null) =>
+    value === null || value === undefined || Number.isNaN(value) ? null : value
+
+  function assembleCard(): CardBody {
+    const card: CardBody = {
       id: id,
       name: name,
-      name_extra: name_extra,
+      name_extra: emptyToNull(name_extra),
       faction: faction,
       side: side,
       type: type,
       is_unique: is_unique,
       role_restrictions: role_restrictions,
-      text: text,
+      text: emptyToNull(text),
       restricted_in: restricted_in,
       banned_in: banned_in,
       splash_banned_in: splash_banned_in,
       allowed_clans: allowed_clans,
       deck_limit: deck_limit,
       traits: traits,
-      cost: cost,
-      influence_cost: influence_cost,
+      cost: emptyToNull(cost),
+      influence_cost: nanToNull(influence_cost),
       elements: elements,
-      strength: strength,
-      glory: glory,
-      fate: fate,
-      honor: honor,
-      influence_pool: influence_pool,
-      strength_bonus: strength_bonus,
-      military: military,
-      political: political,
-      military_bonus: military_bonus,
-      political_bonus: political_bonus,
+      strength: emptyToNull(strength),
+      glory: nanToNull(glory),
+      fate: nanToNull(fate),
+      honor: nanToNull(honor),
+      influence_pool: nanToNull(influence_pool),
+      strength_bonus: emptyToNull(strength_bonus),
+      military: emptyToNull(military),
+      political: emptyToNull(political),
+      military_bonus: emptyToNull(military_bonus),
+      political_bonus: emptyToNull(political_bonus),
     }
-    console.log(card)
     return card
   }
 

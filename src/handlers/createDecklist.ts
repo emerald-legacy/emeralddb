@@ -10,13 +10,13 @@ export const schema = {
     deck_id: Joi.string().required(),
     format: Joi.string().required(),
     name: Joi.string().required(),
-    primary_clan: Joi.string().allow(''),
-    secondary_clan: Joi.string().allow(''),
-    description: Joi.string().allow(''),
+    primary_clan: Joi.string().allow('', null),
+    secondary_clan: Joi.string().allow('', null),
+    description: Joi.string().allow('', null),
     version_number: Joi.string().required(),
     cards: Joi.object().pattern(Joi.string(), Joi.number().min(1).max(3)).required(),
     card_pack_ids: Joi.object().pattern(Joi.string(), Joi.string()),
-    published_date: Joi.date(),
+    published_date: Joi.date().allow(null),
   }),
 }
 
