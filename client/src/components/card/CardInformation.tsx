@@ -57,7 +57,7 @@ export function FormattedValueOrCrossedOut(props: {
   label: string
   icon?: string
 }): JSX.Element {
-  if (props.value === undefined || props.value === null) {
+  if (props.value === undefined || props.value === null || props.value.trim() === '') {
     return (
       <Typography className={classes.crossedOutStats}>
         <b>{props.label}</b>

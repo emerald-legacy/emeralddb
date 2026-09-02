@@ -153,7 +153,13 @@ export function CardDetailView(): JSX.Element {
       })
       .catch((error) => {
         console.log(error)
-        enqueueSnackbar("The card couldn't be renamed!", { variant: 'error' })
+        const serverMessage = error?.data?.()
+        enqueueSnackbar(
+          serverMessage
+            ? `The card couldn't be renamed: ${serverMessage}`
+            : "The card couldn't be renamed!",
+          { variant: 'error' }
+        )
       })
   }
 
