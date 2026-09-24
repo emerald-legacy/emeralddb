@@ -11,6 +11,8 @@ import { EmeraldDBLink } from '../EmeraldDBLink'
 
 import type { JSX } from 'react'
 
+const chipWidth = 104
+
 const legalityStyles: Record<Legality, { label: string; color: string; icon: JSX.Element }> = {
   legal: { label: 'Legal', color: '#2e7d32', icon: <CheckCircleIcon /> },
   restricted: { label: 'Restricted', color: '#b54a00', icon: <WarningIcon /> },
@@ -29,15 +31,15 @@ function LegalityChip(props: { legality: Legality }): JSX.Element {
       label={style.label}
       variant={isOutlined ? 'outlined' : 'filled'}
       sx={{
-        width: 104,
+        width: chipWidth,
         height: 22,
         justifyContent: 'flex-start',
         borderRadius: '3px',
         fontSize: '0.75rem',
         fontWeight: 500,
-        color: isOutlined ? style.color : '#fff',
-        backgroundColor: isOutlined ? 'transparent' : style.color,
-        borderColor: '#bdbdbd',
+        ...(isOutlined
+          ? { color: style.color, borderColor: '#bdbdbd' }
+          : { color: '#fff', backgroundColor: style.color }),
         '& .MuiChip-icon': {
           color: 'inherit',
           fontSize: 14,
@@ -72,7 +74,7 @@ export function CardLegality(props: { card: CardWithVersions; maxWidth: number }
           margin: 0,
           padding: 0,
           display: 'grid',
-          gridTemplateColumns: '104px 1fr',
+          gridTemplateColumns: `${chipWidth}px 1fr`,
           columnGap: '10px',
           rowGap: '6px',
           alignItems: 'center',
