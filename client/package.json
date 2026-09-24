@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@5rdb/api": "file:../apiTypings",
+    "@asciidoctor/core": "^4.1.0",
     "@auth0/auth0-react": "^2.27.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -23,7 +24,6 @@
     "@types/react": "19.2.13",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
-    "asciidoctor": "^3.0.4",
     "axios": "^1.20.0",
     "clsx": "^2.1.1",
     "csstype": "^3.1.3",

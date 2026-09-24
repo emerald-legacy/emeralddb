@@ -1,5 +1,5 @@
 import { useEffect, useState, type JSX } from 'react'
-import asciidoctor from 'asciidoctor'
+import { convert } from '@asciidoctor/core'
 import {
   Box,
   Button,
@@ -21,10 +21,8 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
   const asciiDocUrl =
     'https://raw.githubusercontent.com/Emerald-Legacy/rules-documents/main/docs/Rules%20Reference%20Guide.adoc'
 
-  function reformatContent(asciiDoc: string) {
-    const asciiDoctor = asciidoctor()
-    const convertedHtml = asciiDoctor
-      .convert(asciiDoc)
+  async function reformatContent(asciiDoc: string) {
+    const convertedHtml = (await convert(asciiDoc))
       .toString()
       .replaceAll('[Air]', '<span class=\"icon icon-element-air\"></span>')
       .replaceAll('[Earth]', '<span class=\"icon icon-element-earth\"></span>')
