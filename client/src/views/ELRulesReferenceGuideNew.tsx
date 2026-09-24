@@ -64,7 +64,12 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
           <Typography variant="h4">Emerald Legacy: Rules Reference</Typography>
           <p>
             PDF Version available{' '}
-            <a href={'https://emeraldlegacy.org/rules/'} target={'_blank'}>
+            <a
+              href={
+                'https://emerald-legacy.github.io/rules-documents/Rules%20Reference%20Guide.pdf'
+              }
+              target={'_blank'}
+            >
               here
             </a>
             .
