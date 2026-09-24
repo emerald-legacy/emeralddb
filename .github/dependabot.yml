@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # Keeps the pinned action versions in .github/workflows up to date
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+
+  # Backend dependencies (package.json / yarn.lock in the repository root)
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    groups:
+      # One pull request for all minor and patch updates; major updates get their own
+      backend-minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+
+  # Frontend dependencies (client/package.json / client/yarn.lock)
+  - package-ecosystem: 'npm'
+    directory: '/client'
+    schedule:
+      interval: 'weekly'
+    groups:
+      # One pull request for all minor and patch updates; major updates get their own
+      frontend-minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+    ignore:
+      # Pinned to an exact version through "resolutions" in client/package.json
+      - dependency-name: '@types/react'
