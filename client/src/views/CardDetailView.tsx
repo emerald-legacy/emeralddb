@@ -21,6 +21,7 @@ import { Loading } from '../components/Loading'
 import { RequestError } from '../components/RequestError'
 import { useCard } from '../hooks/useCard'
 import { CardInformation } from '../components/card/CardInformation'
+import { CardLegality } from '../components/card/CardLegality'
 import { CardInPack } from '@5rdb/api'
 import { useCurrentUser } from '../providers/UserProvider'
 import { RulingList } from '../components/RulingList'
@@ -218,6 +219,9 @@ export function CardDetailView(): JSX.Element {
                   />
                 </Grid>
               )}
+              <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                <CardLegality card={card} maxWidth={imageWidth} />
+              </Grid>
               {isDataAdmin() && (
                 <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                   <Button
