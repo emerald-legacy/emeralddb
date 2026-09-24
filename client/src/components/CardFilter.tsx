@@ -25,6 +25,7 @@ import useDebounce from '../hooks/useDebounce'
 import { isEqual } from 'lodash'
 import { CardValueFilter, ValueFilterType } from './CardValueFilter'
 import { ElementSymbol } from './card/ElementSymbol'
+import { isInCardPool } from '../utils/legalityUtils'
 
 const PREFIX = 'CardFilter'
 
@@ -309,7 +310,6 @@ export function applyFilters(
   let filteredCards = cards
   let chosenFormat = filter.format && formats.find((format) => format.id === filter.format)
   if (chosenFormat) {
-    let legalPacksOfFormat = chosenFormat.legal_packs || []
     if (filter.banned === 'only' || filter.restricted === 'only') {
       if (filter.banned === 'only') {
         filteredCards = filteredCards.filter((c) => c.banned_in?.includes(filter.format))
@@ -318,13 +318,7 @@ export function applyFilters(
       }
     } else {
       if (filter.illegal === 'false') {
-        filteredCards = filteredCards.filter((c) =>
-          c.versions.some(
-            (version) =>
-              legalPacksOfFormat.some((pack) => version.pack_id === pack) &&
-              (chosenFormat.id != 'emerald' || !version.rotated)
-          )
-        )
+        filteredCards = filteredCards.filter((c) => isInCardPool(c, chosenFormat))
       }
       if (filter.restricted === 'false') {
         filteredCards = filteredCards.filter((c) => !c.restricted_in?.includes(filter.format))
