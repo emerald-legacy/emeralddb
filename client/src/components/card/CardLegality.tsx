@@ -93,9 +93,13 @@ export function CardLegality(props: { card: CardWithVersions; maxWidth: number }
                   color: isPlayable ? 'inherit' : 'text.secondary',
                 }}
               >
-                <EmeraldDBLink href={`/rules/organized-play/${format.id}`}>
-                  {format.name}
-                </EmeraldDBLink>
+                {legality === 'not-legal' ? (
+                  format.name
+                ) : (
+                  <EmeraldDBLink href={`/rules/organized-play/${format.id}`}>
+                    {format.name}
+                  </EmeraldDBLink>
+                )}
               </Box>
             </Box>
           )
