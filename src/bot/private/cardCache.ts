@@ -20,7 +20,11 @@ interface Cache {
 const cache: Cache = {
   registry: new Map(),
   expiresAt: 0, // Initialize the cache as expired
-  fuzzy: new Fuse([], { isCaseSensitive: false, includeScore: true, ignoreLocation: true }),
+  fuzzy: new Fuse<Card['name']>([], {
+    isCaseSensitive: false,
+    includeScore: true,
+    ignoreLocation: true,
+  }),
 }
 
 const fiveMinutesFromNow = () => Date.now() + 1000 * 60 * 5
