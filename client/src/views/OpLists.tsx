@@ -30,7 +30,7 @@ const ruleDocuments: Record<string, { name: string; link: string }> = {
 export function OpLists(): JSX.Element {
   const params = useParams<{ format: string }>()
   const { cards, cycles, packs, relevantFormats } = useUiStore()
-  const [format, setFormat] = useState(params.format! || '')
+  const [format, setFormat] = useState(params.format || 'emerald')
   const [filterClan, setFilterClan] = useState('')
   const navigate = useNavigate()
 
