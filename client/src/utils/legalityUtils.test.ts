@@ -1,6 +1,6 @@
 import test from 'ava'
 import type { CardWithVersions, Format } from '@5rdb/api'
-import { getCardLegality, getFormatLegalities } from './legalityUtils'
+import { getCardLegality, getFormatLegalities, isInCardPool } from './legalityUtils'
 
 function makeFormat(id: string, legalPacks: string[] | undefined, position = 1): Format {
   return { id, name: id, legal_packs: legalPacks, supported: true, position }
@@ -124,12 +124,29 @@ test('the order of printings does not matter', (t) => {
   t.is(getCardLegality(card, emerald), 'legal')
 })
 
+test('banned and restricted cards are still in the card pool', (t) => {
+  const card = makeCard({
+    versions: [printing('spreading-shadows')],
+    banned_in: ['emerald'],
+    restricted_in: ['standard'],
+  })
+  t.true(isInCardPool(card, emerald))
+  t.true(isInCardPool(card, stronghold))
+  t.false(isInCardPool(card, sanctuary))
+})
+
+test('rotated cards are not in the Emerald Legacy card pool', (t) => {
+  const card = makeCard({ versions: [printing('spreading-shadows', true)] })
+  t.false(isInCardPool(card, emerald))
+  t.true(isInCardPool(card, stronghold))
+})
+
 test('legalities are listed for every format in position order', (t) => {
   const card = makeCard({ versions: [printing('spreading-shadows')], restricted_in: ['emerald'] })
   const formats = [
-    makeFormat('obsidian', obsidian.legal_packs, 6),
-    makeFormat('sanctuary', sanctuary.legal_packs, 1),
-    makeFormat('emerald', emerald.legal_packs, 2),
+    { ...obsidian, position: 6 },
+    { ...sanctuary, position: 1 },
+    { ...emerald, position: 2 },
   ]
   t.deepEqual(
     getFormatLegalities(card, formats).map(({ format, legality }) => [format.id, legality]),

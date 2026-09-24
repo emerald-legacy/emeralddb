@@ -4,13 +4,16 @@ export type Legality = 'legal' | 'restricted' | 'banned' | 'rotated' | 'not-lega
 
 // A card is in a format's pool if any of its printings is in a legal pack.
 // Rotation only applies to the Emerald Legacy format.
-export function getCardLegality(card: CardWithVersions, format: Format): Legality {
+export function isInCardPool(card: CardWithVersions, format: Format): boolean {
   const legalPacks = format.legal_packs || []
-  const isInPool = card.versions.some(
+  return card.versions.some(
     (version) =>
       legalPacks.includes(version.pack_id) && (format.id !== 'emerald' || !version.rotated)
   )
-  if (!isInPool) {
+}
+
+export function getCardLegality(card: CardWithVersions, format: Format): Legality {
+  if (!isInCardPool(card, format)) {
     const isRotated = format.id === 'emerald' && card.versions.some((version) => version.rotated)
     return isRotated ? 'rotated' : 'not-legal'
   }
