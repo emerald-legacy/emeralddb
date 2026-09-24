@@ -7,9 +7,7 @@ interface State<D> {
 }
 
 type Action<D> =
-  | { type: 'startRequest' }
-  | { type: 'success'; payload: D }
-  | { type: 'error'; error: string }
+  { type: 'startRequest' } | { type: 'success'; payload: D } | { type: 'error'; error: string }
 
 // Generic response interface for API calls
 interface ApiResponse<T = any> {

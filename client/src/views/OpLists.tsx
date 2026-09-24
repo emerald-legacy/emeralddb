@@ -7,6 +7,7 @@ import { clans } from '../utils/enums'
 import { OrganizedPlayList } from '../components/OrganizedPlayList'
 import { useNavigate, useParams } from 'react-router'
 import { CardLink } from '../components/card/CardLink'
+import { getCardLegality } from '../utils/legalityUtils'
 
 const emeraldEdict = {
   name: 'Emerald Legacy - Emerald Edict',
@@ -29,7 +30,7 @@ const ruleDocuments: Record<string, { name: string; link: string }> = {
 export function OpLists(): JSX.Element {
   const params = useParams<{ format: string }>()
   const { cards, cycles, packs, relevantFormats } = useUiStore()
-  const [format, setFormat] = useState(params.format! || '')
+  const [format, setFormat] = useState(params.format || 'emerald')
   const [filterClan, setFilterClan] = useState('')
   const navigate = useNavigate()
 
@@ -45,8 +46,11 @@ export function OpLists(): JSX.Element {
 
   const allCards = !filterClan ? cards : cards.filter((c) => c.allowed_clans?.includes(filterClan))
 
-  const restrictedCards = format ? allCards.filter((c) => c.restricted_in?.includes(format)) : []
-  const bannedCards = format ? allCards.filter((c) => c.banned_in?.includes(format)) : []
+  // Cards that are rotated out of or not part of the card pool are left out of the lists
+  const cardsWithLegality = (legality: 'banned' | 'restricted') =>
+    chosenFormat ? allCards.filter((c) => getCardLegality(c, chosenFormat) === legality) : []
+  const restrictedCards = cardsWithLegality('restricted')
+  const bannedCards = cardsWithLegality('banned')
   const rotatedCards =
     format === 'emerald'
       ? allCards

@@ -232,26 +232,10 @@ export function HeaderBar(props: { audience: string; scope: string }): JSX.Eleme
                             <List dense>
                               <ListItem>
                                 <EmeraldDBLink
-                                  href="/rules/organized-play"
-                                  onClick={closeModalsAndPopUps}
-                                >
-                                  <b>Restricted and Banned Lists</b>
-                                </EmeraldDBLink>
-                              </ListItem>
-                              <ListItem>
-                                <EmeraldDBLink
                                   href="/rules/organized-play/emerald"
                                   onClick={closeModalsAndPopUps}
                                 >
-                                  - Emerald Legacy
-                                </EmeraldDBLink>
-                              </ListItem>
-                              <ListItem>
-                                <EmeraldDBLink
-                                  href="/rules/organized-play/standard"
-                                  onClick={closeModalsAndPopUps}
-                                >
-                                  - Fantasy Flight Games
+                                  <b>Restricted and Banned Lists</b>
                                 </EmeraldDBLink>
                               </ListItem>
                               <ListItem>

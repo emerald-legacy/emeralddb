@@ -52,8 +52,10 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
               scope: props.scope,
             },
           })
-          setToken(accessToken)
-          queryClient.invalidateQueries({ queryKey: [Queries.USER] })
+          if (accessToken) {
+            setToken(accessToken)
+            queryClient.invalidateQueries({ queryKey: [Queries.USER] })
+          }
         }
       } catch (e) {
         console.error('Failed to get access token:', e)
