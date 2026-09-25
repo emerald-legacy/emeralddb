@@ -199,8 +199,21 @@ export function DecklistTabs(props: {
             <Grid size={12}>
               {versions.map((v) => (
                 <div hidden={v.id !== currentDecklistId} key={v.id}>
-                  <Box border="1px solid" borderBottom="0" bgcolor="lightgray" p={2}>
-                    <Grid container spacing={1} justifyContent="flex-end">
+                  <Box
+                    sx={{
+                      border: '1px solid',
+                      borderBottom: '0',
+                      bgcolor: 'lightgray',
+                      p: 2,
+                    }}
+                  >
+                    <Grid
+                      container
+                      spacing={1}
+                      sx={{
+                        justifyContent: 'flex-end',
+                      }}
+                    >
                       <Grid size={{ xs: 6, md: 4 }}>
                         <EmeraldDBLink href={`/decks/${v.id}`}>
                           <Button
@@ -253,7 +266,12 @@ export function DecklistTabs(props: {
                       </Grid>
                     </Grid>
                   </Box>
-                  <Box border="1px solid" p={2}>
+                  <Box
+                    sx={{
+                      border: '1px solid',
+                      p: 2,
+                    }}
+                  >
                     <Decklist decklist={v} />
                   </Box>
                 </div>

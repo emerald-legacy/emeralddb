@@ -82,7 +82,13 @@ export function DecklistComment(props: {
   return (
     <Grid container spacing={1}>
       <Grid size={12}>
-        <Box border="1px solid" borderRadius="4px" p={2}>
+        <Box
+          sx={{
+            border: '1px solid',
+            borderRadius: '4px',
+            p: 2,
+          }}
+        >
           {isEditMode ? (
             <>
               <Grid container spacing={1}>
@@ -205,7 +211,11 @@ export function DecklistComment(props: {
       </Grid>
       {props.comment.children.map((comment) => (
         <Grid key={comment.id} size={12}>
-          <Box paddingLeft={4}>
+          <Box
+            sx={{
+              paddingLeft: 4,
+            }}
+          >
             <DecklistComment comment={comment} onCommentsChange={() => props.onCommentsChange()} />
           </Box>
         </Grid>

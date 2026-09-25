@@ -62,7 +62,13 @@ export function CardTextEditor(props: {
       </Grid>
       <Grid size={12}>
         <Typography>Preview:</Typography>
-        <Box borderColor={color} borderLeft={5} paddingLeft="10px">
+        <Box
+          sx={{
+            borderColor: color,
+            borderLeft: 5,
+            paddingLeft: '10px',
+          }}
+        >
           <CardText text={text} />
         </Box>
       </Grid>

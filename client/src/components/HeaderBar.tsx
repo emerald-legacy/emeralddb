@@ -118,7 +118,12 @@ export function HeaderBar(props: { audience: string; scope: string }): JSX.Eleme
     <StyledAppBar position="fixed">
       <Toolbar variant="dense">
         <Container maxWidth={false}>
-          <Grid container justifyContent={'center'}>
+          <Grid
+            container
+            sx={{
+              justifyContent: 'center',
+            }}
+          >
             <Grid size={{ xs: 12, lg: is1440PxOrBigger ? 10 : 12, xl: 10 }}>
               <Grid container>
                 <Grid size={{ xs: 11, sm: 11, md: 2, lg: 3, xl: 2 }}>
@@ -144,10 +149,12 @@ export function HeaderBar(props: { audience: string; scope: string }): JSX.Eleme
                 <Grid size={{ xs: 12, sm: 12, md: 10, lg: 9, xl: 10 }}>
                   <Collapse in={!isMdOrSmaller || isMobileOpen}>
                     <Grid
-                      direction={isMdOrSmaller ? 'column' : 'row'}
                       container
-                      justifyContent="flex-end"
-                      alignItems={isMdOrSmaller ? 'flex-end' : 'center'}
+                      sx={{
+                        flexDirection: isMdOrSmaller ? 'column' : 'row',
+                        justifyContent: 'flex-end',
+                        alignItems: isMdOrSmaller ? 'flex-end' : 'center',
+                      }}
                     >
                       <Grid>
                         <ListItemButton dense={isMdOrSmaller}>
@@ -286,16 +293,18 @@ export function HeaderBar(props: { audience: string; scope: string }): JSX.Eleme
                             placeholder="Search Card..."
                             size="small"
                             variant="outlined"
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <SearchIcon />
-                                </InputAdornment>
-                              ),
-                            }}
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onKeyDown={listenToEnterDown}
+                            slotProps={{
+                              input: {
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <SearchIcon />
+                                  </InputAdornment>
+                                ),
+                              },
+                            }}
                           />
                         </ListItem>
                       </Grid>

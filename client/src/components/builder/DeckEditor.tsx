@@ -300,7 +300,12 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
               </Button>
             </Grid>
             <Grid size={12}>
-              <Box border="1px solid" padding={3}>
+              <Box
+                sx={{
+                  border: '1px solid',
+                  padding: 3,
+                }}
+              >
                 <Decklist decklist={decklist} withoutHeader onQuantityChange={changeCardQuantity} />
               </Box>
             </Grid>
@@ -378,7 +383,12 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
                     />
                   )}
                 </Box>
-                <Box hidden={currentView !== ViewTypes.DESCRIPTION} p={1}>
+                <Box
+                  hidden={currentView !== ViewTypes.DESCRIPTION}
+                  sx={{
+                    p: 1,
+                  }}
+                >
                   <TextField
                     value={description}
                     multiline

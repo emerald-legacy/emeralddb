@@ -7,7 +7,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance'
 import MapIcon from '@mui/icons-material/Map'
 import FlareIcon from '@mui/icons-material/Flare'
 import GavelIcon from '@mui/icons-material/Gavel'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import FlagIcon from '@mui/icons-material/Flag'
 
 import type { JSX } from 'react'

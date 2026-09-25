@@ -65,7 +65,12 @@ export function StatisticChartCard({
             margin={{ left: 0, bottom: 0 }}
           />
         ) : (
-          <Typography align="center" color="text.secondary">
+          <Typography
+            align="center"
+            sx={{
+              color: 'text.secondary',
+            }}
+          >
             {noDataMessage}
           </Typography>
         )}

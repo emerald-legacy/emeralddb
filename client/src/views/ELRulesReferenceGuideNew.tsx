@@ -56,9 +56,14 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
   const TableOfContents = () => <div dangerouslySetInnerHTML={{ __html: toc }} />
 
   return (
-    <Grid container spacing={3} direction={isSmOrBigger ? 'row' : 'column-reverse'}>
+    <Grid container spacing={3} sx={{ flexDirection: isSmOrBigger ? 'row' : 'column-reverse' }}>
       <Grid size={{ sm: 8 }}>
-        <Box style={{ maxHeight: isSmOrBigger ? '93vh' : '85vh', overflow: 'auto' }} p={1}>
+        <Box
+          style={{ maxHeight: isSmOrBigger ? '93vh' : '85vh', overflow: 'auto' }}
+          sx={{
+            p: 1,
+          }}
+        >
           <Typography variant="h4">Emerald Legacy: Rules Reference</Typography>
           <p>
             PDF Version available{' '}
@@ -76,7 +81,11 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
         </Box>
       </Grid>
       <Grid size={{ sm: 4 }}>
-        <Box p={1}>
+        <Box
+          sx={{
+            p: 1,
+          }}
+        >
           {!isSmOrBigger ? (
             <>
               <Fab

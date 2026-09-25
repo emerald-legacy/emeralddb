@@ -195,12 +195,14 @@ export function Decklist(props: {
     <Grid container spacing={2}>
       <Grid hidden={stats.validationErrors.length === 0} size={12}>
         <Box
-          p={1}
-          border="1px solid"
-          borderColor="red"
-          borderRadius="4px"
-          bgcolor="pink"
-          fontSize={12}
+          sx={{
+            p: 1,
+            border: '1px solid',
+            borderColor: 'red',
+            borderRadius: '4px',
+            bgcolor: 'pink',
+            fontSize: 12,
+          }}
         >
           {stats.validationErrors.map((error) => (
             <Typography variant="caption" key={error}>
@@ -229,9 +231,11 @@ export function Decklist(props: {
       <Grid size={{ xs: 12, sm: 6, lg: 6 }}>
         <Grid
           container
-          justifyContent="space-between"
-          direction="column"
           style={{ height: '100%' }}
+          sx={{
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
         >
           <Grid>
             {!props.withoutHeader && isLoggedIn() && (
@@ -306,7 +310,14 @@ export function Decklist(props: {
         <Typography variant="subtitle2">
           Minimum: {stats.dynastyDeckMinimum}, Maximum: {stats.deckMaximum}
         </Typography>
-        <Grid component="label" container alignItems="center" spacing={1}>
+        <Grid
+          component="label"
+          container
+          spacing={1}
+          sx={{
+            alignItems: 'center',
+          }}
+        >
           <Grid>
             <Typography variant="subtitle2">Sort By Cost</Typography>
           </Grid>
@@ -352,7 +363,14 @@ export function Decklist(props: {
         <Typography variant="subtitle2">
           Minimum: {stats.conflictDeckMinimum}, Maximum: {stats.deckMaximum}
         </Typography>
-        <Grid component="label" container alignItems="center" spacing={1}>
+        <Grid
+          component="label"
+          container
+          spacing={1}
+          sx={{
+            alignItems: 'center',
+          }}
+        >
           <Grid>
             <Typography variant="subtitle2">Sort By Cost</Typography>
           </Grid>

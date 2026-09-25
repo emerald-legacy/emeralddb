@@ -34,7 +34,7 @@ export function CardValueFilter(props: {
   useEffect(() => props.onFilterChange(filterType, filterString), [filterType, filterString])
 
   return (
-    <StyledGrid container alignItems="center" spacing={1}>
+    <StyledGrid container spacing={1} sx={{ alignItems: 'center' }}>
       <Grid sx={{ width: 44, flexShrink: 0 }}>{props.valueLabel}</Grid>
       <Grid sx={{ flexShrink: 0 }}>
         <ButtonGroup size="small" className={classes.buttonGroup} variant="contained">

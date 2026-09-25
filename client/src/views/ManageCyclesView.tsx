@@ -192,7 +192,14 @@ export function ManageCyclesView(): JSX.Element {
       <Box sx={{ pb: 4 }}>
         <Grid container spacing={3}>
           <Grid size={12}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 2,
+              }}
+            >
               <Typography variant="h4">Cycles</Typography>
               <Button
                 variant="contained"
@@ -215,8 +222,20 @@ export function ManageCyclesView(): JSX.Element {
                   mb: 1,
                 }}
               >
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                  <Typography variant="subtitle1" fontWeight="bold">
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2,
+                  }}
+                >
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontWeight: 'bold',
+                    }}
+                  >
                     {cycle.rotated && (
                       <CachedIcon style={{ color: 'red', fontSize: 16, marginRight: 8 }} />
                     )}
@@ -235,10 +254,16 @@ export function ManageCyclesView(): JSX.Element {
                 {packsForCycle(cycle.id).map((pack) => (
                   <Box
                     key={pack.id}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ ml: 4, mb: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      ml: 4,
+                      mb: 1,
+                      p: 1,
+                      bgcolor: 'action.hover',
+                      borderRadius: 1,
+                    }}
                   >
                     <Typography variant="body2">
                       {pack.rotated && (
@@ -301,7 +326,13 @@ export function ManageCyclesView(): JSX.Element {
               label="Pack Name"
               size="small"
             />
-            <Box padding={1.5} border="1px solid lightgray" borderRadius={1}>
+            <Box
+              sx={{
+                padding: 1.5,
+                border: '1px solid lightgray',
+                borderRadius: 1,
+              }}
+            >
               <Typography variant="body2">ID: {packId}</Typography>
             </Box>
             <TextField
@@ -339,7 +370,13 @@ export function ManageCyclesView(): JSX.Element {
               label="Cycle Name"
               size="small"
             />
-            <Box padding={1.5} border="1px solid lightgray" borderRadius={1}>
+            <Box
+              sx={{
+                padding: 1.5,
+                border: '1px solid lightgray',
+                borderRadius: 1,
+              }}
+            >
               <Typography variant="body2">ID: {newCycleId}</Typography>
             </Box>
             <TextField

@@ -129,7 +129,13 @@ export function DeckFilter(props: {
 
   return (
     <StyledPaper className={classes.filter}>
-      <Grid container spacing={1} justifyContent="flex-end">
+      <Grid
+        container
+        spacing={1}
+        sx={{
+          justifyContent: 'flex-end',
+        }}
+      >
         <Grid size={{ xs: 12, sm: 6 }}>
           <Autocomplete
             key={filterState.primaryClan}

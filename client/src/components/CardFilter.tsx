@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { factions, cardTypes, sides, elements, roleRestrictions } from '../utils/enums'
 import { CardTypeIcon } from './card/CardTypeIcon'
-import Autocomplete from '@mui/material/Autocomplete'
+import Autocomplete, { AutocompleteRenderInputParams } from '@mui/material/Autocomplete'
 import { useUiStore } from '../providers/UiStoreProvider'
 import { CycleList } from './CycleList'
 import useDebounce from '../hooks/useDebounce'
@@ -457,7 +457,7 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
 }
 
 function renderTriggeredAbilityInputWithIcon(
-  params: any,
+  params: AutocompleteRenderInputParams,
   selectedOption: { icon?: string } | undefined
 ): JSX.Element {
   return (
@@ -466,16 +466,19 @@ function renderTriggeredAbilityInputWithIcon(
       size="small"
       label="Triggered Ability"
       variant="outlined"
-      InputProps={{
-        ...params.InputProps,
-        startAdornment: selectedOption?.icon ? (
-          <>
-            <span className={`icon icon-${selectedOption.icon}`} style={{ marginRight: 2 }} />
-            {params.InputProps.startAdornment}
-          </>
-        ) : (
-          params.InputProps.startAdornment
-        ),
+      slotProps={{
+        ...params.slotProps,
+        input: {
+          ...params.slotProps.input,
+          startAdornment: selectedOption?.icon ? (
+            <>
+              <span className={`icon icon-${selectedOption.icon}`} style={{ marginRight: 2 }} />
+              {params.slotProps.input.startAdornment}
+            </>
+          ) : (
+            params.slotProps.input.startAdornment
+          ),
+        },
       }}
     />
   )
@@ -665,7 +668,13 @@ export function CardFilter(props: {
 
   return (
     <StyledPaper className={classes.filter}>
-      <Grid container spacing={1} justifyContent="flex-end">
+      <Grid
+        container
+        spacing={1}
+        sx={{
+          justifyContent: 'flex-end',
+        }}
+      >
         <Grid size={{ xs: 12, sm: 8, md: !props.fullWidth ? 6 : 10 }}>
           <TextField
             fullWidth

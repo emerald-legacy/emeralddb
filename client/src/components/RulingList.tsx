@@ -159,11 +159,13 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
       {props.rulings.map((ruling) => (
         <Grid key={ruling.id} size={12}>
           <Box
-            border="1px solid"
-            borderColor="lightgrey"
-            marginTop={1}
-            padding={2}
-            borderRadius="3px"
+            sx={{
+              border: '1px solid',
+              borderColor: 'lightgrey',
+              marginTop: 1,
+              padding: 2,
+              borderRadius: '3px',
+            }}
           >
             <ReactMarkdown>
               {`${replaceLinkTo5rdb(ruling.text)} 
@@ -172,7 +174,13 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
             </ReactMarkdown>
           </Box>
           {isRulesAdmin() && (
-            <Box bgcolor="#eeeeee" padding={1} display="flex">
+            <Box
+              sx={{
+                bgcolor: '#eeeeee',
+                padding: 1,
+                display: 'flex',
+              }}
+            >
               <Button
                 variant="contained"
                 className={classes.editButton}
@@ -220,7 +228,12 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
               />
             </Grid>
             <Grid size={12}>
-              <Box padding={2} border="1px solid lightgray">
+              <Box
+                sx={{
+                  padding: 2,
+                  border: '1px solid lightgray',
+                }}
+              >
                 <Typography>Preview:</Typography>
                 <ReactMarkdown>{rulingText}</ReactMarkdown>
               </Box>
@@ -250,7 +263,13 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Grid container spacing={1} justifyContent="flex-end">
+          <Grid
+            container
+            spacing={1}
+            sx={{
+              justifyContent: 'flex-end',
+            }}
+          >
             <Grid>
               <Button
                 onClick={() => setRulingModalOpen(false)}
