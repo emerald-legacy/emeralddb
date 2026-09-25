@@ -54,7 +54,14 @@ export function VersionPicker(props: {
   }
 
   return (
-    <Grid container spacing={0.5} alignItems="center" sx={{ mt: 1 }}>
+    <Grid
+      container
+      spacing={0.5}
+      sx={{
+        alignItems: 'center',
+        mt: 1,
+      }}
+    >
       <Grid size={3.5}>
         <TextField
           id="major"

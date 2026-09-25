@@ -21,6 +21,7 @@ import { Loading } from '../components/Loading'
 import { RequestError } from '../components/RequestError'
 import { useCard } from '../hooks/useCard'
 import { CardInformation } from '../components/card/CardInformation'
+import { CardLegality } from '../components/card/CardLegality'
 import { CardInPack } from '@5rdb/api'
 import { useCurrentUser } from '../providers/UserProvider'
 import { RulingList } from '../components/RulingList'
@@ -173,15 +174,17 @@ export function CardDetailView(): JSX.Element {
               {card.versions.length > 1 && (
                 <Grid size={12}>
                   <Tabs
-                    TabIndicatorProps={{
-                      style: {
-                        top: 0,
-                      },
-                    }}
                     value={chosenVersionIndex}
                     onChange={(_, newValue) => setChosenVersionIndex(newValue)}
                     variant="scrollable"
                     scrollButtons="auto"
+                    slotProps={{
+                      indicator: {
+                        style: {
+                          top: 0,
+                        },
+                      },
+                    }}
                   >
                     {card.versions.map((v, index) => (
                       <Tab
@@ -206,9 +209,11 @@ export function CardDetailView(): JSX.Element {
               container
               spacing={0}
               size={{ xs: 12, md: 5 }}
-              display="flex"
-              justifyContent="center"
-              alignContent="flex-start"
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignContent: 'flex-start',
+              }}
             >
               {chosenVersion && (
                 <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -218,6 +223,9 @@ export function CardDetailView(): JSX.Element {
                   />
                 </Grid>
               )}
+              <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+                <CardLegality card={card} maxWidth={imageWidth} />
+              </Grid>
               {isDataAdmin() && (
                 <Grid size={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                   <Button
@@ -323,7 +331,6 @@ export function CardDetailView(): JSX.Element {
             <Grid size={12}>
               <TextField
                 disabled
-                InputLabelProps={{ shrink: true }}
                 required
                 id="id"
                 label="Card ID (generated from Name + Name Extra)"
@@ -331,6 +338,9 @@ export function CardDetailView(): JSX.Element {
                 fullWidth
                 variant="outlined"
                 size="small"
+                slotProps={{
+                  inputLabel: { shrink: true },
+                }}
               />
             </Grid>
           </Grid>

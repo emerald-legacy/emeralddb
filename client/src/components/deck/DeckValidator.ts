@@ -1,5 +1,6 @@
 import { CardWithVersions, Format } from '@5rdb/api'
 import uniq from 'lodash/uniq'
+import { isInCardPool } from '../../utils/legalityUtils'
 
 export type CardWithQuantity = CardWithVersions & {
   quantity: number
@@ -328,12 +329,6 @@ export function createDeckStatistics(
   const format = formats.find((f) => f.id === formatId)
   const { strongholds, provinces, roles, conflictCards, dynastyCards, allDeckCards } =
     splitCardsToDecks(cards || {}, allCardsWithVersions)
-  const allIllegalCardIds = allCardsWithVersions
-    .filter((c) => !c.versions.some((v) => (format?.legal_packs || []).includes(v.pack_id)))
-    .map((c) => c.id)
-  const allRotatedCardIds = allCardsWithVersions
-    .filter((c) => !c.versions.some((v) => !v.rotated))
-    .map((c) => c.id)
   const dynastyCardsWrapper = splitDynastyCards(dynastyCards)
   const conflictCardsWrapper = splitConflictCards(conflictCards)
   const dynastyFateCost: { [cost: string]: number } = {}
@@ -388,8 +383,7 @@ export function createDeckStatistics(
     .reduce((a, b) => a + b, 0)
   const bannedCards = allDeckCards.filter((c) => c.banned_in?.includes(formatId))
   const restrictedCards = allDeckCards.filter((c) => c.restricted_in?.includes(formatId))
-  const illegalCards = allDeckCards.filter((c) => allIllegalCardIds.includes(c.id))
-  const rotatedCards = allDeckCards.filter((c) => allRotatedCardIds.includes(c.id))
+  const rotatedCards = allDeckCards.filter((c) => !format || !isInCardPool(c, format))
 
   const deckMaximum =
     formatId === 'skirmish' ? 35 : formatId === 'obsidian' ? 45 + numberOfRallyCards : 45
@@ -422,7 +416,7 @@ export function createDeckStatistics(
     secondaryClan: secondaryClan,
     bannedCards: bannedCards,
     restrictedCards: restrictedCards,
-    rotatedCards: formatId === 'emerald' ? uniq([...illegalCards, ...rotatedCards]) : illegalCards,
+    rotatedCards: rotatedCards,
     validationErrors: [],
   }
 

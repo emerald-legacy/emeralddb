@@ -425,13 +425,15 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
                   <Grid size={12}>
                     <TextField
                       disabled
-                      InputLabelProps={{ shrink: true }}
                       required
                       id="id"
                       label="Card ID (generated from Name + Name Extra)"
                       value={id}
                       fullWidth
                       size="small"
+                      slotProps={{
+                        inputLabel: { shrink: true },
+                      }}
                     />
                   </Grid>
                 </Grid>

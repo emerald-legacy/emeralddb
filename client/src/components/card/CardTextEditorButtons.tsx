@@ -42,7 +42,7 @@ export function CardTextEditorButtons(props: {
   }
 
   return (
-    <StyledGrid container spacing={1} justifyContent="space-between">
+    <StyledGrid container spacing={1} sx={{ justifyContent: 'space-between' }}>
       <Grid size={{ xs: 12, sm: 3 }}>
         <ButtonGroup variant="outlined" className={classes.buttonGroup}>
           <Button onClick={() => clickTag('br')}>

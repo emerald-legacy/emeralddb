@@ -116,7 +116,14 @@ export function EditFormatsView(): JSX.Element {
         <Grid size={12}>
           <Card>
             <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 2,
+                }}
+              >
                 <Typography variant="h5">Formats</Typography>
                 <Button variant="contained" color="secondary" onClick={() => openCreateModal()}>
                   Add New Format

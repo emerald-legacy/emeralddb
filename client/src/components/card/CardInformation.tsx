@@ -225,7 +225,7 @@ export function CardInformation(props: {
   }
 
   return (
-    <StyledBox border="solid 1px" padding="15px" borderRadius="3px">
+    <StyledBox sx={{ border: 'solid 1px', padding: '15px', borderRadius: '3px' }}>
       <Grid container className={classes.block}>
         <Grid size={10}>
           <Typography
@@ -254,7 +254,12 @@ export function CardInformation(props: {
       </Grid>
       <Grid container>
         <Grid size={12}>
-          <Box borderLeft={`5px solid ${color}`} paddingLeft="10px">
+          <Box
+            sx={{
+              borderLeft: `5px solid ${color}`,
+              paddingLeft: '10px',
+            }}
+          >
             {textLines.map((line, idx) => (
               <p key={idx}>
                 <CardText text={line} />

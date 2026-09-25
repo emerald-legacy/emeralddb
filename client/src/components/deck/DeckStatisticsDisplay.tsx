@@ -223,8 +223,18 @@ export function DeckStatisticsDisplay({
   )
 
   return (
-    <Box p={1}>
-      <Grid container spacing={2} alignItems="stretch">
+    <Box
+      sx={{
+        p: 1,
+      }}
+    >
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          alignItems: 'stretch',
+        }}
+      >
         <StatisticChartCard
           title="Dynasty Fate Cost"
           averageValue={averageDynastyFateCost}

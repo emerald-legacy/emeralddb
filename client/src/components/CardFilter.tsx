@@ -18,13 +18,14 @@ import {
 } from '@mui/material'
 import { factions, cardTypes, sides, elements, roleRestrictions } from '../utils/enums'
 import { CardTypeIcon } from './card/CardTypeIcon'
-import Autocomplete from '@mui/material/Autocomplete'
+import Autocomplete, { AutocompleteRenderInputParams } from '@mui/material/Autocomplete'
 import { useUiStore } from '../providers/UiStoreProvider'
 import { CycleList } from './CycleList'
 import useDebounce from '../hooks/useDebounce'
 import { isEqual } from 'lodash'
 import { CardValueFilter, ValueFilterType } from './CardValueFilter'
 import { ElementSymbol } from './card/ElementSymbol'
+import { isInCardPool } from '../utils/legalityUtils'
 
 const PREFIX = 'CardFilter'
 
@@ -309,7 +310,6 @@ export function applyFilters(
   let filteredCards = cards
   let chosenFormat = filter.format && formats.find((format) => format.id === filter.format)
   if (chosenFormat) {
-    let legalPacksOfFormat = chosenFormat.legal_packs || []
     if (filter.banned === 'only' || filter.restricted === 'only') {
       if (filter.banned === 'only') {
         filteredCards = filteredCards.filter((c) => c.banned_in?.includes(filter.format))
@@ -318,13 +318,7 @@ export function applyFilters(
       }
     } else {
       if (filter.illegal === 'false') {
-        filteredCards = filteredCards.filter((c) =>
-          c.versions.some(
-            (version) =>
-              legalPacksOfFormat.some((pack) => version.pack_id === pack) &&
-              (chosenFormat.id != 'emerald' || !version.rotated)
-          )
-        )
+        filteredCards = filteredCards.filter((c) => isInCardPool(c, chosenFormat))
       }
       if (filter.restricted === 'false') {
         filteredCards = filteredCards.filter((c) => !c.restricted_in?.includes(filter.format))
@@ -463,7 +457,7 @@ function filterReducer(state: FilterState, action: FilterAction): FilterState {
 }
 
 function renderTriggeredAbilityInputWithIcon(
-  params: any,
+  params: AutocompleteRenderInputParams,
   selectedOption: { icon?: string } | undefined
 ): JSX.Element {
   return (
@@ -472,16 +466,19 @@ function renderTriggeredAbilityInputWithIcon(
       size="small"
       label="Triggered Ability"
       variant="outlined"
-      InputProps={{
-        ...params.InputProps,
-        startAdornment: selectedOption?.icon ? (
-          <>
-            <span className={`icon icon-${selectedOption.icon}`} style={{ marginRight: 2 }} />
-            {params.InputProps.startAdornment}
-          </>
-        ) : (
-          params.InputProps.startAdornment
-        ),
+      slotProps={{
+        ...params.slotProps,
+        input: {
+          ...params.slotProps.input,
+          startAdornment: selectedOption?.icon ? (
+            <>
+              <span className={`icon icon-${selectedOption.icon}`} style={{ marginRight: 2 }} />
+              {params.slotProps.input.startAdornment}
+            </>
+          ) : (
+            params.slotProps.input.startAdornment
+          ),
+        },
       }}
     />
   )
@@ -671,7 +668,13 @@ export function CardFilter(props: {
 
   return (
     <StyledPaper className={classes.filter}>
-      <Grid container spacing={1} justifyContent="flex-end">
+      <Grid
+        container
+        spacing={1}
+        sx={{
+          justifyContent: 'flex-end',
+        }}
+      >
         <Grid size={{ xs: 12, sm: 8, md: !props.fullWidth ? 6 : 10 }}>
           <TextField
             fullWidth

@@ -22,7 +22,13 @@ export function FormatWithInfo(props: { format: Format }): JSX.Element {
           </span>
         )}
       </span>
-      <Box hidden={!infoShown} border="1px solid grey" padding={1}>
+      <Box
+        hidden={!infoShown}
+        sx={{
+          border: '1px solid grey',
+          padding: 1,
+        }}
+      >
         {props.format.description && (
           <Typography>
             <b>Description: </b>

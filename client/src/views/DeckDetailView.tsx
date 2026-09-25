@@ -51,10 +51,12 @@ export function DeckDetailView(): JSX.Element {
                     <b>Description:</b>
                   </Typography>
                   <Box
-                    border="1px solid"
-                    borderRadius="4px"
-                    p={2}
-                    borderColor={getColorForFactionId(decklist.primary_clan || '')}
+                    sx={{
+                      border: '1px solid',
+                      borderRadius: '4px',
+                      p: 2,
+                      borderColor: getColorForFactionId(decklist.primary_clan || ''),
+                    }}
                   >
                     {decklist.description ? (
                       <Typography>

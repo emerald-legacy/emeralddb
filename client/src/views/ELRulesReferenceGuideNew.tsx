@@ -1,5 +1,5 @@
 import { useEffect, useState, type JSX } from 'react'
-import asciidoctor from 'asciidoctor'
+import { convert } from '@asciidoctor/core'
 import {
   Box,
   Button,
@@ -21,10 +21,8 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
   const asciiDocUrl =
     'https://raw.githubusercontent.com/Emerald-Legacy/rules-documents/main/docs/Rules%20Reference%20Guide.adoc'
 
-  function reformatContent(asciiDoc: string) {
-    const asciiDoctor = asciidoctor()
-    const convertedHtml = asciiDoctor
-      .convert(asciiDoc)
+  async function reformatContent(asciiDoc: string) {
+    const convertedHtml = (await convert(asciiDoc))
       .toString()
       .replaceAll('[Air]', '<span class=\"icon icon-element-air\"></span>')
       .replaceAll('[Earth]', '<span class=\"icon icon-element-earth\"></span>')
@@ -58,13 +56,23 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
   const TableOfContents = () => <div dangerouslySetInnerHTML={{ __html: toc }} />
 
   return (
-    <Grid container spacing={3} direction={isSmOrBigger ? 'row' : 'column-reverse'}>
+    <Grid container spacing={3} sx={{ flexDirection: isSmOrBigger ? 'row' : 'column-reverse' }}>
       <Grid size={{ sm: 8 }}>
-        <Box style={{ maxHeight: isSmOrBigger ? '93vh' : '85vh', overflow: 'auto' }} p={1}>
+        <Box
+          style={{ maxHeight: isSmOrBigger ? '93vh' : '85vh', overflow: 'auto' }}
+          sx={{
+            p: 1,
+          }}
+        >
           <Typography variant="h4">Emerald Legacy: Rules Reference</Typography>
           <p>
             PDF Version available{' '}
-            <a href={'https://emeraldlegacy.org/rules/'} target={'_blank'}>
+            <a
+              href={
+                'https://emerald-legacy.github.io/rules-documents/Rules%20Reference%20Guide.pdf'
+              }
+              target={'_blank'}
+            >
               here
             </a>
             .
@@ -73,7 +81,11 @@ export function ELRulesReferenceGuideNew(): JSX.Element {
         </Box>
       </Grid>
       <Grid size={{ sm: 4 }}>
-        <Box p={1}>
+        <Box
+          sx={{
+            p: 1,
+          }}
+        >
           {!isSmOrBigger ? (
             <>
               <Fab

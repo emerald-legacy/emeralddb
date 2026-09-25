@@ -134,9 +134,14 @@ export function FFGRulesReferenceGuide(): JSX.Element {
   }
   return (
     <Root>
-      <Grid container spacing={3} direction={isSmOrBigger ? 'row' : 'column-reverse'}>
+      <Grid container spacing={3} sx={{ flexDirection: isSmOrBigger ? 'row' : 'column-reverse' }}>
         <Grid size={{ sm: 8 }}>
-          <Box style={{ maxHeight: isSmOrBigger ? '93vh' : '85vh', overflow: 'auto' }} p={1}>
+          <Box
+            style={{ maxHeight: isSmOrBigger ? '93vh' : '85vh', overflow: 'auto' }}
+            sx={{
+              p: 1,
+            }}
+          >
             <Typography variant="h4">Fantasy Flight Games: Rules Reference</Typography>
             <p>
               <b>Version 16</b>, January 5, 2021
@@ -6572,7 +6577,11 @@ export function FFGRulesReferenceGuide(): JSX.Element {
           </Box>
         </Grid>
         <Grid size={{ sm: 4 }}>
-          <Box p={1}>
+          <Box
+            sx={{
+              p: 1,
+            }}
+          >
             {!isSmOrBigger ? (
               <>
                 <Fab
