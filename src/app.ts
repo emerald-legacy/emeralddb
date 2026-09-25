@@ -25,8 +25,13 @@ export default async (): Promise<Service> => {
   // Add Cache-Control headers for API GET requests
   app.use('/api', (req, res, next) => {
     if (req.method === 'GET') {
-      // Cache for 5 minutes (300 seconds)
-      res.set('Cache-Control', 'public, max-age=300')
+      if (req.path === '/users/me') {
+        // User-specific data must not be cached
+        res.set('Cache-Control', 'no-store')
+      } else {
+        // Cache for 5 minutes (300 seconds)
+        res.set('Cache-Control', 'public, max-age=300')
+      }
     }
     next()
   })
