@@ -93,6 +93,12 @@ async function apiCall<T>(
   }
 }
 
+// API GET responses are cached by the browser for 5 minutes. Re-fetching with
+// cache: 'reload' bypasses that cache and stores the fresh response in it.
+export async function refreshCache(path: string): Promise<void> {
+  await fetch(`/api${path}`, { cache: 'reload' })
+}
+
 // Public API resources
 export const publicApi = {
   Card: {
