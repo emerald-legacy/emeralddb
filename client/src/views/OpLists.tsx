@@ -8,6 +8,7 @@ import { OrganizedPlayList } from '../components/OrganizedPlayList'
 import { useNavigate, useParams } from 'react-router'
 import { CardLink } from '../components/card/CardLink'
 import { getCardLegality } from '../utils/legalityUtils'
+import type { Format } from '@5rdb/api'
 
 const emeraldEdict = {
   name: 'Emerald Legacy - Emerald Edict',
@@ -86,14 +87,15 @@ export function OpLists(): JSX.Element {
           <Autocomplete
             id="combo-box-format"
             autoHighlight
+            disableClearable
             options={sortedFormats}
             getOptionLabel={(option) => option.name}
-            value={chosenFormat || null}
+            // null keeps the input controlled while no format matches the URL
+            value={chosenFormat ?? (null as unknown as Format)}
             renderInput={(params) => <TextField {...params} label="Format" variant="outlined" />}
             onChange={(e, value) => {
-              const newPathParam = value?.id || ''
-              setFormat(newPathParam)
-              navigate(`/rules/organized-play/${newPathParam}`)
+              setFormat(value.id)
+              navigate(`/rules/organized-play/${value.id}`)
             }}
           />
         </Grid>
