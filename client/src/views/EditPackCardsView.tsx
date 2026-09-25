@@ -20,7 +20,7 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import CachedIcon from '@mui/icons-material/Cached'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined'
 import { useParams } from 'react-router'
@@ -260,10 +260,12 @@ export function EditPackCardsView(): JSX.Element {
     <Box sx={{ maxWidth: 1280, mx: 'auto', pb: 6 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        justifyContent="space-between"
-        alignItems={{ xs: 'stretch', sm: 'flex-end' }}
         spacing={2}
-        sx={{ mt: 2 }}
+        sx={{
+          justifyContent: 'space-between',
+          alignItems: { xs: 'stretch', sm: 'flex-end' },
+          mt: 2,
+        }}
       >
         <Box>
           {cycleName && (
@@ -357,7 +359,13 @@ export function EditPackCardsView(): JSX.Element {
               </Box>
 
               <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <Stack direction="row" alignItems="flex-start" spacing={1}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    alignItems: 'flex-start',
+                  }}
+                >
                   <Typography
                     variant="subtitle2"
                     sx={{

@@ -94,7 +94,15 @@ export function DeckBuilderWizard(props: {
   }
 
   return (
-    <Grid container spacing={2} justifyContent="center" alignItems="center" direction="column">
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Grid hidden={step > -1} size={{ xs: 12, md: 4 }}>
         <Typography variant="h4" align="center" sx={{ mb: 2 }}>
           Create New Deck
@@ -228,13 +236,17 @@ export function DeckBuilderWizard(props: {
               container
               spacing={{ xs: 0, sm: 2 }}
               style={{ minWidth: 550 }}
-              justifyContent={{ xs: 'center', sm: 'flex-start' }}
               onMouseLeave={() => setHoveredCardId(null)}
+              sx={{
+                justifyContent: { xs: 'center', sm: 'flex-start' },
+              }}
             >
               <Grid
                 size={{ xs: 12, sm: 6 }}
-                display="flex"
-                justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                sx={{
+                  display: 'flex',
+                  justifyContent: { xs: 'center', sm: 'flex-start' },
+                }}
               >
                 <RadioGroup
                   value={role}
@@ -278,8 +290,10 @@ export function DeckBuilderWizard(props: {
               </Grid>
               <Grid
                 size={{ xs: 12, sm: 6 }}
-                display="flex"
-                justifyContent={{ xs: 'center', sm: 'flex-start' }}
+                sx={{
+                  display: 'flex',
+                  justifyContent: { xs: 'center', sm: 'flex-start' },
+                }}
               >
                 <RadioGroup
                   value={role}
@@ -326,7 +340,13 @@ export function DeckBuilderWizard(props: {
         )}
       </Grid>
       {step >= 0 && (
-        <Grid size={{ xs: 12, md: 12 }} container justifyContent="center">
+        <Grid
+          size={{ xs: 12, md: 12 }}
+          container
+          sx={{
+            justifyContent: 'center',
+          }}
+        >
           <Grid size="auto">
             <Stepper connector={null} sx={{ gap: 1 }}>
               <Step completed={format !== ''}>
@@ -350,7 +370,14 @@ export function DeckBuilderWizard(props: {
         </Grid>
       )}
       <Grid hidden={step < 0} size={{ xs: 12, md: 6 }}>
-        <Grid container spacing={2} direction="row" justifyContent="center">
+        <Grid
+          container
+          spacing={2}
+          direction="row"
+          sx={{
+            justifyContent: 'center',
+          }}
+        >
           <Grid size="auto">
             {step >= 0 && (
               <Button variant="contained" onClick={handleBack}>

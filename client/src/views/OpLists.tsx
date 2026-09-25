@@ -175,7 +175,13 @@ export function OpLists(): JSX.Element {
                   hidden={rotatedCardsOfCycle.length === 0}
                   size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
                 >
-                  <Box border="1px solid gray" borderRadius="4px" p={2}>
+                  <Box
+                    sx={{
+                      border: '1px solid gray',
+                      borderRadius: '4px',
+                      p: 2,
+                    }}
+                  >
                     <Typography>
                       <b>Cycle: {cycle.name}</b> ({rotatedCardsOfCycle.length})
                     </Typography>

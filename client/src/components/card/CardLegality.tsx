@@ -3,7 +3,7 @@ import { Box, Chip } from '@mui/material'
 import BlockIcon from '@mui/icons-material/Block'
 import CachedIcon from '@mui/icons-material/Cached'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutlineOutlined'
 import WarningIcon from '@mui/icons-material/Warning'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { getFormatLegalities, Legality } from '../../utils/legalityUtils'
@@ -58,14 +58,16 @@ export function CardLegality(props: { card: CardWithVersions; maxWidth: number }
     <Box
       component="section"
       aria-label="Legality"
-      border="1px solid"
-      borderColor="lightgrey"
-      borderRadius="3px"
-      padding={1.5}
-      marginTop={2}
-      width="100%"
-      maxWidth={props.maxWidth}
-      boxSizing="border-box"
+      sx={{
+        border: '1px solid',
+        borderColor: 'lightgrey',
+        borderRadius: '3px',
+        padding: 1.5,
+        marginTop: 2,
+        width: '100%',
+        maxWidth: props.maxWidth,
+        boxSizing: 'border-box',
+      }}
     >
       <Box
         component="ul"

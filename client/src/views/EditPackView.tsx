@@ -81,7 +81,12 @@ function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
       <Card>
         <CardContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
               ID: {pack.id} (immutable)
             </Typography>
             <TextField
@@ -104,8 +109,10 @@ function EditPackForm(props: { pack: Pack; cycles: Cycle[] }): JSX.Element {
               type="date"
               value={releasedAt}
               onChange={(e) => setReleasedAt(e.target.value)}
-              InputLabelProps={{ shrink: true }}
               size="small"
+              slotProps={{
+                inputLabel: { shrink: true },
+              }}
             />
             <TextField
               label="Publisher ID"

@@ -31,7 +31,13 @@ export function OrganizedPlayList(props: {
   })
 
   return (
-    <Box border="1px solid gray" borderRadius="4px" p={2}>
+    <Box
+      sx={{
+        border: '1px solid gray',
+        borderRadius: '4px',
+        p: 2,
+      }}
+    >
       <Typography>
         <b>{props.title}</b>
       </Typography>

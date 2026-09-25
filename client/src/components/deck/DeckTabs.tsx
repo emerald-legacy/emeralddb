@@ -112,17 +112,25 @@ export function DeckTabs(props: {
             return (
               <Grid key={deck.id} size={12}>
                 <Box
-                  padding={1}
-                  borderRadius="3px"
-                  border="1px solid"
                   hidden={!isSmOrBigger && currentDeckId !== undefined && deck.id !== currentDeckId}
                   className={
                     deck.id === currentDeckId ? classes.selectedDeck : classes.unselectedDeck
                   }
                   style={{ cursor: 'pointer' }}
                   onClick={() => chooseDeck(deck.id)}
+                  sx={{
+                    padding: 1,
+                    borderRadius: '3px',
+                    border: '1px solid',
+                  }}
                 >
-                  <Grid container spacing={1} alignItems="center">
+                  <Grid
+                    container
+                    spacing={1}
+                    sx={{
+                      alignItems: 'center',
+                    }}
+                  >
                     <Grid size={4}>
                       <Typography>{latestList?.name || 'Empty Deck'}</Typography>
                     </Grid>
@@ -170,7 +178,13 @@ export function DeckTabs(props: {
               const latestDecklistId = latestDecklistForDeck(currentDeck!)?.id
               return (
                 <Grid size={12}>
-                  <Grid container spacing={1} justifyContent="flex-end">
+                  <Grid
+                    container
+                    spacing={1}
+                    sx={{
+                      justifyContent: 'flex-end',
+                    }}
+                  >
                     <Grid size={4}>
                       <EmeraldDBLink href={`/builder/${currentDeckId}/edit`}>
                         <Button

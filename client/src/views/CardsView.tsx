@@ -316,7 +316,11 @@ export function CardsView(): JSX.Element {
     const pageCount = Math.ceil(filteredCards.length / PAGE_SIZE)
 
     return (
-      <Box paddingBottom={2}>
+      <Box
+        sx={{
+          paddingBottom: 2,
+        }}
+      >
         <Grid container spacing={1}>
           <Grid size={{ xs: 6, sm: 3 }}>
             <Select
@@ -573,7 +577,11 @@ export function CardsView(): JSX.Element {
                   <Grid container spacing={1}>
                     {currentCards.map((card) => (
                       <Grid key={card.id} size={{ xs: 6, sm: 4, md: 3, lg: 2 }}>
-                        <Box margin={'0 auto'}>
+                        <Box
+                          sx={{
+                            margin: '0 auto',
+                          }}
+                        >
                           <CardImageOrText
                             cardId={card.id}
                             onClick={handleImageClick}
@@ -637,7 +645,12 @@ export function CardsView(): JSX.Element {
                       </Box>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
-                      <Box maxWidth={'300px'} margin={'0 auto'}>
+                      <Box
+                        sx={{
+                          maxWidth: '300px',
+                          margin: '0 auto',
+                        }}
+                      >
                         <CardImageOrText
                           cardId={card.id}
                           onClick={handleImageClick}
