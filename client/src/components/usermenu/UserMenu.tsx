@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import { useState, useEffect, type JSX } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { privateApi } from '../../api'
+import { privateApi, refreshCache } from '../../api'
 import { getToken, setToken } from '../../utils/auth'
 import { Queries } from '../HeaderBar'
 import { LoginButton } from './LoginButton'
@@ -71,6 +71,8 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
         (response) => {
           setCurrentUser(response.data() as unknown as User)
           setModalOpen(false)
+          // The username is part of the published decklists
+          return refreshCache('/decklists')
         }
       )
     }

@@ -4,7 +4,7 @@ import { Box, Typography, Button, Grid, useMediaQuery, Tooltip } from '@mui/mate
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { useState, type JSX } from 'react'
-import { privateApi } from '../../api'
+import { privateApi, refreshCache } from '../../api'
 import { CardFactionIcon } from '../card/CardFactionIcon'
 import { DecklistTabs, latestDecklistForDeck } from './DecklistTabs'
 import EditIcon from '@mui/icons-material/Edit'
@@ -73,7 +73,18 @@ export function DeckTabs(props: {
       confirmationText: 'Delete',
     })
     if (!confirmed) return
+    const versionIds = (decks.find((deck) => deck.id === deckId)?.versions ?? []).map(
+      (version) => version.id
+    )
     privateApi.Deck.delete({ deckId: deckId })
+      .then(() =>
+        refreshCache(
+          '/decklists',
+          `/decks/${deckId}`,
+          `/decklists/${deckId}`,
+          ...versionIds.map((versionId) => `/decklists/${versionId}`)
+        )
+      )
       .then(() => {
         props.onDeckUpdated()
         setCurrentDeckId(undefined)

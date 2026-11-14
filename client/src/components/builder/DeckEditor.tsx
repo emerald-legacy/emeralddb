@@ -23,7 +23,7 @@ import { useState, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { BuilderCardList } from './BuilderCardList'
 import { Decklist } from '../deck/Decklist'
-import { privateApi } from '../../api'
+import { privateApi, refreshCache } from '../../api'
 import { DeckBuilderWizard } from './DeckBuilderWizard'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useSnackbar } from 'notistack'
@@ -214,12 +214,15 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
         card_pack_ids: cardPackIds,
         published_date: undefined,
       },
-    }).then(() => {
-      setDecklist({ ...decklist, version_number: getNextVersionNumber(decklist.version_number) })
-      navigate(`/builder/${deckId}/edit`)
-      enqueueSnackbar('Successfully created deck', { variant: 'success' })
-      setVersionModalOpen(false)
     })
+      // /decklists/{deckId} resolves to the latest version of the deck
+      .then(() => refreshCache(`/decks/${deckId}`, `/decklists/${deckId}`))
+      .then(() => {
+        setDecklist({ ...decklist, version_number: getNextVersionNumber(decklist.version_number) })
+        navigate(`/builder/${deckId}/edit`)
+        enqueueSnackbar('Successfully created deck', { variant: 'success' })
+        setVersionModalOpen(false)
+      })
   }
 
   function createOrUpdateDeck(decklist: DecklistViewModel) {
