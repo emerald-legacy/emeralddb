@@ -19,7 +19,7 @@ import { useUiStore } from '../../providers/UiStoreProvider'
 import SaveIcon from '@mui/icons-material/Save'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
-import { privateApi } from '../../api'
+import { privateApi, refreshCache } from '../../api'
 import { useNavigate } from 'react-router'
 import { toSlugId } from '../../utils/slugIdUtils'
 
@@ -354,10 +354,8 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
         if (!confirmed) return
         const newCard = assembleCard()
         privateApi.Card.update({ cardId: newCard.id, body: newCard })
-          .then(() => {
-            uiStore.invalidateData()
-            navigate(`/card/${newCard.id}`)
-          })
+          .then(() => Promise.all([uiStore.invalidateData(), refreshCache(`/cards/${newCard.id}`)]))
+          .then(() => navigate(`/card/${newCard.id}`))
           .catch((error) => {
             console.log(error)
             enqueueSnackbar(`The card couldn't be saved: ${serverErrorMessage(error)}`, {
@@ -375,10 +373,8 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
       if (!confirmed) return
       const newCard = assembleCard()
       privateApi.Card.create({ body: newCard })
-        .then(() => {
-          uiStore.invalidateData()
-          navigate(`/card/${newCard.id}`)
-        })
+        .then(() => Promise.all([uiStore.invalidateData(), refreshCache(`/cards/${newCard.id}`)]))
+        .then(() => navigate(`/card/${newCard.id}`))
         .catch((error) => {
           console.log(error)
           enqueueSnackbar(`The card couldn't be created: ${serverErrorMessage(error)}`, {

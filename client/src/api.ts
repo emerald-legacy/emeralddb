@@ -94,9 +94,21 @@ async function apiCall<T>(
 }
 
 // API GET responses are cached by the browser for 5 minutes. Re-fetching with
-// cache: 'reload' bypasses that cache and stores the fresh response in it.
-export async function refreshCache(path: string): Promise<void> {
-  await fetch(`/api${path}`, { cache: 'reload' })
+// cache: 'reload' bypasses that cache and stores the fresh responses in it.
+// Call this after every change for all GET paths whose data was affected.
+//
+// This is best effort and never rejects: the change itself has already succeeded
+// when this runs, so a failed refresh must not turn into an error message for the user.
+// Worst case, the stale entry expires on its own after 5 minutes.
+export async function refreshCache(...paths: string[]): Promise<void> {
+  const results = await Promise.allSettled(
+    paths.map((path) => fetch(`/api${path}`, { cache: 'reload' }))
+  )
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      console.warn(`Could not refresh cached response for /api${paths[index]}`, result.reason)
+    }
+  })
 }
 
 // Public API resources

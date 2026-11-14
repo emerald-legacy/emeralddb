@@ -5,12 +5,14 @@ import React, { useState, type JSX } from 'react'
 import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useBetaEnvironment } from '../hooks/useBetaEnvironment'
+import { useUiStore } from '../providers/UiStoreProvider'
 
 export function AdminView(): JSX.Element {
   const navigate = useNavigate()
   const [packId, setPackId] = useState('')
   const { enqueueSnackbar } = useSnackbar()
   const [betaEnvironment] = useBetaEnvironment()
+  const { invalidateData } = useUiStore()
 
   if (betaEnvironment.loading) {
     return <Typography>Loading ...</Typography>
@@ -21,13 +23,16 @@ export function AdminView(): JSX.Element {
     const enteredPackId = packId
     setPackId('')
     axios
-      .get(`${betaUrl}api/packs/export/${enteredPackId}`)
+      // The timestamp makes every request unique, so a pack that was just fixed on beta
+      // is never served from the 5 minute browser cache of an earlier export.
+      .get(`${betaUrl}api/packs/export/${enteredPackId}`, { params: { _t: Date.now() } })
       .then((exported) =>
         privateApi.Pack.import({
           body: {
             ...exported.data,
           },
         })
+          .then(() => invalidateData())
           .then(() => enqueueSnackbar('Successfully imported pack!', { variant: 'success' }))
           .catch(() => enqueueSnackbar("Couldn't import pack", { variant: 'error' }))
       )

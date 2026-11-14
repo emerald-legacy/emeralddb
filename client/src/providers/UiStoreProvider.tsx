@@ -1,6 +1,7 @@
 import { Pack, Cycle, Trait, CardWithVersions, Format, CardInPack } from '@5rdb/api'
 import { createContext, ReactNode, useContext, useMemo, type JSX } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { refreshCache } from '../api'
 
 export interface UiStore {
   cards: CardWithVersions[]
@@ -39,15 +40,8 @@ export const UiStoreQueries = {
   PUBLISHED_DECKLISTS: ['published-decklists'] as const,
 }
 
-// Helper function to fetch data with cache-busting
-async function fetchWithCacheBusting<T>(endpoint: string): Promise<T> {
-  const timestamp = Date.now()
-  const response = await fetch(`${endpoint}?_t=${timestamp}`, {
-    cache: 'no-store',
-    headers: {
-      'Cache-Control': 'no-cache',
-    },
-  })
+async function fetchJson<T>(endpoint: string): Promise<T> {
+  const response = await fetch(endpoint)
   return (await response.json()) as T
 }
 
@@ -57,27 +51,27 @@ export function UiStoreProvider(props: { children: ReactNode }): JSX.Element {
   // Use TanStack Query for all data fetching with automatic caching
   const { data: cards = [] } = useQuery<CardWithVersions[]>({
     queryKey: UiStoreQueries.CARDS,
-    queryFn: () => fetchWithCacheBusting<CardWithVersions[]>('/api/cards'),
+    queryFn: () => fetchJson<CardWithVersions[]>('/api/cards'),
   })
 
   const { data: packs = [] } = useQuery<Pack[]>({
     queryKey: UiStoreQueries.PACKS,
-    queryFn: () => fetchWithCacheBusting<Pack[]>('/api/packs'),
+    queryFn: () => fetchJson<Pack[]>('/api/packs'),
   })
 
   const { data: cycles = [] } = useQuery<Cycle[]>({
     queryKey: UiStoreQueries.CYCLES,
-    queryFn: () => fetchWithCacheBusting<Cycle[]>('/api/cycles'),
+    queryFn: () => fetchJson<Cycle[]>('/api/cycles'),
   })
 
   const { data: traits = [] } = useQuery<Trait[]>({
     queryKey: UiStoreQueries.TRAITS,
-    queryFn: () => fetchWithCacheBusting<Trait[]>('/api/traits'),
+    queryFn: () => fetchJson<Trait[]>('/api/traits'),
   })
 
   const { data: formats = [], isLoading: formatsLoading } = useQuery<Format[]>({
     queryKey: UiStoreQueries.FORMATS,
-    queryFn: () => fetchWithCacheBusting<Format[]>('/api/formats'),
+    queryFn: () => fetchJson<Format[]>('/api/formats'),
   })
 
   // Compute relevant formats
@@ -86,8 +80,10 @@ export function UiStoreProvider(props: { children: ReactNode }): JSX.Element {
   // Check if any query is loading
   const isLoading = formatsLoading
 
-  // Replace toggleReload with query invalidation
+  // Refresh the browser cache first, so the refetches below get the fresh data
   const invalidateData = async () => {
+    await refreshCache('/cards', '/packs', '/cycles', '/traits', '/formats')
+
     queryClient.invalidateQueries({ queryKey: UiStoreQueries.CARDS })
     queryClient.invalidateQueries({ queryKey: UiStoreQueries.PACKS })
     queryClient.invalidateQueries({ queryKey: UiStoreQueries.CYCLES })
