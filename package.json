@@ -21,10 +21,10 @@
     "heroku-prebuild": "cd client && yarn heroku-prebuild && cd .."
   },
   "engines": {
-    "node": ">=22.11.0"
+    "node": ">=26.0.0"
   },
   "volta": {
-    "node": "25.0.0"
+    "node": "26.13.1"
   },
   "license": "MIT",
   "dependencies": {
