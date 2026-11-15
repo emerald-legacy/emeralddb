@@ -8,6 +8,7 @@
     "build:clean": "rimraf dist",
     "build:client": "cd client && yarn install && yarn build && cd .. && cp -r client/build dist/public",
     "build:server": "tsc",
+    "build:test": "rimraf .ava-build && tsc -p tsconfig.test.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "migrate:latest": "knex migrate:latest",
@@ -16,8 +17,8 @@
     "start:server:dev": "cross-env NODE_ENV=development sh bin/watch.sh",
     "start": "NODE_ENV=production yarn migrate:latest && node dist/index.js",
     "test": "yarn lint && yarn test:unit && yarn build && ava",
-    "test:unit": "yarn build:clean && ava",
-    "test:unit:watch": "ava --watch",
+    "test:unit": "yarn build:clean && yarn build:test && ava",
+    "test:unit:watch": "yarn build:test && concurrently --raw \"tsc -p tsconfig.test.json --watch --preserveWatchOutput\" \"ava --watch\"",
     "heroku-prebuild": "cd client && yarn heroku-prebuild && cd .."
   },
   "engines": {
@@ -68,18 +69,23 @@
     "yarn": "^1.22.22"
   },
   "ava": {
-    "extensions": [
-      "ts"
+    "files": [
+      "src/**/*.test.ts",
+      "client/src/**/*.test.ts"
     ],
-    "require": [
-      "ts-node/register"
-    ]
+    "typescript": {
+      "rewritePaths": {
+        "src/": ".ava-build/src/",
+        "client/src/": ".ava-build/client/src/"
+      },
+      "compile": false
+    }
   },
   "devDependencies": {
+    "@ava/typescript": "^7.0.0",
     "@types/compression": "^1.8.1",
-    "ava": "^7.0.0",
+    "ava": "^8.4.0",
     "nodemon": "^3.1.14",
-    "rimraf": "^6.1.4",
-    "ts-node": "^10.9.2"
+    "rimraf": "^6.1.4"
   }
 }
