@@ -1,6 +1,5 @@
 import React, { useRef, type JSX } from 'react'
 import { styled } from '@mui/material/styles'
-import clsx from 'clsx'
 import TableCell from '@mui/material/TableCell'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { CardQuantitySelector } from './CardQuantitySelector'
@@ -8,6 +7,10 @@ import { CardLink } from '../card/CardLink'
 import { InfluenceElement } from '../card/InfluenceElement'
 
 const PREFIX = 'VirtualizedCardTable'
+
+function classNames(...names: (string | false)[]): string {
+  return names.filter(Boolean).join(' ')
+}
 
 const classes = {
   flexContainer: `${PREFIX}-flexContainer`,
@@ -183,9 +186,11 @@ const cellRenderer = (
     <TableCell
       component="div"
       width={width}
-      className={clsx(classes.tableCell, classes.flexContainer, {
-        [classes.noClick]: onRowClick == null,
-      })}
+      className={classNames(
+        classes.tableCell,
+        classes.flexContainer,
+        onRowClick == null && classes.noClick
+      )}
       variant="body"
       style={{
         height: rowHeight,
@@ -224,7 +229,7 @@ export const VirtualizedCardTable: React.FC<MuiVirtualizedTableProps> = ({
           <TableCell
             key={column.columnType}
             component="div"
-            className={clsx(classes.flexContainer, classes.tableCell, classes.noClick)}
+            className={classNames(classes.flexContainer, classes.tableCell, classes.noClick)}
             variant="head"
             width={column.width}
             style={{
@@ -253,9 +258,11 @@ export const VirtualizedCardTable: React.FC<MuiVirtualizedTableProps> = ({
           return (
             <div
               key={virtualRow.key}
-              className={clsx(classes.tableRow, classes.flexContainer, {
-                [classes.tableRowHover]: onRowClick != null,
-              })}
+              className={classNames(
+                classes.tableRow,
+                classes.flexContainer,
+                onRowClick != null && classes.tableRowHover
+              )}
               style={{
                 position: 'absolute',
                 top: 0,

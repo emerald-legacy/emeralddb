@@ -1,5 +1,4 @@
 import { CardWithVersions, Format } from '@5rdb/api'
-import uniq from 'lodash/uniq'
 import { isInCardPool } from '../../utils/legalityUtils'
 
 export type CardWithQuantity = CardWithVersions & {
@@ -182,7 +181,7 @@ function validateDecklist(
       }
     })
   if (
-    uniq(allDeckCards.map((c) => c.faction)).some(
+    [...new Set(allDeckCards.map((c) => c.faction))].some(
       (faction) =>
         faction !== 'neutral' && faction !== stats.primaryClan && faction !== stats.secondaryClan
     )
@@ -297,7 +296,7 @@ function validateDecklist(
     let legal = false
 
     for (const permutation of permutations) {
-      const uniqueElements = uniq(permutation)
+      const uniqueElements = [...new Set(permutation)]
       if (uniqueElements.length === 5) {
         legal = true
       } else if (
