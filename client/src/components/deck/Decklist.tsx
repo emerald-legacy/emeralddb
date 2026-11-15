@@ -9,7 +9,6 @@ import { InfluenceElement } from '../card/InfluenceElement'
 import { useSnackbar } from 'notistack'
 import { CardWithQuantity, createDeckStatistics } from './DeckValidator'
 import { CardQuantitySelector } from '../builder/CardQuantitySelector'
-import min from 'lodash/min'
 import { Loading } from '../Loading'
 import { useState, type JSX } from 'react'
 import { CardFactionIcon } from '../card/CardFactionIcon'
@@ -39,7 +38,7 @@ export function DeckCardSubList(props: {
             <CardQuantitySelector
               deckLimit={
                 props.format === 'skirmish' || props.format === 'obsidian'
-                  ? min([2, card.deck_limit]) || 2
+                  ? Math.min(2, card.deck_limit ?? 2) || 2
                   : card.deck_limit
               }
               onQuantityChange={(newQuantity) => props.onQuantityChange!(card.id, newQuantity)}
