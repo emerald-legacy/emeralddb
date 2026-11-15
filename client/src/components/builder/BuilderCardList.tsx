@@ -12,7 +12,6 @@ import {
   TextField,
   useMediaQuery,
 } from '@mui/material'
-import min from 'lodash/min'
 import { useState, useMemo, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { convertTraitList } from '../../utils/cardTextUtils'
@@ -252,7 +251,8 @@ export function BuilderCardList(props: {
     return {
       quantityForId: {
         quantity: selectedCards[card.id] || 0,
-        deckLimit: min([card.deck_limit, defaultDeckLimit]) || defaultDeckLimit,
+        deckLimit:
+          Math.min(card.deck_limit ?? defaultDeckLimit, defaultDeckLimit) || defaultDeckLimit,
         onQuantityChange: (newQuantity: number) => changeCardQuantity(card.id, newQuantity),
       },
       nameFactionType: {

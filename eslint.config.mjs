@@ -25,6 +25,7 @@ export default [
   {
     ignores: [
       'dist/**',
+      '.ava-build/**',
       'public/**',
       'node_modules/**',
       'client/build/**',

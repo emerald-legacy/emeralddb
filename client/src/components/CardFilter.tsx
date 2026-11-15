@@ -22,7 +22,7 @@ import Autocomplete, { AutocompleteRenderInputParams } from '@mui/material/Autoc
 import { useUiStore } from '../providers/UiStoreProvider'
 import { CycleList } from './CycleList'
 import useDebounce from '../hooks/useDebounce'
-import { isEqual } from 'lodash'
+import { deepEqual } from '../utils/deepEqual'
 import { CardValueFilter, ValueFilterType } from './CardValueFilter'
 import { ElementSymbol } from './card/ElementSymbol'
 import { isInCardPool } from '../utils/legalityUtils'
@@ -565,7 +565,7 @@ export function CardFilter(props: {
 
   const [packModalOpen, setPackModalOpen] = useState(false)
 
-  if (props.filterState && !isEqual(initialFilterState, props.filterState)) {
+  if (props.filterState && !deepEqual(initialFilterState, props.filterState)) {
     if (props.filterState.text) {
       setSearchTerm(props.filterState.text)
     }

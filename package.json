@@ -8,6 +8,7 @@
     "build:clean": "rimraf dist",
     "build:client": "cd client && yarn install && yarn build && cd .. && cp -r client/build dist/public",
     "build:server": "tsc",
+    "build:test": "rimraf .ava-build && tsc -p tsconfig.test.json",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "migrate:latest": "knex migrate:latest",
@@ -16,38 +17,38 @@
     "start:server:dev": "cross-env NODE_ENV=development sh bin/watch.sh",
     "start": "NODE_ENV=production yarn migrate:latest && node dist/index.js",
     "test": "yarn lint && yarn test:unit && yarn build && ava",
-    "test:unit": "yarn build:clean && ava",
-    "test:unit:watch": "ava --watch",
+    "test:unit": "yarn build:clean && yarn build:test && ava",
+    "test:unit:watch": "yarn build:test && concurrently --raw \"tsc -p tsconfig.test.json --watch --preserveWatchOutput\" \"ava --watch\"",
     "heroku-prebuild": "cd client && yarn heroku-prebuild && cd .."
   },
   "engines": {
-    "node": ">=22.11.0"
+    "node": ">=26.0.0"
   },
   "volta": {
-    "node": "25.0.0"
+    "node": "26.13.1"
   },
   "license": "MIT",
   "dependencies": {
     "@5rdb/api": "file:./apiTypings",
     "@discordjs/builders": "^1.15.0",
     "@discordjs/rest": "^2.6.3",
-    "@sentry/node": "^11.11.0",
+    "@sentry/node": "^11.12.0",
     "@types/cors": "^2.8.6",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/lodash": "^4.17.27",
     "@types/node": "^26.6.6",
     "@types/passport": "^1.0.17",
-    "@typescript-eslint/eslint-plugin": "^8.72.1",
-    "@typescript-eslint/parser": "^8.72.1",
+    "@typescript-eslint/eslint-plugin": "^8.72.2",
+    "@typescript-eslint/parser": "^8.72.2",
     "compression": "^1.8.2",
     "concurrently": "^10.0.7",
     "cors": "^2.8.6",
     "cross-env": "^10.1.0",
-    "discord-api-types": "^0.38.58",
+    "discord-api-types": "^0.38.59",
     "discord.js": "^14.28.1",
     "dotenv": "^18.0.10",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.7",
     "eslint-plugin-security": "^4.2.1",
@@ -61,25 +62,30 @@
     "knex": "^3.3.0",
     "passport": "^0.7.0",
     "pg": "^8.23.1",
-    "prettier": "^3.9.10",
+    "prettier": "^3.10.1",
     "source-map-support": "^0.5.21",
     "typescript": "^6.0.3",
     "uuid": "^14.0.3",
     "yarn": "^1.22.22"
   },
   "ava": {
-    "extensions": [
-      "ts"
+    "files": [
+      "src/**/*.test.ts",
+      "client/src/**/*.test.ts"
     ],
-    "require": [
-      "ts-node/register"
-    ]
+    "typescript": {
+      "rewritePaths": {
+        "src/": ".ava-build/src/",
+        "client/src/": ".ava-build/client/src/"
+      },
+      "compile": false
+    }
   },
   "devDependencies": {
+    "@ava/typescript": "^7.0.0",
     "@types/compression": "^1.8.1",
-    "ava": "^7.0.0",
+    "ava": "^8.4.0",
     "nodemon": "^3.1.14",
-    "rimraf": "^6.1.4",
-    "ts-node": "^10.9.2"
+    "rimraf": "^6.1.4"
   }
 }

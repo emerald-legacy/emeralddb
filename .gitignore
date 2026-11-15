@@ -15,6 +15,7 @@ trash
 \.vs/
 
 dist
+.ava-build
 
 .eslintcache
 
