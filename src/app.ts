@@ -7,6 +7,7 @@ import path from 'path'
 
 import env from './env'
 import api from './api'
+import { cacheControl } from './middlewares/cacheControl'
 import { Service } from './typings/Service'
 
 export default async (): Promise<Service> => {
@@ -23,13 +24,7 @@ export default async (): Promise<Service> => {
   app.use(cors())
 
   // Add Cache-Control headers for API GET requests
-  app.use('/api', (req, res, next) => {
-    if (req.method === 'GET') {
-      // Cache for 5 minutes (300 seconds)
-      res.set('Cache-Control', 'public, max-age=300')
-    }
-    next()
-  })
+  app.use('/api', cacheControl)
 
   app.use('/api', api())
   app.use(express.static(path.resolve(__dirname, 'public')))

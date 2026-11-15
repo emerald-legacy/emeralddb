@@ -29,7 +29,7 @@ import { useUiStore } from '../providers/UiStoreProvider'
 import { RequestError } from '../components/RequestError'
 import { useEffect, useState, type JSX } from 'react'
 import { CardInPack } from '@5rdb/api'
-import { privateApi } from '../api'
+import { privateApi, refreshCache } from '../api'
 import { useSnackbar } from 'notistack'
 import { getImageUrl } from '../utils/imageUrl'
 
@@ -189,7 +189,7 @@ export function EditPackCardsView(): JSX.Element {
           cardInPack: newCard,
         },
       })
-      await invalidateData()
+      await Promise.all([invalidateData(), refreshCache(`/cards/${cardId}`)])
       enqueueSnackbar(editing ? 'Changes saved' : 'Card added to pack', { variant: 'success' })
       setModalOpen(false)
     } catch (error) {
@@ -222,7 +222,7 @@ export function EditPackCardsView(): JSX.Element {
           cardInPack: cardToDelete,
         },
       })
-      await invalidateData()
+      await Promise.all([invalidateData(), refreshCache(`/cards/${cardToDelete.card_id}`)])
       enqueueSnackbar('Card removed from pack', { variant: 'success' })
       setDeleteDialogOpen(false)
       setCardToDelete(null)

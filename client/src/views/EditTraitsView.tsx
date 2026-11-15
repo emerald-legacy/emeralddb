@@ -60,8 +60,8 @@ export function EditTraitsView(): JSX.Element {
         trait: { id: traitId, name: traitName },
       },
     })
+      .then(() => invalidateData())
       .then(() => {
-        invalidateData()
         setModalOpen(false)
         enqueueSnackbar('Successfully posted trait!', { variant: 'success' })
       })
@@ -89,7 +89,7 @@ export function EditTraitsView(): JSX.Element {
           trait: traitToDelete,
         },
       })
-      invalidateData()
+      await invalidateData()
       enqueueSnackbar('Successfully deleted trait!', { variant: 'success' })
       closeDeleteDialog()
     } catch (error) {

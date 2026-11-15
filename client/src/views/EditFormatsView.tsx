@@ -85,8 +85,8 @@ export function EditFormatsView(): JSX.Element {
         },
       },
     })
+      .then(() => invalidateData())
       .then(() => {
-        invalidateData()
         setFormatId('')
         setFormatName('')
         setLegalPacks([])

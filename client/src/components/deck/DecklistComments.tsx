@@ -8,7 +8,7 @@ import { DecklistComment } from './DecklistComment'
 import { useState, type JSX } from 'react'
 import { useSnackbar } from 'notistack'
 import ReplyIcon from '@mui/icons-material/Reply'
-import { privateApi } from '../../api'
+import { privateApi, refreshCache } from '../../api'
 import { useCurrentUser } from '../../providers/UserProvider'
 
 export type DecklistCommentWithChildren = DecklistCommentWithUser & {
@@ -65,6 +65,10 @@ export function DecklistComments(props: { decklistId: string }): JSX.Element {
   const comments = data.data
   const commentsWithChildren = createCommentTree(comments)
 
+  function refreshComments() {
+    refreshCache(`/decklists/${props.decklistId}/comments`).then(() => fetchData())
+  }
+
   function createComment() {
     setIsSaving(true)
     privateApi.Comment.create({
@@ -74,7 +78,7 @@ export function DecklistComments(props: { decklistId: string }): JSX.Element {
       },
     })
       .then(() => {
-        fetchData()
+        refreshComments()
         enqueueSnackbar('Successfully created comment!', { variant: 'success' })
         setIsEditMode(false)
         setNewComment('')
@@ -147,7 +151,7 @@ export function DecklistComments(props: { decklistId: string }): JSX.Element {
       </Grid>
       {commentsWithChildren.map((comment) => (
         <Grid key={comment.id} size={12}>
-          <DecklistComment comment={comment} onCommentsChange={() => fetchData()} />
+          <DecklistComment comment={comment} onCommentsChange={() => refreshComments()} />
         </Grid>
       ))}
     </Grid>

@@ -4,7 +4,7 @@ import { Box, Button, Grid, Tab, Tabs, Typography } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { useState, type JSX } from 'react'
-import { privateApi } from '../../api'
+import { privateApi, refreshCache } from '../../api'
 import { Decklist } from './Decklist'
 import DeleteIcon from '@mui/icons-material/Delete'
 import LinkIcon from '@mui/icons-material/Link'
@@ -90,9 +90,20 @@ export function DecklistTabs(props: {
   const { enqueueSnackbar } = useSnackbar()
   const queryClient = useQueryClient()
 
+  function refreshDecklistCaches(decklistId: string) {
+    // The server also resolves /decklists/{deckId} to the deck's latest version
+    return refreshCache(
+      '/decklists',
+      `/decklists/${decklistId}`,
+      `/decklists/${deck.id}`,
+      `/decks/${deck.id}`
+    )
+  }
+
   const publishMutation = useMutation({
     mutationFn: (decklistId: string) => privateApi.Decklist.publish({ decklistId }),
-    onSuccess: () => {
+    onSuccess: async (_response, decklistId) => {
+      await refreshDecklistCaches(decklistId)
       props.onDecklistUpdated()
       enqueueSnackbar('The decklist was published successfully!', { variant: 'success' })
       queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
@@ -121,6 +132,7 @@ export function DecklistTabs(props: {
     })
     if (!confirmed) return
     privateApi.Decklist.delete({ decklistId: decklistId })
+      .then(() => refreshDecklistCaches(decklistId))
       .then(() => {
         props.onDecklistUpdated()
         setCurrentDecklistId(latestDecklistForDeck(deck)?.id || undefined)
@@ -151,6 +163,7 @@ export function DecklistTabs(props: {
     })
     if (!confirmed) return
     privateApi.Decklist.unpublish({ decklistId: decklistId })
+      .then(() => refreshDecklistCaches(decklistId))
       .then(() => {
         props.onDecklistUpdated()
         enqueueSnackbar('The decklist was unpublished successfully!', { variant: 'success' })

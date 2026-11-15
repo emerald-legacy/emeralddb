@@ -15,7 +15,7 @@ import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { useState, type JSX } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { privateApi } from '../api'
+import { privateApi, refreshCache } from '../api'
 import { useCurrentUser } from '../providers/UserProvider'
 
 const PREFIX = 'RulingList'
@@ -84,6 +84,7 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
     })
     if (!confirmed) return
     privateApi.Ruling.delete({ rulingId: ruling.id })
+      .then(() => refreshCache(`/cards/${props.cardId}`))
       .then(() => {
         window.location.reload()
       })
@@ -109,6 +110,7 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
           link: rulingLink,
         },
       })
+        .then(() => refreshCache(`/cards/${props.cardId}`))
         .then(() => {
           window.location.reload()
         })
@@ -133,6 +135,7 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
           link: rulingLink,
         },
       })
+        .then(() => refreshCache(`/cards/${props.cardId}`))
         .then(() => {
           window.location.reload()
         })

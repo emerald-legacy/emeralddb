@@ -15,7 +15,7 @@ import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import React, { useState, type JSX } from 'react'
 import { useNavigate } from 'react-router'
-import { privateApi } from '../api'
+import { privateApi, refreshCache } from '../api'
 import { Loading } from '../components/Loading'
 import { useUiStore } from '../providers/UiStoreProvider'
 import { toSlugId } from '../utils/slugIdUtils'
@@ -55,7 +55,7 @@ const Root = styled('div')(({ theme }) => ({
 
 export function ManageCyclesView(): JSX.Element {
   const navigate = useNavigate()
-  const { packs, cycles } = useUiStore()
+  const { packs, cycles, cards, invalidateData } = useUiStore()
   const [packModalOpen, setPackModalOpen] = useState(false)
   const [cycleModalOpen, setCycleModalOpen] = useState(false)
 
@@ -90,6 +90,16 @@ export function ManageCyclesView(): JSX.Element {
     return packs.filter((p) => p.cycle_id === cycleId)
   }
 
+  // Rotating changes the `rotated` flag of every printing in the packs, so the cached
+  // detail response of each card that is printed in them is outdated as well.
+  // This can be a few hundred small requests for a cycle, which is fine for a rare admin action.
+  function cardPathsForPacks(packIds: string[]): string[] {
+    const ids = new Set(packIds)
+    return cards
+      .filter((card) => card.versions.some((version) => ids.has(version.pack_id)))
+      .map((card) => `/cards/${card.id}`)
+  }
+
   function openPackModal(cycleId: string) {
     setPackId('')
     setPackName('')
@@ -121,9 +131,8 @@ export function ManageCyclesView(): JSX.Element {
         position: packPosition,
       },
     })
-      .then(() => {
-        window.location.reload()
-      })
+      .then(() => invalidateData())
+      .then(() => setPackModalOpen(false))
       .catch((error) => {
         console.log(error)
         enqueueSnackbar("The pack couldn't be created!", { variant: 'error' })
@@ -146,9 +155,8 @@ export function ManageCyclesView(): JSX.Element {
         publisher: 'emerald-legacy',
       },
     })
-      .then(() => {
-        window.location.reload()
-      })
+      .then(() => invalidateData())
+      .then(() => setCycleModalOpen(false))
       .catch((error) => {
         console.log(error)
         enqueueSnackbar("The cycle couldn't be created!", { variant: 'error' })
@@ -162,9 +170,10 @@ export function ManageCyclesView(): JSX.Element {
       confirmationText: 'Rotate Cycle',
     })
     if (!confirmed) return
+    const cardPaths = cardPathsForPacks(packsForCycle(cycleId).map((pack) => pack.id))
     try {
       await privateApi.Cycle.rotate({ cycleId })
-      window.location.reload()
+      await Promise.all([invalidateData(), refreshCache(...cardPaths)])
     } catch (error) {
       console.log(error)
       enqueueSnackbar("The cycle couldn't be rotated!", { variant: 'error' })
@@ -178,9 +187,10 @@ export function ManageCyclesView(): JSX.Element {
       confirmationText: 'Rotate Pack',
     })
     if (!confirmed) return
+    const cardPaths = cardPathsForPacks([packId])
     try {
       await privateApi.Pack.rotate({ packId })
-      window.location.reload()
+      await Promise.all([invalidateData(), refreshCache(...cardPaths)])
     } catch (error) {
       console.log(error)
       enqueueSnackbar("The pack couldn't be rotated!", { variant: 'error' })

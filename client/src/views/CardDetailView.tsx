@@ -27,7 +27,7 @@ import { useCurrentUser } from '../providers/UserProvider'
 import { RulingList } from '../components/RulingList'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useUiStore } from '../providers/UiStoreProvider'
-import { privateApi } from '../api'
+import { privateApi, refreshCache } from '../api'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { toSlugId } from '../utils/slugIdUtils'
@@ -54,7 +54,7 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 
 export function CardDetailView(): JSX.Element {
   const params = useParams<{ id: string }>()
-  const { cards, packs } = useUiStore()
+  const { cards, packs, invalidateData } = useUiStore()
   const [data] = useCard(params.id!)
   const [chosenVersionIndex, setChosenVersionIndex] = useState(0)
   const [chosenVersion, setChosenVersion] = useState<Omit<CardInPack, 'card_id'>>()
@@ -118,6 +118,8 @@ export function CardDetailView(): JSX.Element {
       cardId: card.id,
       body: { replacementCardId: deletionReplacementCardId },
     })
+      // Decklists that contained the card were changed on the server as well
+      .then(() => Promise.all([invalidateData(), refreshCache(`/cards/${card.id}`, '/decklists')]))
       .then(() => {
         if (deletionReplacementCardId) {
           navigate(`/card/${deletionReplacementCardId}`)
@@ -148,6 +150,13 @@ export function CardDetailView(): JSX.Element {
         nameExtra: newNameExtra,
       },
     })
+      // Decklists that contained the card were changed on the server as well
+      .then(() =>
+        Promise.all([
+          invalidateData(),
+          refreshCache(`/cards/${card.id}`, `/cards/${newCardId}`, '/decklists'),
+        ])
+      )
       .then(() => {
         navigate(`/card/${newCardId}`)
         setRenameModalOpen(false)
