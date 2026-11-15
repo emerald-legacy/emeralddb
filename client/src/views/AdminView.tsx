@@ -1,8 +1,8 @@
 import { Box, Button, Card, CardContent, Grid, TextField, Typography } from '@mui/material'
 import { useNavigate } from 'react-router'
 import { privateApi } from '../api'
+import type { Pack$export } from '@5rdb/api'
 import React, { useState, type JSX } from 'react'
-import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useBetaEnvironment } from '../hooks/useBetaEnvironment'
 import { useUiStore } from '../providers/UiStoreProvider'
@@ -22,14 +22,19 @@ export function AdminView(): JSX.Element {
   const importPack = () => {
     const enteredPackId = packId
     setPackId('')
-    axios
-      // The timestamp makes every request unique, so a pack that was just fixed on beta
-      // is never served from the 5 minute browser cache of an earlier export.
-      .get(`${betaUrl}api/packs/export/${enteredPackId}`, { params: { _t: Date.now() } })
+    // The timestamp makes every request unique, so a pack that was just fixed on beta
+    // is never served from the 5 minute browser cache of an earlier export.
+    fetch(`${betaUrl}api/packs/export/${enteredPackId}?_t=${Date.now()}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Request failed with status code ${response.status}`)
+        }
+        return response.json() as Promise<Pack$export['response']>
+      })
       .then((exported) =>
         privateApi.Pack.import({
           body: {
-            ...exported.data,
+            ...exported,
           },
         })
           .then(() => invalidateData())
