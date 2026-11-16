@@ -4,6 +4,7 @@ import { Response } from 'express'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Decklist, Decklists$publish } from '@5rdb/api'
 import { isDeckValid } from './validators/deckValidator'
+import { getUserId } from '../utils/getUserId'
 
 export const schema = {
   body: Joi.object<Decklists$publish['request']['params']>({
@@ -20,8 +21,8 @@ export async function handler(
     res.sendStatus(404)
     return
   }
-  const user = (req as any).auth as { sub: string }
-  if (user.sub !== decklist.user_id) {
+  const userId = getUserId(req)
+  if (userId !== decklist.user_id) {
     res.sendStatus(403)
     return
   }
@@ -29,7 +30,7 @@ export async function handler(
   if (!valid) {
     res.status(400).send('Deck has validation errors')
   } else {
-    console.log(`Publish decklist ${decklist.id} for user ${user.sub}!`)
+    console.log(`Publish decklist ${decklist.id} for user ${userId}!`)
     return await publishDecklist(req.params.decklistId)
   }
 }

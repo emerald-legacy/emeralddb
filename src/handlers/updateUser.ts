@@ -3,6 +3,7 @@ import * as Express from 'express'
 import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Users$update, User } from '@5rdb/api'
+import { getUserId } from '../utils/getUserId'
 
 export const schema = {
   body: Joi.object<Users$update['request']['body']>({
@@ -15,12 +16,7 @@ export async function handler(
   req: ValidatedRequest<typeof schema>,
   res: Express.Response
 ): Promise<User | undefined> {
-  const currentUser = (req as any).auth as User & { sub: string }
-  if (!currentUser?.sub) {
-    res.status(401).send()
-    return
-  }
-  const dbUser = await getOrInsertDBUser(currentUser.sub)
+  const dbUser = await getOrInsertDBUser(getUserId(req))
   if (dbUser.id !== req.body.id) {
     res.status(403).send()
     return

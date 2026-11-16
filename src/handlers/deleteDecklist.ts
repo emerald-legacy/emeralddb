@@ -5,6 +5,7 @@ import {
   deleteDeck,
 } from '../gateways/storage/index'
 import { Request, Response } from 'express'
+import { getUserId } from '../utils/getUserId'
 
 export async function handler(req: Request, res: Response): Promise<void> {
   const decklistId = req.params.decklistId
@@ -17,8 +18,8 @@ export async function handler(req: Request, res: Response): Promise<void> {
     res.status(404).send()
     return
   }
-  const user = (req as any).auth as { sub: string }
-  if (decklist.user_id !== user.sub) {
+  const userId = getUserId(req)
+  if (decklist.user_id !== userId) {
     res.status(403).send()
     return
   }

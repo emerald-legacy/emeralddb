@@ -4,16 +4,6 @@ import jwks from 'jwks-rsa'
 import { getOrInsertDBUser } from '../gateways/storage'
 import env from '../env'
 
-export interface Auth0User {
-  iss: string
-  sub: string
-  aud: string[]
-  iat: number
-  exp: number
-  azp: string
-  scope: string
-}
-
 const RULES_ADMIN = 'rules_admin'
 const DATA_ADMIN = 'data_admin'
 
@@ -34,12 +24,12 @@ export async function rulesAdminOnly(
   res: express.Response,
   next: express.NextFunction
 ): Promise<void> {
-  const user: Auth0User = (req as any).auth as Auth0User
-  if (!user?.sub) {
+  const userId = req.auth?.sub
+  if (!userId) {
     res.status(401).send()
     return
   }
-  const dbUser = await getOrInsertDBUser(user.sub)
+  const dbUser = await getOrInsertDBUser(userId)
   if (!dbUser.roles.includes(RULES_ADMIN)) {
     res.status(401).send()
     return
@@ -52,12 +42,12 @@ export async function dataAdminOnly(
   res: express.Response,
   next: express.NextFunction
 ): Promise<void> {
-  const user: Auth0User = (req as any).auth as Auth0User
-  if (!user?.sub) {
+  const userId = req.auth?.sub
+  if (!userId) {
     res.status(401).send()
     return
   }
-  const dbUser = await getOrInsertDBUser(user.sub)
+  const dbUser = await getOrInsertDBUser(userId)
   if (!dbUser.roles.includes(DATA_ADMIN)) {
     res.status(401).send()
     return
