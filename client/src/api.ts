@@ -137,7 +137,6 @@ export const publicApi = {
     get: (params?: ApiParams) => apiCall('GET', '/auth0', params),
   },
   Deck: {
-    findForUser: (params?: ApiParams) => apiCall('POST', '/decks', params),
     find: (params?: ApiParams) => apiCall('GET', '/decks/{deckId}', params),
   },
   Decklist: {
@@ -180,6 +179,8 @@ export const privateApi = {
     delete: (params?: ApiParams) => apiCall('DELETE', '/decklists/{decklistId}', params, true),
   },
   Deck: {
+    // The decks of the logged-in user
+    findForUser: (params?: ApiParams) => apiCall('POST', '/decks', params, true),
     create: (params?: ApiParams) => apiCall('PUT', '/decks', params, true),
     delete: (params?: ApiParams) => apiCall('DELETE', '/decks/{deckId}', params, true),
   },

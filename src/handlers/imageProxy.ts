@@ -5,7 +5,7 @@ import https from 'https'
 const ALLOWED_DOMAINS = ['lcg-cdn.fantasyflightgames.com', 'images-cdn.fantasyflightgames.com']
 
 export async function handler(req: Request, res: Response): Promise<void> {
-  const url = req.query.url as string
+  const url = typeof req.query.url === 'string' ? req.query.url : undefined
   if (!url) {
     res.status(400).json({ error: 'Missing url parameter' })
     return
