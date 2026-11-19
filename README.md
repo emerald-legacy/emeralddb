@@ -3,12 +3,17 @@
 ## Prerequisites:
 To run the application you need:
 * Node version 26 or higher (pinned to 26.13.1 via Volta, `.nvmrc` and `.node-version`)
+* Yarn 4 (pinned to 4.18.1 via Volta and `packageManager` in `package.json`)
 * A local Postgres database
 
 ## Set Up:
 
-### Install yarn globally
-``` npm install yarn -g ```
+### Install Node and Yarn
+With [Volta](https://volta.sh), which picks up the pinned versions in the project:
+```volta install node yarn```
+
+Without Volta, use Corepack (Node 25+ doesn't ship it anymore):
+```npm install -g corepack && corepack enable```
 
 
 ### Install backend packages
