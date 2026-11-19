@@ -141,16 +141,6 @@ export function AdminView(): JSX.Element {
                     </Button>
                   </Box>
                 </Box>
-                {/** Enable if you need local data */}
-                <Button
-                  disabled
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => privateApi.Data.import()}
-                  fullWidth
-                >
-                  Import Data (Disabled)
-                </Button>
               </Box>
             </CardContent>
           </Card>

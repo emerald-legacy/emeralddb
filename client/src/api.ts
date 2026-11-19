@@ -236,10 +236,6 @@ export const publicApi = {
 
 // Private API resources (with authentication)
 export const privateApi = {
-  Data: {
-    // There's no /import route on the server (any more); only used by a disabled button
-    import: endpoint<Record<never, never>>('GET', '/import', true),
-  },
   Beta: {
     url: endpoint<Config$betaUrl>('GET', '/beta-url', true),
   },

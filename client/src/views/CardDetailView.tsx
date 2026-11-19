@@ -27,7 +27,7 @@ import { useCurrentUser } from '../providers/UserProvider'
 import { RulingList } from '../components/RulingList'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useUiStore } from '../providers/UiStoreProvider'
-import { privateApi, refreshCache } from '../api'
+import { errorMessage, privateApi, refreshCache } from '../api'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { toSlugId } from '../utils/slugIdUtils'
@@ -163,13 +163,9 @@ export function CardDetailView(): JSX.Element {
       })
       .catch((error) => {
         console.log(error)
-        const serverMessage = error?.data?.()
-        enqueueSnackbar(
-          serverMessage
-            ? `The card couldn't be renamed: ${serverMessage}`
-            : "The card couldn't be renamed!",
-          { variant: 'error' }
-        )
+        enqueueSnackbar(`The card couldn't be renamed: ${errorMessage(error)}`, {
+          variant: 'error',
+        })
       })
   }
 

@@ -27,10 +27,7 @@ export function DecksView(): JSX.Element {
   const { formats } = useUiStore()
   const { data: decks = [] } = useQuery<PublishedDecklistWithExtraInfo[]>({
     queryKey: UiStoreQueries.PUBLISHED_DECKLISTS,
-    queryFn: () =>
-      publicApi.Decklist.findPublished().then(
-        (response) => response.data() as PublishedDecklistWithExtraInfo[]
-      ),
+    queryFn: () => publicApi.Decklist.findPublished().then((response) => response.data()),
   })
   const [filter, setFilter] = useState<DeckFilterState | undefined>(undefined)
   const isMdOrBigger = useMediaQuery('(min-width:600px)')

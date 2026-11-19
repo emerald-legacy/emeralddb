@@ -10,16 +10,6 @@ export class ApiError extends Error {
     super(message)
     this.name = 'ApiError'
   }
-
-  /** @deprecated Compatibility with the old error object. Use `body`. */
-  data(): unknown {
-    return this.body
-  }
-
-  /** @deprecated Compatibility with the old error object. Use `message`. */
-  error(): string {
-    return this.message
-  }
 }
 
 function joinIfStrings(value: unknown): string | undefined {

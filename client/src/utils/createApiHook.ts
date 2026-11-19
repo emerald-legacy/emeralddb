@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useReducer } from 'react'
+import { errorMessage } from '../api'
 
 interface State<D> {
   loading: boolean
@@ -50,9 +51,9 @@ export function createApiHook<Data, Id>(
       dispatch({ type: 'startRequest' })
       apiCall(pm ? pm(resourceId) : undefined)
         .then((response) => dispatch({ type: 'success', payload: response.data() }))
-        .catch((response) => {
-          console.log(response)
-          dispatch({ type: 'error', error: response.error() })
+        .catch((error: unknown) => {
+          console.log(error)
+          dispatch({ type: 'error', error: errorMessage(error) })
         })
     }, [resourceId])
 

@@ -1,7 +1,7 @@
-import { Deck, DecklistViewModel } from '@5rdb/api'
+import { DecklistViewModel } from '@5rdb/api'
 import { Box, Button, Grid, Switch, Typography } from '@mui/material'
 import { useNavigate } from 'react-router'
-import { privateApi } from '../../api'
+import { errorMessage, privateApi } from '../../api'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { useCurrentUser } from '../../providers/UserProvider'
 import { CardLink } from '../card/CardLink'
@@ -170,12 +170,12 @@ export function Decklist(props: {
       },
     })
       .then((response) => {
-        const newDeck = response.data() as Deck
+        const newDeck = response.data()
         navigate(`/builder/${newDeck.id}/edit`)
         enqueueSnackbar('Successfully copied deck!', { variant: 'success' })
       })
       .catch((error) => {
-        enqueueSnackbar('Error while copying deck: ' + error, { variant: 'error' })
+        enqueueSnackbar('Error while copying deck: ' + errorMessage(error), { variant: 'error' })
       })
   }
 

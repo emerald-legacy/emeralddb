@@ -1,10 +1,4 @@
-import {
-  DecklistViewModel,
-  Decklist as DecklistType,
-  Deck,
-  CardWithVersions,
-  Format,
-} from '@5rdb/api'
+import { DecklistViewModel, Decklist as DecklistType, CardWithVersions, Format } from '@5rdb/api'
 import { styled } from '@mui/material/styles'
 import {
   Box,
@@ -23,7 +17,7 @@ import { useState, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { BuilderCardList } from './BuilderCardList'
 import { Decklist } from '../deck/Decklist'
-import { privateApi, refreshCache } from '../../api'
+import { errorMessage, privateApi, refreshCache } from '../../api'
 import { DeckBuilderWizard } from './DeckBuilderWizard'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useSnackbar } from 'notistack'
@@ -199,7 +193,13 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   const filteredCards = showAllCards ? cards : prefilterCards(cards, decklist, formats, true)
 
   function updateDeck(decklist: DecklistViewModel, deckId: string) {
-    const { stronghold: _stronghold, role: _role, ...decklistToSave } = decklist as any
+    // A decklist loaded from the server can still carry stronghold and role
+    // (DecklistWithExtraInfo), which the create schema rejects
+    const {
+      stronghold: _stronghold,
+      role: _role,
+      ...decklistToSave
+    }: DecklistViewModel & { stronghold?: unknown; role?: unknown } = decklist
     const cardPackIds: Record<string, string> = {}
     for (const cardId of Object.keys(decklist.cards)) {
       const version = validCardVersionForFormat(cardId, decklist.format)
@@ -231,12 +231,12 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
     } else {
       privateApi.Deck.create({ body: {} })
         .then((response) => {
-          const newDeck = response.data() as Deck
+          const newDeck = response.data()
           updateDeck(decklist, newDeck.id)
         })
         .catch((error) => {
           console.log(error)
-          enqueueSnackbar('Error while creating deck: ' + error, { variant: 'error' })
+          enqueueSnackbar('Error while creating deck: ' + errorMessage(error), { variant: 'error' })
         })
     }
   }

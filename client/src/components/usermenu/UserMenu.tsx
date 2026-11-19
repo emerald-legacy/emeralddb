@@ -1,4 +1,3 @@
-import { User } from '@5rdb/api'
 import { useAuth0 } from '@auth0/auth0-react'
 import {
   Button,
@@ -70,7 +69,7 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
       privateApi.User.update({
         body: { id: currentUser.id, name: modalUsername ?? currentUser.name },
       }).then((response) => {
-        setCurrentUser(response.data() as unknown as User)
+        setCurrentUser(response.data())
         setModalOpen(false)
         // The username is part of the published decklists
         return refreshCache('/decklists')

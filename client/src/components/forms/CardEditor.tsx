@@ -19,35 +19,11 @@ import { useUiStore } from '../../providers/UiStoreProvider'
 import SaveIcon from '@mui/icons-material/Save'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
-import { privateApi, refreshCache } from '../../api'
+import { errorMessage, privateApi, refreshCache } from '../../api'
 import { useNavigate } from 'react-router'
 import { toSlugId } from '../../utils/slugIdUtils'
 
 const Root = styled('form')(() => ({}))
-
-// Optional card fields are nullable columns. The editor sends null (not undefined) for cleared
-// fields so that an update actually resets the column instead of keeping the previous value
-// (see CardInput in @5rdb/api).
-
-// The API answers a rejected card with either a string, a list of validation errors or
-// { message: [...] }. Flatten all of them so the editor can show what went wrong.
-function serverErrorMessage(error: any): string {
-  const data = error?.response?.data
-  if (typeof data === 'string' && data.length > 0) {
-    return data
-  }
-  if (Array.isArray(data)) {
-    return data.join(', ')
-  }
-  const message = data?.message
-  if (Array.isArray(message)) {
-    return message.join(', ')
-  }
-  if (typeof message === 'string' && message.length > 0) {
-    return message
-  }
-  return error?.message ?? 'unknown error'
-}
 
 export function CardEditor(props: { existingCard?: CardType; editMode?: boolean }): JSX.Element {
   const navigate = useNavigate()
@@ -358,7 +334,7 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
           .then(() => navigate(`/card/${newCard.id}`))
           .catch((error) => {
             console.log(error)
-            enqueueSnackbar(`The card couldn't be saved: ${serverErrorMessage(error)}`, {
+            enqueueSnackbar(`The card couldn't be saved: ${errorMessage(error)}`, {
               variant: 'error',
             })
           })
@@ -377,7 +353,7 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
         .then(() => navigate(`/card/${newCard.id}`))
         .catch((error) => {
           console.log(error)
-          enqueueSnackbar(`The card couldn't be created: ${serverErrorMessage(error)}`, {
+          enqueueSnackbar(`The card couldn't be created: ${errorMessage(error)}`, {
             variant: 'error',
           })
         })
