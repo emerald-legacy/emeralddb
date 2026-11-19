@@ -28,7 +28,7 @@ export async function insertOrUpdateCard(card: Card): Promise<Card> {
   return row
 }
 
-export async function updateCard(card: Card): Promise<Card> {
+export async function updateCard(card: Card): Promise<Card | undefined> {
   const result = await pg(TABLE)
     .where('id', card.id)
     .update({ ...card }, '*')

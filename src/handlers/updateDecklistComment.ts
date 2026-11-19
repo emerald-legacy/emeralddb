@@ -25,5 +25,9 @@ export async function handler(
     res.status(403).send()
     return
   }
-  return editComment(req.params.id, req.body.comment)
+  const edited = await editComment(req.params.id, req.body.comment)
+  if (!edited) {
+    res.status(404).send()
+  }
+  return edited
 }

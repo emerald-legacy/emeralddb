@@ -24,7 +24,7 @@ export async function updateCardsInDecklist(
   decklistId: string,
   cards: Record<string, number>,
   cardPackIds?: Record<string, string>
-): Promise<Decklist> {
+): Promise<Decklist | undefined> {
   const updateData: Record<string, unknown> = { cards }
   if (cardPackIds !== undefined) {
     updateData.card_pack_ids = cardPackIds
@@ -42,7 +42,7 @@ export async function insertDecklist(
     .then(([row]) => row)
 }
 
-export async function publishDecklist(decklistId: string): Promise<Decklist> {
+export async function publishDecklist(decklistId: string): Promise<Decklist | undefined> {
   const publishedDate = new Date()
   const result = await pg(TABLE)
     .where('id', decklistId)
@@ -51,7 +51,7 @@ export async function publishDecklist(decklistId: string): Promise<Decklist> {
   return result[0]
 }
 
-export async function unpublishDecklist(decklistId: string): Promise<Decklist> {
+export async function unpublishDecklist(decklistId: string): Promise<Decklist | undefined> {
   const result = await pg(TABLE)
     .where('id', decklistId)
     .update({ published_date: null })

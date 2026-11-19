@@ -22,7 +22,10 @@ export async function getComment(commentId: string): Promise<DecklistComment | u
   return pg(TABLE).where('id', commentId).first()
 }
 
-export async function editComment(commentId: string, newText: string): Promise<DecklistComment> {
+export async function editComment(
+  commentId: string,
+  newText: string
+): Promise<DecklistComment | undefined> {
   const now = new Date()
   const result = await pg(TABLE)
     .where('id', commentId)

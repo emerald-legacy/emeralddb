@@ -31,6 +31,10 @@ export async function handler(
     res.status(400).send('Deck has validation errors')
   } else {
     console.log(`Publish decklist ${decklist.id} for user ${userId}!`)
-    return await publishDecklist(req.params.decklistId)
+    const published = await publishDecklist(req.params.decklistId)
+    if (!published) {
+      res.sendStatus(404)
+    }
+    return published
   }
 }

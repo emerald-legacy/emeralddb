@@ -25,5 +25,9 @@ export async function handler(
     return
   }
 
-  return updateCard(req.body)
+  const updated = await updateCard(req.body)
+  if (!updated) {
+    res.status(404).send()
+  }
+  return updated
 }

@@ -21,5 +21,9 @@ export async function handler(
     res.status(403).send()
     return
   }
-  return updateUser(req.body)
+  const updated = await updateUser(req.body)
+  if (!updated) {
+    res.status(404).send()
+  }
+  return updated
 }

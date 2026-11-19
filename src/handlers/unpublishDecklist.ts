@@ -26,5 +26,9 @@ export async function handler(
     return
   }
   console.log(`Unpublish decklist ${decklist.id} for user ${userId}!`)
-  return await unpublishDecklist(req.params.decklistId)
+  const unpublished = await unpublishDecklist(req.params.decklistId)
+  if (!unpublished) {
+    res.sendStatus(404)
+  }
+  return unpublished
 }
