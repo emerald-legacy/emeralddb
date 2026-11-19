@@ -5,13 +5,6 @@ __metadata:
   version: 10
   cacheKey: 10c0
 
-"@5rdb/api@file:../apiTypings::locator=client%40workspace%3A.":
-  version: 1.0.7
-  resolution: "@5rdb/api@file:../apiTypings#../apiTypings::hash=9e7991&locator=client%40workspace%3A."
-  checksum: 10c0/3db75d9496169f804f574014697098a088da4d115a93265cc4c7cd008fe97fa084e248533d7f65cbcc66caf37dfe0a1b4e37cab1506afba9c9e67e6ca5f15d71
-  languageName: node
-  linkType: hard
-
 "@asciidoctor/core@npm:4.2.1":
   version: 4.2.1
   resolution: "@asciidoctor/core@npm:4.2.1"
@@ -1376,7 +1369,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "client@workspace:."
   dependencies:
-    "@5rdb/api": "file:../apiTypings"
     "@asciidoctor/core": "npm:4.2.1"
     "@auth0/auth0-react": "npm:2.30.0"
     "@emotion/react": "npm:11.14.0"

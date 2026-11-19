@@ -5,12 +5,11 @@ __metadata:
   version: 10
   cacheKey: 10c0
 
-"@5rdb/api@file:./apiTypings::locator=fiveringsdb-node%40workspace%3A.":
-  version: 1.0.7
-  resolution: "@5rdb/api@file:./apiTypings#./apiTypings::hash=9e7991&locator=fiveringsdb-node%40workspace%3A."
-  checksum: 10c0/3db75d9496169f804f574014697098a088da4d115a93265cc4c7cd008fe97fa084e248533d7f65cbcc66caf37dfe0a1b4e37cab1506afba9c9e67e6ca5f15d71
+"@5rdb/api@link:./apiTypings::locator=fiveringsdb-node%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@5rdb/api@link:./apiTypings::locator=fiveringsdb-node%40workspace%3A."
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@ava/typescript@npm:7.0.0":
   version: 7.0.0
@@ -2047,7 +2046,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "fiveringsdb-node@workspace:."
   dependencies:
-    "@5rdb/api": "file:./apiTypings"
+    "@5rdb/api": "link:./apiTypings"
     "@ava/typescript": "npm:7.0.0"
     "@types/compression": "npm:1.8.1"
     "@types/cors": "npm:2.8.19"
