@@ -67,14 +67,14 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
 
   if (currentUser !== undefined) {
     const updateUser = () => {
-      privateApi.User.update({ body: { id: currentUser.id, name: modalUsername } }).then(
-        (response) => {
-          setCurrentUser(response.data() as unknown as User)
-          setModalOpen(false)
-          // The username is part of the published decklists
-          return refreshCache('/decklists')
-        }
-      )
+      privateApi.User.update({
+        body: { id: currentUser.id, name: modalUsername ?? currentUser.name },
+      }).then((response) => {
+        setCurrentUser(response.data() as unknown as User)
+        setModalOpen(false)
+        // The username is part of the published decklists
+        return refreshCache('/decklists')
+      })
     }
     return (
       <div style={{ float: 'right' }}>

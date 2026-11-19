@@ -1,7 +1,7 @@
 import '../testEnv'
 import test from 'ava'
 import express from 'express'
-import type { Card } from '@5rdb/api'
+import type { CardInput } from '@5rdb/api'
 import { asyncHandler } from '../utils/asyncHandler'
 import { makeCard, sendRequest } from '../testUtils'
 import { handler } from './renameCard'
@@ -29,12 +29,12 @@ function rename(body: Record<string, string>) {
 }
 
 test.serial('in-place edit keeps the id, updates name, and never deletes the card', async (t) => {
-  const inserted: Card[] = []
+  const inserted: CardInput[] = []
   const deleted: string[] = []
   cardStore.getCard = async (id) => (id === 'card-a' ? { ...existing } : undefined)
   cardStore.insertOrUpdateCard = async (card) => {
     inserted.push(card)
-    return card
+    return makeCard({ id: card.id, name: card.name })
   }
   cardStore.deleteCard = async (id) => {
     deleted.push(id)
@@ -57,7 +57,7 @@ test.serial('in-place edit keeps the id, updates name, and never deletes the car
 })
 
 test.serial('renaming onto a different existing card is rejected with 400', async (t) => {
-  const inserted: Card[] = []
+  const inserted: CardInput[] = []
   const deleted: string[] = []
   cardStore.getCard = async (id) => {
     if (id === 'card-a') return { ...existing }
@@ -66,7 +66,7 @@ test.serial('renaming onto a different existing card is rejected with 400', asyn
   }
   cardStore.insertOrUpdateCard = async (card) => {
     inserted.push(card)
-    return card
+    return makeCard({ id: card.id, name: card.name })
   }
   cardStore.deleteCard = async (id) => {
     deleted.push(id)
@@ -90,7 +90,7 @@ test.serial('renaming a non-existent card is rejected with 400', async (t) => {
   cardStore.getCard = async () => undefined
   cardStore.insertOrUpdateCard = async (card) => {
     inserted += 1
-    return card
+    return makeCard({ id: card.id, name: card.name })
   }
 
   const response = await rename({
@@ -107,12 +107,12 @@ test.serial('renaming a non-existent card is rejected with 400', async (t) => {
 test.serial(
   'renaming to a free id creates the new card, migrates references, and deletes the old',
   async (t) => {
-    const inserted: Card[] = []
+    const inserted: CardInput[] = []
     const deleted: string[] = []
     cardStore.getCard = async (id) => (id === 'card-a' ? { ...existing } : undefined)
     cardStore.insertOrUpdateCard = async (card) => {
       inserted.push(card)
-      return card
+      return makeCard({ id: card.id, name: card.name })
     }
     cardStore.deleteCard = async (id) => {
       deleted.push(id)

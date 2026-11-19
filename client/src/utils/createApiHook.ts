@@ -13,7 +13,6 @@ type Action<D> =
 interface ApiResponse<T = any> {
   data: () => T
   status: () => number
-  error: () => string
 }
 
 type ApiCall = (params?: any) => Promise<ApiResponse>

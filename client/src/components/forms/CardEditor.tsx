@@ -1,4 +1,4 @@
-import { Card as CardType, Trait } from '@5rdb/api'
+import { Card as CardType, CardInput, Trait } from '@5rdb/api'
 import { styled } from '@mui/material/styles'
 import { Box, Button, Card, CardContent, Grid, Switch, TextField, Typography } from '@mui/material'
 import React, { useState, type JSX } from 'react'
@@ -26,8 +26,8 @@ import { toSlugId } from '../../utils/slugIdUtils'
 const Root = styled('form')(() => ({}))
 
 // Optional card fields are nullable columns. The editor sends null (not undefined) for cleared
-// fields so that an update actually resets the column instead of keeping the previous value.
-type CardBody = { [K in keyof CardType]: CardType[K] | null }
+// fields so that an update actually resets the column instead of keeping the previous value
+// (see CardInput in @5rdb/api).
 
 // The API answers a rejected card with either a string, a list of validation errors or
 // { message: [...] }. Flatten all of them so the editor can show what went wrong.
@@ -290,8 +290,8 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
   const nanToNull = (value: number | undefined | null) =>
     value === null || value === undefined || Number.isNaN(value) ? null : value
 
-  function assembleCard(): CardBody {
-    const card: CardBody = {
+  function assembleCard(): CardInput {
+    const card: CardInput = {
       id: id,
       name: name,
       name_extra: emptyToNull(name_extra),

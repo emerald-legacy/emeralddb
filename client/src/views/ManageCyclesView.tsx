@@ -172,7 +172,7 @@ export function ManageCyclesView(): JSX.Element {
     if (!confirmed) return
     const cardPaths = cardPathsForPacks(packsForCycle(cycleId).map((pack) => pack.id))
     try {
-      await privateApi.Cycle.rotate({ cycleId })
+      await privateApi.Cycle.rotate({ id: cycleId })
       await Promise.all([invalidateData(), refreshCache(...cardPaths)])
     } catch (error) {
       console.log(error)
@@ -189,7 +189,7 @@ export function ManageCyclesView(): JSX.Element {
     if (!confirmed) return
     const cardPaths = cardPathsForPacks([packId])
     try {
-      await privateApi.Pack.rotate({ packId })
+      await privateApi.Pack.rotate({ id: packId })
       await Promise.all([invalidateData(), refreshCache(...cardPaths)])
     } catch (error) {
       console.log(error)

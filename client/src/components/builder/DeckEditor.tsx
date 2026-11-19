@@ -229,7 +229,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
     if (props.existingDecklist) {
       updateDeck(decklist, props.existingDecklist.deck_id)
     } else {
-      privateApi.Deck.create()
+      privateApi.Deck.create({ body: {} })
         .then((response) => {
           const newDeck = response.data() as Deck
           updateDeck(decklist, newDeck.id)

@@ -16,28 +16,59 @@ import {
   DeckWithVersions,
   DecklistWithUser,
   DecklistCommentWithUser,
+  PublishedDecklistWithExtraInfo,
 } from './compositeTypes'
+
+/**
+ * A request body for a row: optional columns may also be sent as null, which
+ * clears them in the database (the server's Joi schemas allow it).
+ */
+export type Clearable<Row> = {
+  [Column in keyof Row]: undefined extends Row[Column] ? Row[Column] | null : Row[Column]
+}
+
+export type CardInput = Clearable<Card>
+
+// size is computed by the server; rotated defaults to false
+export type PackInput = Clearable<
+  Omit<Pack, 'size' | 'rotated' | 'released_at'> & {
+    rotated?: boolean
+    // A string in JSON, which the server converts to a Date
+    released_at?: Date | string
+    // Accepted for clients that send a whole Pack, but ignored
+    size?: number
+  }
+>
+
+// rotated defaults to false, and is changed with Cycles$rotate
+export type CycleInput = Omit<Cycle, 'rotated'>
+
+export type FormatInput = Clearable<Format>
 
 export interface Cards$findAll {
   response: CardWithVersions[]
 }
 
 export interface Cards$find {
+  request: { params: { cardId: string } }
   response: CardWithDetails
 }
 
 export interface Cards$update {
-  request: { body: Card }
+  request: { params: { cardId: string }; body: CardInput }
   response: Card
 }
 
 export interface Cards$rename {
-  request: { body: { existingCardId: string; newCardId: string; name: string; nameExtra?: string } }
+  request: {
+    params: { cardId: string }
+    body: { existingCardId: string; newCardId: string; name: string; nameExtra?: string }
+  }
   response: Card
 }
 
 export interface Cards$create {
-  request: { body: Card }
+  request: { body: CardInput }
   response: Card
 }
 
@@ -46,7 +77,7 @@ export interface Cards$delete {
 }
 
 export interface Formats$insertOrUpdate {
-  request: { body: { format: Format } }
+  request: { body: { format: FormatInput } }
   response: Format
 }
 
@@ -59,7 +90,7 @@ export interface Packs$findAll {
 }
 
 export interface Packs$create {
-  request: { body: Pack }
+  request: { body: PackInput }
   response: Pack
 }
 
@@ -68,7 +99,7 @@ export interface Cycles$findAll {
 }
 
 export interface Cycles$create {
-  request: { body: Cycle }
+  request: { body: CycleInput }
   response: Cycle
 }
 
@@ -137,18 +168,17 @@ export interface Decklists$validate {
 }
 
 export interface Decklists$findAllPublished {
-  response: Pick<
-    DecklistWithUser,
-    'id' | 'username' | 'name' | 'format' | 'primary_clan' | 'secondary_clan' | 'published_date'
-  >[]
+  response: PublishedDecklistWithExtraInfo[]
 }
 
 export interface Decklists$publish {
   request: { params: { decklistId: string } }
+  response: Decklist
 }
 
 export interface Decklists$unpublish {
   request: { params: { decklistId: string } }
+  response: Decklist
 }
 
 export interface Ruling$findAll {
@@ -161,7 +191,7 @@ export interface Ruling$create {
 }
 
 export interface Ruling$update {
-  request: { body: Ruling }
+  request: { params: { rulingId: string }; body: Ruling }
   response: Ruling
 }
 
@@ -215,4 +245,17 @@ export interface Traits$insertOrUpdate {
 
 export interface Traits$delete {
   request: { body: { trait: Trait } }
+}
+
+export interface Traits$findAll {
+  response: Trait[]
+}
+
+// Public client configuration, read from the server's environment
+export interface Config$auth0 {
+  response: { domain: string; clientId: string }
+}
+
+export interface Config$betaUrl {
+  response: { betaUrl: string }
 }
