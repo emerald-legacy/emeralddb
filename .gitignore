@@ -8,6 +8,15 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
+# Yarn 4 (root and client/), node-modules linker, no Plug'n'Play
+**/.yarn/*
+!**/.yarn/patches
+!**/.yarn/plugins
+!**/.yarn/releases
+!**/.yarn/sdks
+!**/.yarn/versions
+.pnp.*
+
 trash
 .env
 

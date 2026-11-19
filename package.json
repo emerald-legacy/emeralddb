@@ -27,6 +27,7 @@
   "volta": {
     "node": "26.13.1"
   },
+  "packageManager": "yarn@4.18.1",
   "license": "MIT",
   "dependencies": {
     "@5rdb/api": "file:./apiTypings",
@@ -62,8 +63,7 @@
     "prettier": "^3.10.1",
     "source-map-support": "^0.5.21",
     "typescript": "^6.0.3",
-    "uuid": "^14.0.3",
-    "yarn": "^1.22.22"
+    "uuid": "^14.0.3"
   },
   "ava": {
     "files": [
