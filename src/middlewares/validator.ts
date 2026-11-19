@@ -1,4 +1,4 @@
-import { Request, RequestHandler } from 'express'
+import { Request } from 'express'
 import { ParamsDictionary, Query } from 'express-serve-static-core'
 import { ObjectSchema } from 'joi'
 
@@ -14,12 +14,21 @@ export type ValidatedRequest<
   BodySchema = ReqSchema['body'] extends ObjectSchema<infer C> ? C : undefined,
 > = Request<Params, unknown, BodySchema, QuerySchema>
 
+/** The part of Express's Response that validate() uses */
+interface ValidationResponse {
+  status(code: number): { send(body: unknown): unknown }
+}
+
+/**
+ * Typed with only what it uses from Express, so tests can pass plain objects.
+ * It's still assignable wherever Express expects a RequestHandler.
+ */
 export const validate =
   <Body = undefined, ReqQuery = Query>(schemas: {
     readonly body?: ObjectSchema<Body>
     readonly query?: ObjectSchema<ReqQuery>
-  }): RequestHandler<ParamsDictionary, unknown, Body, ReqQuery> =>
-  (req, res, next) => {
+  }) =>
+  (req: { body: Body; query: ReqQuery }, res: ValidationResponse, next: () => void): void => {
     if (schemas.query) {
       const result = schemas.query.validate(req.query)
       if (result.error) {

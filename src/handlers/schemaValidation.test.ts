@@ -1,47 +1,38 @@
+import '../testEnv'
 import test from 'ava'
-import type { NextFunction, Request, Response } from 'express'
 import { validate } from '../middlewares/validator'
-
-process.env.DISCORD_CONFIG =
-  process.env.DISCORD_CONFIG || JSON.stringify({ clientId: '', botToken: '', isBotEnabled: false })
-
-const { schema: createCycleSchema } = require('./createCycle')
-const { schema: createPackSchema } = require('./createPack')
-const { schema: importPackSchema } = require('./importPack')
-const { schema: updateCardsInPackSchema } = require('./updateCardsInPack')
-const { schema: updateCardInPackSchema } = require('./updateCardInPack')
-const { schema: deleteCardInPackSchema } = require('./deleteCardInPack')
-const { schema: insertOrUpdateFormatSchema } = require('./insertOrUpdateFormat')
-const { schema: updateTraitSchema } = require('./updateTrait')
-const { schema: deleteTraitSchema } = require('./deleteTrait')
-const { schema: createDeckSchema } = require('./createDeck')
-const { schema: createDecklistSchema } = require('./createDecklist')
-const { schema: validateDecklistSchema } = require('./validateDecklist')
-const { schema: updateUserSchema } = require('./updateUser')
-const { schema: createRulingSchema } = require('./createRuling')
-const { schema: updateRulingSchema } = require('./updateRuling')
-const { schema: createCommentSchema } = require('./createDecklistComment')
-const { schema: updateCommentSchema } = require('./updateDecklistComment')
+import { schema as createCycleSchema } from './createCycle'
+import { schema as createPackSchema } from './createPack'
+import { schema as importPackSchema } from './importPack'
+import { schema as updateCardsInPackSchema } from './updateCardsInPack'
+import { schema as updateCardInPackSchema } from './updateCardInPack'
+import { schema as deleteCardInPackSchema } from './deleteCardInPack'
+import { schema as insertOrUpdateFormatSchema } from './insertOrUpdateFormat'
+import { schema as updateTraitSchema } from './updateTrait'
+import { schema as deleteTraitSchema } from './deleteTrait'
+import { schema as createDeckSchema } from './createDeck'
+import { schema as createDecklistSchema } from './createDecklist'
+import { schema as validateDecklistSchema } from './validateDecklist'
+import { schema as updateUserSchema } from './updateUser'
+import { schema as createRulingSchema } from './createRuling'
+import { schema as updateRulingSchema } from './updateRuling'
+import { schema as createCommentSchema } from './createDecklistComment'
+import { schema as updateCommentSchema } from './updateDecklistComment'
 
 type Schema = Parameters<typeof validate>[0]
 
 function runValidation(schema: Schema, body: unknown) {
-  const req = { body, query: {} } as unknown as Request
   const statusCalls: number[] = []
   const res = {
     status(code: number) {
       statusCalls.push(code)
-      return res
+      return { send: () => undefined }
     },
-    send() {
-      return res
-    },
-  } as unknown as Response
+  }
   let nextCalls = 0
-  const next = (() => {
+  validate(schema)({ body, query: {} }, res, () => {
     nextCalls += 1
-  }) as unknown as NextFunction
-  validate(schema)(req, res, next)
+  })
   return { statusCalls, nextCalls }
 }
 
@@ -340,7 +331,7 @@ test('createDecklist accepts a saved-back decklist (null clans, server-owned fie
 })
 
 test('createDecklist strips the server-owned user_id', (t) => {
-  const req = {
+  const req: { body: object; query: object } = {
     body: {
       deck_id: 'd1',
       format: 'emerald',
@@ -351,12 +342,13 @@ test('createDecklist strips the server-owned user_id', (t) => {
       created_at: '2026-01-01T00:00:00.000Z',
     },
     query: {},
-  } as any
-  const res = { status: () => res, send: () => res } as any
+  }
+  const res = { status: () => ({ send: () => undefined }) }
   let nextCalls = 0
-  validate(createDecklistSchema)(req, res, (() => {
+  const schema: Schema = createDecklistSchema
+  validate(schema)(req, res, () => {
     nextCalls += 1
-  }) as any)
+  })
   t.is(nextCalls, 1)
   t.false('user_id' in req.body)
   t.false('created_at' in req.body)
