@@ -4,7 +4,7 @@
 To run the application you need:
 * Node version 26 or higher (pinned to 26.13.1 via Volta, `.nvmrc` and `.node-version`)
 * Yarn 4 (pinned to 4.18.1 via Volta and `packageManager` in `package.json`)
-* A local Postgres database
+* A local Postgres database, e.g. from `docker compose up -d` (Postgres 18, user `postgres`, password `password`, port 5432; the data stays in a Docker volume until `docker compose down -v`)
 
 ## Set Up:
 
