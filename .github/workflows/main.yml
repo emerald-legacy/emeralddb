@@ -28,8 +28,14 @@ jobs:
         with:
           node-version: '26.x'
           cache: 'yarn'
+          cache-dependency-path: |
+            yarn.lock
+            client/yarn.lock
       - name: Install dependencies
         run: yarn
+      # The type-aware lint rules need the client's dependencies for type information
+      - name: Install client dependencies
+        run: cd client && yarn
       - name: Run linter
         run: yarn lint
 
