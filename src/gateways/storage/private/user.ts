@@ -3,15 +3,17 @@ import { pg } from './pg'
 
 export const TABLE = 'users'
 
-export async function getUser(id: string): Promise<User> {
+export async function getUser(id: string): Promise<User | undefined> {
   return pg(TABLE).where('id', id).first()
 }
 
 export async function insertUser(user: User): Promise<User> {
-  const insert = pg(TABLE).insert({ ...user })
-  const update = pg.queryBuilder().update({ ...user })
-  const result = await pg.raw(`? ON CONFLICT ("id") DO ? returning *`, [insert, update])
-  return result.rows[0]
+  const [row] = await pg(TABLE)
+    .insert({ ...user })
+    .onConflict('id')
+    .merge()
+    .returning('*')
+  return row
 }
 
 export async function updateUser(user: Omit<User, 'roles'>): Promise<User> {
@@ -20,9 +22,6 @@ export async function updateUser(user: Omit<User, 'roles'>): Promise<User> {
 }
 
 export async function getOrInsertDBUser(userId: string): Promise<User> {
-  let dbUser: User = await getUser(userId)
-  if (!dbUser) {
-    dbUser = await insertUser({ id: userId, name: 'Unnamed Samurai', roles: [] })
-  }
-  return dbUser
+  const dbUser = await getUser(userId)
+  return dbUser ?? (await insertUser({ id: userId, name: 'Unnamed Samurai', roles: [] }))
 }

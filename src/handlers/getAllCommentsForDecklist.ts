@@ -9,7 +9,7 @@ export async function handler(req: Request): Promise<DecklistCommentWithUser[] |
       const user = await getUser(comment.user_id)
       return {
         ...comment,
-        username: user.name,
+        username: user?.name ?? 'Unknown user',
       }
     })
   )

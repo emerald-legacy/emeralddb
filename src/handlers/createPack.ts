@@ -12,7 +12,8 @@ export const schema = {
     publisher_id: Joi.string().allow('', null),
     released_at: Joi.date().allow(null),
     rotated: Joi.boolean().allow(null),
-    size: Joi.number().allow(null),
+    // computed by the server, not stored; the admin form sends whole Pack objects
+    size: Joi.any().strip(),
   }),
 }
 

@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid'
 
 export const TABLE = 'decklists'
 
-export async function getDecklist(decklistId: string): Promise<Decklist> {
+export async function getDecklist(decklistId: string): Promise<Decklist | undefined> {
   return pg(TABLE).where('id', decklistId).first()
 }
 
@@ -46,15 +46,19 @@ export async function publishDecklist(decklistId: string): Promise<Decklist> {
   const publishedDate = new Date()
   const result = await pg(TABLE)
     .where('id', decklistId)
-    .update({ published_date: publishedDate }, '*')
+    .update({ published_date: publishedDate })
+    .returning('*')
   return result[0]
 }
 
 export async function unpublishDecklist(decklistId: string): Promise<Decklist> {
-  const result = await pg(TABLE).where('id', decklistId).update({ published_date: null }, '*')
+  const result = await pg(TABLE)
+    .where('id', decklistId)
+    .update({ published_date: null })
+    .returning('*')
   return result[0]
 }
 
 export async function deleteDecklist(decklistId: string): Promise<void> {
-  return pg(TABLE).where('id', decklistId).delete()
+  await pg(TABLE).where('id', decklistId).delete()
 }

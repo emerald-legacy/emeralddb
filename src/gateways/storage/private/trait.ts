@@ -7,17 +7,19 @@ export async function getAllTraits(): Promise<Trait[]> {
   return pg(TABLE).select()
 }
 
-export async function getTrait(traitId: string): Promise<Trait> {
+export async function getTrait(traitId: string): Promise<Trait | undefined> {
   return pg(TABLE).where('id', traitId).first()
 }
 
 export async function insertOrUpdateTrait(trait: Trait): Promise<Trait> {
-  const insert = pg(TABLE).insert({ ...trait })
-  const update = pg.queryBuilder().update({ ...trait })
-  const result = await pg.raw(`? ON CONFLICT ("id") DO ? returning *`, [insert, update])
-  return result.rows[0]
+  const [row] = await pg(TABLE)
+    .insert({ ...trait })
+    .onConflict('id')
+    .merge()
+    .returning('*')
+  return row
 }
 
-export async function deleteTrait(traitId: string): Promise<Trait> {
-  return pg(TABLE).where('id', traitId).delete()
+export async function deleteTrait(traitId: string): Promise<void> {
+  await pg(TABLE).where('id', traitId).delete()
 }

@@ -9,7 +9,7 @@ export async function getAllDecks(): Promise<Deck[]> {
   return pg(TABLE).select()
 }
 
-export async function getDeck(deckId: string): Promise<Deck> {
+export async function getDeck(deckId: string): Promise<Deck | undefined> {
   return pg(TABLE).where('id', deckId).first()
 }
 
@@ -29,5 +29,5 @@ export async function deleteDeck(deckId: string): Promise<void> {
   for (const decklist of decklists) {
     await deleteDecklist(decklist.id)
   }
-  return pg(TABLE).where('id', deckId).delete()
+  await pg(TABLE).where('id', deckId).delete()
 }

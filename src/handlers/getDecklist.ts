@@ -10,7 +10,7 @@ import { Decklist, Decklists$find, DecklistWithUser, DecklistWithExtraInfo } fro
 
 export async function addUsernameToDecklist(decklist: Decklist): Promise<DecklistWithUser> {
   const user = await getUser(decklist.user_id)
-  return { ...decklist, username: user.name }
+  return { ...decklist, username: user?.name ?? 'Unknown user' }
 }
 
 export async function handler(
