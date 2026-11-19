@@ -12,7 +12,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@asciidoctor/core@npm:^4.2.1":
+"@asciidoctor/core@npm:4.2.1":
   version: 4.2.1
   resolution: "@asciidoctor/core@npm:4.2.1"
   peerDependencies:
@@ -34,7 +34,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@auth0/auth0-react@npm:^2.30.0":
+"@auth0/auth0-react@npm:2.30.0":
   version: 2.30.0
   resolution: "@auth0/auth0-react@npm:2.30.0"
   dependencies:
@@ -276,7 +276,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/react@npm:^11.13.3":
+"@emotion/react@npm:11.14.0":
   version: 11.14.0
   resolution: "@emotion/react@npm:11.14.0"
   dependencies:
@@ -317,7 +317,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/styled@npm:^11.13.0":
+"@emotion/styled@npm:11.14.1":
   version: 11.14.1
   resolution: "@emotion/styled@npm:11.14.1"
   dependencies:
@@ -424,7 +424,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/icons-material@npm:^9.5.0":
+"@mui/icons-material@npm:9.5.0":
   version: 9.5.0
   resolution: "@mui/icons-material@npm:9.5.0"
   dependencies:
@@ -440,7 +440,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/material@npm:^9.5.0":
+"@mui/material@npm:9.5.0":
   version: 9.5.0
   resolution: "@mui/material@npm:9.5.0"
   dependencies:
@@ -516,7 +516,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/system@npm:^9.4.0, @mui/system@npm:^9.5.0":
+"@mui/system@npm:9.5.0, @mui/system@npm:^9.5.0":
   version: 9.5.0
   resolution: "@mui/system@npm:9.5.0"
   dependencies:
@@ -611,7 +611,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-charts@npm:^9.18.0":
+"@mui/x-charts@npm:9.18.0":
   version: 9.18.0
   resolution: "@mui/x-charts@npm:9.18.0"
   dependencies:
@@ -641,7 +641,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-data-grid@npm:^9.18.0":
+"@mui/x-data-grid@npm:9.18.0":
   version: 9.18.0
   resolution: "@mui/x-data-grid@npm:9.18.0"
   dependencies:
@@ -874,7 +874,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.107.1":
+"@tanstack/react-query@npm:5.107.1":
   version: 5.107.1
   resolution: "@tanstack/react-query@npm:5.107.1"
   dependencies:
@@ -889,7 +889,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:^3.14.26":
+"@tanstack/react-virtual@npm:3.14.26":
   version: 3.14.26
   resolution: "@tanstack/react-virtual@npm:3.14.26"
   dependencies:
@@ -1073,7 +1073,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.3.0":
+"@types/react-dom@npm:19.3.0":
   version: 19.3.0
   resolution: "@types/react-dom@npm:19.3.0"
   peerDependencies:
@@ -1261,7 +1261,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-react@npm:^6.3.0":
+"@vitejs/plugin-react@npm:6.3.0":
   version: 6.3.0
   resolution: "@vitejs/plugin-react@npm:6.3.0"
   dependencies:
@@ -1377,28 +1377,28 @@ __metadata:
   resolution: "client@workspace:."
   dependencies:
     "@5rdb/api": "file:../apiTypings"
-    "@asciidoctor/core": "npm:^4.2.1"
-    "@auth0/auth0-react": "npm:^2.30.0"
-    "@emotion/react": "npm:^11.13.3"
-    "@emotion/styled": "npm:^11.13.0"
-    "@mui/icons-material": "npm:^9.5.0"
-    "@mui/material": "npm:^9.5.0"
-    "@mui/system": "npm:^9.4.0"
-    "@mui/x-charts": "npm:^9.18.0"
-    "@mui/x-data-grid": "npm:^9.18.0"
-    "@tanstack/react-query": "npm:^5.107.1"
-    "@tanstack/react-virtual": "npm:^3.14.26"
+    "@asciidoctor/core": "npm:4.2.1"
+    "@auth0/auth0-react": "npm:2.30.0"
+    "@emotion/react": "npm:11.14.0"
+    "@emotion/styled": "npm:11.14.1"
+    "@mui/icons-material": "npm:9.5.0"
+    "@mui/material": "npm:9.5.0"
+    "@mui/system": "npm:9.5.0"
+    "@mui/x-charts": "npm:9.18.0"
+    "@mui/x-data-grid": "npm:9.18.0"
+    "@tanstack/react-query": "npm:5.107.1"
+    "@tanstack/react-virtual": "npm:3.14.26"
     "@types/react": "npm:19.3.0"
-    "@types/react-dom": "npm:^19.3.0"
-    "@vitejs/plugin-react": "npm:^6.3.0"
-    material-ui-confirm: "npm:^4.0.0"
-    notistack: "npm:^3.0.1"
-    react: "npm:^19.3.1"
-    react-dom: "npm:^19.3.1"
-    react-markdown: "npm:^10.0.0"
-    react-router: "npm:^8.5.1"
-    typescript: "npm:^7.0.2"
-    vite: "npm:^8.3.8"
+    "@types/react-dom": "npm:19.3.0"
+    "@vitejs/plugin-react": "npm:6.3.0"
+    material-ui-confirm: "npm:4.0.0"
+    notistack: "npm:3.0.2"
+    react: "npm:19.3.1"
+    react-dom: "npm:19.3.1"
+    react-markdown: "npm:10.1.0"
+    react-router: "npm:8.5.1"
+    typescript: "npm:7.0.2"
+    vite: "npm:8.3.8"
   dependenciesMeta:
     browser-tabs-lock:
       built: false
@@ -2116,7 +2116,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"material-ui-confirm@npm:^4.0.0":
+"material-ui-confirm@npm:4.0.0":
   version: 4.0.0
   resolution: "material-ui-confirm@npm:4.0.0"
   peerDependencies:
@@ -2547,7 +2547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"notistack@npm:^3.0.1":
+"notistack@npm:3.0.2":
   version: 3.0.2
   resolution: "notistack@npm:3.0.2"
   dependencies:
@@ -2684,7 +2684,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^19.3.1":
+"react-dom@npm:19.3.1":
   version: 19.3.1
   resolution: "react-dom@npm:19.3.1"
   dependencies:
@@ -2709,7 +2709,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-markdown@npm:^10.0.0":
+"react-markdown@npm:10.1.0":
   version: 10.1.0
   resolution: "react-markdown@npm:10.1.0"
   dependencies:
@@ -2731,7 +2731,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:^8.5.1":
+"react-router@npm:8.5.1":
   version: 8.5.1
   resolution: "react-router@npm:8.5.1"
   dependencies:
@@ -2768,7 +2768,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^19.3.1":
+"react@npm:19.3.1":
   version: 19.3.1
   resolution: "react@npm:19.3.1"
   checksum: 10c0/f0ed036d1223562c09c8347858ca712733ea6e27a30db709ee9c3f3f176d3e9e767afce735d59956addf3d030102e256bba82dea635fc1bdb0e01107e98fef10
@@ -3024,7 +3024,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^7.0.2":
+"typescript@npm:7.0.2":
   version: 7.0.2
   resolution: "typescript@npm:7.0.2"
   dependencies:
@@ -3095,7 +3095,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^7.0.2#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A7.0.2#optional!builtin<compat/typescript>":
   version: 7.0.2
   resolution: "typescript@patch:typescript@npm%3A7.0.2#optional!builtin<compat/typescript>::version=7.0.2&hash=3bafbf"
   dependencies:
@@ -3265,7 +3265,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^8.3.8":
+"vite@npm:8.3.8":
   version: 8.3.8
   resolution: "vite@npm:8.3.8"
   dependencies:
