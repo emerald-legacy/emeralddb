@@ -109,6 +109,24 @@ test('importPack accepts pack + cards + cardsInPack', (t) => {
   assertAccepted(t, importPackSchema, { pack: { id: 'p' }, cards: [], cardsInPack: [] })
 })
 
+test('importPack accepts the traits of the exported cards', (t) => {
+  assertAccepted(t, importPackSchema, {
+    pack: { id: 'p' },
+    cards: [],
+    cardsInPack: [],
+    traits: [{ id: 'bushi', name: 'Bushi' }],
+  })
+})
+
+test('importPack rejects a trait without a name', (t) => {
+  assertRejected(t, importPackSchema, {
+    pack: { id: 'p' },
+    cards: [],
+    cardsInPack: [],
+    traits: [{ id: 'bushi' }],
+  })
+})
+
 test('importPack rejects a missing required array', (t) => {
   assertRejected(t, importPackSchema, { pack: { id: 'p' }, cards: [] })
 })

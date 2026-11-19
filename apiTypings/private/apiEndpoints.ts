@@ -222,6 +222,8 @@ export interface Pack$import {
       pack: Pack
       cards: Card[]
       cardsInPack: CardInPack[]
+      // Optional, so exports from instances without traits in the export still import
+      traits?: Trait[]
     }
   }
 }
@@ -232,6 +234,8 @@ export interface Pack$export {
     pack: Pack
     cards: Card[]
     cardsInPack: CardInPack[]
+    // The traits of the pack's cards, so new traits are imported with the pack
+    traits: Trait[]
   }
 }
 

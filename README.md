@@ -34,6 +34,6 @@ Packs are imported from the beta instance configured in `BETA_URL`, one pack at 
 2. In the 'roles' column of the 'users' table, enter ```data_admin``` for your user and save those changes
 3. You should be able to access the Admin page of the application now
 4. The pack's cycle has to exist first. If it doesn't, create it on the Admin page under Manage Cycles And Packs, with the same ID as on beta
-5. Enter the pack ID under "Import A Pack From BETA". This imports the pack, its cards and their pack entries. Traits and formats aren't part of the import and are maintained on the Admin page
+5. Enter the pack ID under "Import A Pack From BETA". This imports the pack, its cards, their pack entries and the cards' traits. Formats aren't part of the import and are maintained on the Admin page
 
 
