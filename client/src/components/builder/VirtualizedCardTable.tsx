@@ -69,16 +69,7 @@ const StyledContainer = styled('div')(({ theme }) => ({
 }))
 
 export interface ColumnData {
-  columnType:
-    | 'quantityForId'
-    | 'nameFactionType'
-    | 'traits'
-    | 'influenceAndFaction'
-    | 'cost'
-    | 'mil'
-    | 'pol'
-    | 'glory'
-    | 'strength'
+  columnType: keyof TableCardData
   label: string
   width: number
 }
@@ -96,91 +87,55 @@ interface MuiVirtualizedTableProps {
   rowHeight?: number
 }
 
+// The cell content for one column, read from the row's field of the same name
+function cellContent(row: TableCardData, columnType: keyof TableCardData): JSX.Element {
+  switch (columnType) {
+    case 'quantityForId':
+      return (
+        <CardQuantitySelector
+          deckLimit={row.quantityForId.deckLimit}
+          quantity={row.quantityForId.quantity}
+          onQuantityChange={row.quantityForId.onQuantityChange}
+        />
+      )
+    case 'nameFactionType':
+      return <CardLink cardId={row.nameFactionType.cardId} format={row.nameFactionType.format} />
+    case 'traits':
+      return (
+        <span style={{ fontSize: 12 }}>
+          <i>{row.traits?.traits}</i>
+        </span>
+      )
+    case 'influenceAndFaction':
+      return (
+        <div style={{ textAlign: 'right', width: '100%', paddingRight: '10px' }}>
+          <InfluenceElement
+            faction={row.influenceAndFaction.faction}
+            influence={row.influenceAndFaction.influence}
+          />
+        </div>
+      )
+    case 'cost':
+      return <div style={{ textAlign: 'center', width: '100%' }}>{row.cost.cost}</div>
+    case 'mil':
+      return <span>{row.mil?.mil}</span>
+    case 'pol':
+      return <span>{row.pol?.pol}</span>
+    case 'glory':
+      return <span>{row.glory?.glory}</span>
+    case 'strength':
+      return <span>{row.strength?.strength}</span>
+  }
+}
+
 const cellRenderer = (
-  cellData: any,
-  columnType: string,
+  row: TableCardData,
+  columnType: keyof TableCardData,
   width: number,
   rowHeight: number,
   onRowClick?: () => void
 ): JSX.Element => {
-  let renderComponent = <div />
-
-  if (columnType === 'quantityForId') {
-    const quantityData = cellData as {
-      quantity: number
-      cardId: string
-      deckLimit: number
-      onQuantityChange: (newQuantity: number) => void
-    }
-    renderComponent = (
-      <CardQuantitySelector
-        deckLimit={quantityData.deckLimit}
-        quantity={quantityData.quantity}
-        onQuantityChange={quantityData.onQuantityChange}
-      />
-    )
-  }
-  if (columnType === 'nameFactionType') {
-    const nameData = cellData as {
-      name: string
-      faction: string
-      type: string
-      cardId: string
-      format: string
-    }
-    renderComponent = <CardLink cardId={nameData.cardId} format={nameData.format} />
-  }
-  if (columnType === 'traits') {
-    const traitsData = cellData as {
-      traits: string
-    }
-    renderComponent = (
-      <span style={{ fontSize: 12 }}>
-        <i>{traitsData.traits}</i>
-      </span>
-    )
-  }
-  if (columnType === 'influenceAndFaction') {
-    const influenceData = cellData as {
-      influence: number
-      faction: string
-    }
-    renderComponent = (
-      <div style={{ textAlign: 'right', width: '100%', paddingRight: '10px' }}>
-        <InfluenceElement faction={influenceData.faction} influence={influenceData.influence} />
-      </div>
-    )
-  }
-  if (columnType === 'cost') {
-    const costData = cellData as {
-      cost: string
-    }
-    renderComponent = <div style={{ textAlign: 'center', width: '100%' }}>{costData.cost}</div>
-  }
-  if (columnType === 'mil') {
-    const milData = cellData as {
-      mil: string
-    }
-    renderComponent = <span>{milData.mil}</span>
-  }
-  if (columnType === 'pol') {
-    const polData = cellData as {
-      pol: string
-    }
-    renderComponent = <span>{polData.pol}</span>
-  }
-  if (columnType === 'glory') {
-    const gloryData = cellData as {
-      glory: string
-    }
-    renderComponent = <span>{gloryData.glory}</span>
-  }
-  if (columnType === 'strength') {
-    const strengthData = cellData as {
-      strength: string
-    }
-    renderComponent = <span>{strengthData.strength}</span>
-  }
+  const renderComponent = cellContent(row, columnType)
 
   return (
     <TableCell
@@ -274,10 +229,9 @@ export const VirtualizedCardTable: React.FC<MuiVirtualizedTableProps> = ({
               onClick={onRowClick}
             >
               {columns.map((column) => {
-                const cellData = rowData[column.columnType as keyof TableCardData]
                 return (
                   <React.Fragment key={column.columnType}>
-                    {cellRenderer(cellData, column.columnType, column.width, rowHeight, onRowClick)}
+                    {cellRenderer(rowData, column.columnType, column.width, rowHeight, onRowClick)}
                   </React.Fragment>
                 )
               })}

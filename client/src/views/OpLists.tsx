@@ -8,7 +8,6 @@ import { OrganizedPlayList } from '../components/OrganizedPlayList'
 import { useNavigate, useParams } from 'react-router'
 import { CardLink } from '../components/card/CardLink'
 import { getCardLegality } from '../utils/legalityUtils'
-import type { Format } from '@5rdb/api'
 
 const emeraldEdict = {
   name: 'Emerald Legacy - Emerald Edict',
@@ -87,13 +86,15 @@ export function OpLists(): JSX.Element {
           <Autocomplete
             id="combo-box-format"
             autoHighlight
-            disableClearable
+            // Not a constant, so the value may be null: that keeps the input controlled while
+            // no format matches the URL. There's nothing to clear then, so no clear button shows.
+            disableClearable={chosenFormat !== undefined}
             options={sortedFormats}
             getOptionLabel={(option) => option.name}
-            // null keeps the input controlled while no format matches the URL
-            value={chosenFormat ?? (null as unknown as Format)}
+            value={chosenFormat ?? null}
             renderInput={(params) => <TextField {...params} label="Format" variant="outlined" />}
-            onChange={(e, value) => {
+            onChange={(_, value) => {
+              if (!value) return
               setFormat(value.id)
               navigate(`/rules/organized-play/${value.id}`)
             }}

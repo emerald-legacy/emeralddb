@@ -25,6 +25,16 @@ import { toSlugId } from '../../utils/slugIdUtils'
 
 const Root = styled('form')(() => ({}))
 
+function displayValue(value: unknown): string {
+  if (value === null || value === undefined) {
+    return '{null}'
+  }
+  if (Array.isArray(value)) {
+    return value.map(String).join(',')
+  }
+  return String(value)
+}
+
 export function CardEditor(props: { existingCard?: CardType; editMode?: boolean }): JSX.Element {
   const navigate = useNavigate()
   const existingCard = props.existingCard
@@ -198,18 +208,14 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
     }
   }
 
+  // Compares the displayed values, so arrays are compared by their contents
   function compareValue(
     fieldId: string,
-
-    originalValue: any,
-
-    newValue: any
+    originalValue: unknown,
+    newValue: unknown
   ): { fieldId: string; changes: { old: string; new: string } }[] {
-    if (originalValue !== newValue) {
-      const changes = {
-        old: originalValue?.toString() ?? '{null}',
-        new: newValue?.toString() ?? '{null}',
-      }
+    const changes = { old: displayValue(originalValue), new: displayValue(newValue) }
+    if (changes.old !== changes.new) {
       return [
         {
           fieldId: fieldId,
@@ -237,7 +243,9 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
     changes.push(...compareValue('text', originalCard.text, text))
     changes.push(...compareValue('restricted_in', originalCard.restricted_in, restricted_in))
     changes.push(...compareValue('banned_in', originalCard.banned_in, banned_in))
-    changes.push(...compareValue('splash_banned_in', [], splash_banned_in))
+    changes.push(
+      ...compareValue('splash_banned_in', originalCard.splash_banned_in, splash_banned_in)
+    )
     changes.push(...compareValue('allowed_clans', originalCard.allowed_clans, allowed_clans))
     changes.push(...compareValue('deck_limit', originalCard.deck_limit, deck_limit))
     changes.push(...compareValue('traits', originalCard.traits, traits))

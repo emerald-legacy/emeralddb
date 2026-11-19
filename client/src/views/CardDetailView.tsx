@@ -180,7 +180,7 @@ export function CardDetailView(): JSX.Element {
                 <Grid size={12}>
                   <Tabs
                     value={chosenVersionIndex}
-                    onChange={(_, newValue) => setChosenVersionIndex(newValue)}
+                    onChange={(_, newValue: number) => setChosenVersionIndex(newValue)}
                     variant="scrollable"
                     scrollButtons="auto"
                     slotProps={{

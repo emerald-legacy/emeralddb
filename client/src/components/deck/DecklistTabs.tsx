@@ -184,7 +184,7 @@ export function DecklistTabs(props: {
         <Grid size={12}>
           <Tabs
             value={versions.findIndex((list) => list.id === currentDecklistId) || 0}
-            onChange={(e, newValue) =>
+            onChange={(_, newValue: number) =>
               setCurrentDecklistId(versions[newValue]?.id || versions[0].id)
             }
             indicatorColor="primary"

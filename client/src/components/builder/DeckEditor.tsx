@@ -340,7 +340,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
               <Grid size={12}>
                 <Tabs
                   value={currentView}
-                  onChange={(e, newValue) => setCurrentView(newValue)}
+                  onChange={(_, newValue: ViewTypes) => setCurrentView(newValue)}
                   variant="fullWidth"
                 >
                   <Tab
