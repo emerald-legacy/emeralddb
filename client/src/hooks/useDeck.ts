@@ -1,8 +1,4 @@
-import { createApiHook } from '../utils/createApiHook'
-import { Decks$find } from '@5rdb/api'
 import { publicApi } from '../api'
+import { createApiHook } from '../utils/createApiHook'
 
-export const useDeck = createApiHook<Decks$find['response'], string>(
-  publicApi.Deck.find,
-  (deckId) => ({ deckId })
-)
+export const useDeck = createApiHook((deckId: string) => publicApi.Deck.find({ deckId }))
