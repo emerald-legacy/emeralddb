@@ -1,5 +1,7 @@
-import { SlashCommandBuilder } from '@discordjs/builders'
-import { CommandInteraction } from 'discord.js'
+import {
+  ChatInputCommandInteraction,
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
+} from 'discord.js'
 
 export interface Config {
   botToken: string
@@ -8,8 +10,9 @@ export interface Config {
 
 export interface Command {
   name: string
-  command: Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>
-  handler(interaction: CommandInteraction): Promise<any>
+  // Only what registerCommands needs from a SlashCommandBuilder
+  command: { toJSON(): RESTPostAPIChatInputApplicationCommandsJSONBody }
+  handler(interaction: ChatInputCommandInteraction): Promise<unknown>
 }
 
 export interface CardInput {

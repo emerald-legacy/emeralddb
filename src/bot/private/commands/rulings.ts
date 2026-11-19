@@ -1,5 +1,4 @@
-import { DiscordAPIError, EmbedBuilder } from 'discord.js'
-import { SlashCommandBuilder } from '@discordjs/builders'
+import { DiscordAPIError, EmbedBuilder, SlashCommandBuilder } from 'discord.js'
 import { getAllRulingsForCard } from '../../../gateways/storage'
 import { search } from '../cardsFuzzySearch'
 import { CachedCard, Command, RulingInput } from '../types'
@@ -18,7 +17,7 @@ function color(ruling: RulingInput): number {
 
 const links = /\[([^\]]+)]\([^)]+\)/g // Matches `[some text](some link)` and captures `some text`
 function formatRulingText(rawText: string): string {
-  return rawText.replace(links, (_, text) => `\`${text}\``).trim()
+  return rawText.replace(links, (_, text: string) => `\`${text}\``).trim()
 }
 
 function truncate(n: number, str: string): string {
@@ -60,10 +59,10 @@ export const command: Command = {
         .setName('name')
         .setDescription('The name of the card or a part of its name')
         .setRequired(true)
-    ) as any,
+    ),
 
   async handler(interaction) {
-    const query = (interaction as any).options.getString('name')
+    const query = interaction.options.getString('name')
     if (!query) return
 
     const result = await search(query)

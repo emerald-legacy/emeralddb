@@ -1,6 +1,4 @@
-import { REST } from '@discordjs/rest'
-import { Client, GatewayIntentBits } from 'discord.js'
-import { Routes } from 'discord-api-types/v10'
+import { Client, GatewayIntentBits, REST, Routes } from 'discord.js'
 
 import { Service } from '../../typings/Service'
 import { command as cardCommand } from './commands/card'
@@ -21,7 +19,7 @@ export async function createBot(config: Config): Promise<Service> {
   const client = new Client({ intents: [GatewayIntentBits.Guilds] })
 
   client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isCommand()) return
+    if (!interaction.isChatInputCommand()) return
 
     switch (interaction.commandName) {
       case cardCommand.name:

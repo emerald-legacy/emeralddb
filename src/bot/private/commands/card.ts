@@ -1,5 +1,4 @@
-import { DiscordAPIError } from 'discord.js'
-import { SlashCommandBuilder } from '@discordjs/builders'
+import { DiscordAPIError, SlashCommandBuilder } from 'discord.js'
 import { search } from '../cardsFuzzySearch'
 import { Command } from '../types'
 import { listAlternatives } from '../format'
@@ -16,10 +15,10 @@ export const command: Command = {
         .setName('name')
         .setDescription('The name of the card or a part of its name')
         .setRequired(true)
-    ) as any,
+    ),
 
   async handler(interaction) {
-    const query = (interaction as any).options.getString('name')
+    const query = interaction.options.getString('name')
     if (!query) return
 
     const result = await search(query)
