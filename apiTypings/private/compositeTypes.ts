@@ -22,6 +22,10 @@ export type DecklistViewModel = Omit<
   'deck_id' | 'created_at' | 'published_date' | 'owner_id'
 >
 
+/** A card by id and name, for lists that only show its name */
+export type CardReference = Pick<Card, 'id' | 'name'>
+
+/** A decklist in the public deck list: a summary without its cards */
 export type PublishedDecklist = Pick<
   DecklistWithUser,
   | 'id'
@@ -44,6 +48,6 @@ export type DecklistWithExtraInfo = Decklist & {
 }
 
 export type PublishedDecklistWithExtraInfo = PublishedDecklist & {
-  stronghold?: Card
-  role?: Card
+  stronghold?: CardReference
+  role?: CardReference
 }

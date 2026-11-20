@@ -77,20 +77,47 @@ function assertNoAuth0Ids(t: import('ava').ExecutionContext, json: string) {
   t.false(json.includes('user_id'), 'no user_id field')
 }
 
-test.serial('GET /decklists names each owner', async (t) => {
+test.serial('GET /decklists is a summary per decklist, without its cards', async (t) => {
   stubStores()
+  const cardLookups: string[][] = []
+  cardStore.getCardsOfTypes = async (cardIds, types) => {
+    cardLookups.push(types)
+    return [
+      { id: 'some-stronghold', name: 'Some Stronghold', type: 'stronghold' },
+      { id: 'some-role', name: 'Some Role', type: 'role' },
+    ].filter((card) => cardIds.includes(card.id) && types.includes(card.type))
+  }
+  const withCards = (base: Decklist, cards: Decklist['cards']): Decklist => ({ ...base, cards })
+  decklistStore.getAllPublishedDecklists = async () => [
+    withCards(decklist('list-a', alice), { 'some-stronghold': 1, 'some-role': 1, other: 3 }),
+    withCards(decklist('list-b', bob), { other: 3 }),
+  ]
+
   const { status, body, json } = await get('/decklists')
+
   t.is(status, 200)
   assertNoAuth0Ids(t, json)
-  t.like(body, [
+  t.deepEqual(body, [
     {
       id: 'list-a',
-      owner_id: 'public-alice',
+      name: 'list-a',
+      version_number: '1.0',
+      format: 'emerald',
+      published_date: '2026-01-02T00:00:00.000Z',
       username: 'Alice',
-      stronghold: { type: 'stronghold' },
+      stronghold: { id: 'some-stronghold', name: 'Some Stronghold' },
+      role: { id: 'some-role', name: 'Some Role' },
     },
-    { id: 'list-b', owner_id: 'public-bob', username: 'Bob' },
+    {
+      id: 'list-b',
+      name: 'list-b',
+      version_number: '1.0',
+      format: 'emerald',
+      published_date: '2026-01-02T00:00:00.000Z',
+      username: 'Bob',
+    },
   ])
+  t.deepEqual(cardLookups, [['stronghold', 'role']], 'one card query for all decklists')
 })
 
 test.serial('GET /decklists/:id names the owner', async (t) => {
