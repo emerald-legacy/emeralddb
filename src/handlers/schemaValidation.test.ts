@@ -201,9 +201,8 @@ test('createDeck accepts a forkedFrom id', (t) => {
 
 // --- createDecklist --------------------------------------------------------
 
-test('createDecklist accepts empty id/clans/description with a real format + name', (t) => {
+test('createDecklist accepts empty clans/description with a real format + name', (t) => {
   assertAccepted(t, createDecklistSchema, {
-    id: '',
     deck_id: 'deck-1',
     format: 'standard',
     name: 'New Deck',
@@ -337,9 +336,8 @@ test('updateDecklistComment accepts { comment }', (t) => {
 // Optional columns are NULL in the database, so a client that loads an entity and
 // saves it back sends null. Joi rejects null unless it is explicitly allowed.
 
-test('createDecklist accepts a saved-back decklist (null clans, server-owned fields)', (t) => {
+test('createDecklist accepts a saved-back decklist with null clans', (t) => {
   assertAccepted(t, createDecklistSchema, {
-    id: 'dl1',
     deck_id: 'd1',
     format: 'emerald',
     name: 'My Deck',
@@ -349,35 +347,29 @@ test('createDecklist accepts a saved-back decklist (null clans, server-owned fie
     version_number: '0.2',
     cards: { 'daidoji-hiroteru': 3 },
     card_pack_ids: { 'daidoji-hiroteru': 'core' },
-    published_date: undefined,
-    created_at: '2026-01-01T00:00:00.000Z',
-    user_id: 'auth0|123',
-    username: 'someone',
   })
 })
 
-test('createDecklist strips the server-owned user_id', (t) => {
-  const req: { body: object; query: object } = {
-    body: {
-      deck_id: 'd1',
-      format: 'emerald',
-      name: 'My Deck',
-      version_number: '0.2',
-      cards: { 'daidoji-hiroteru': 3 },
-      user_id: 'auth0|attacker',
-      created_at: '2026-01-01T00:00:00.000Z',
-    },
-    query: {},
+test('createDecklist rejects server-owned fields', (t) => {
+  const decklist = {
+    deck_id: 'd1',
+    format: 'emerald',
+    name: 'My Deck',
+    version_number: '0.2',
+    cards: { 'daidoji-hiroteru': 3 },
   }
-  const res = { status: () => ({ send: () => undefined }) }
-  let nextCalls = 0
-  const schema: Schema = createDecklistSchema
-  validate(schema)(req, res, () => {
-    nextCalls += 1
-  })
-  t.is(nextCalls, 1)
-  t.false('user_id' in req.body)
-  t.false('created_at' in req.body)
+  const serverOwned = {
+    id: 'dl1',
+    created_at: '2026-01-01T00:00:00.000Z',
+    owner_id: '6f1c1f9e-5b7a-4a43-9a51-5d1f0f3d2b10',
+    user_id: 'auth0|attacker',
+    username: 'someone',
+    // Publishing goes through POST /decklists/:id/publish, which validates the deck
+    published_date: '2026-01-01T00:00:00.000Z',
+  }
+  for (const [field, value] of Object.entries(serverOwned)) {
+    assertRejected(t, createDecklistSchema, { ...decklist, [field]: value }, field)
+  }
 })
 
 test('updateRuling accepts null source and link', (t) => {

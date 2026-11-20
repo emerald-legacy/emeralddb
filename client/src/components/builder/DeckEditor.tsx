@@ -1,4 +1,10 @@
-import { DecklistViewModel, Decklist as DecklistType, CardWithVersions, Format } from '@5rdb/api'
+import {
+  DecklistViewModel,
+  Decklist as DecklistType,
+  Decklists$create,
+  CardWithVersions,
+  Format,
+} from '@5rdb/api'
 import { styled } from '@mui/material/styles'
 import {
   Box,
@@ -193,13 +199,6 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   const filteredCards = showAllCards ? cards : prefilterCards(cards, decklist, formats, true)
 
   function updateDeck(decklist: DecklistViewModel, deckId: string) {
-    // A decklist loaded from the server can still carry stronghold and role
-    // (DecklistWithExtraInfo), which the create schema rejects
-    const {
-      stronghold: _stronghold,
-      role: _role,
-      ...decklistToSave
-    }: DecklistViewModel & { stronghold?: unknown; role?: unknown } = decklist
     const cardPackIds: Record<string, string> = {}
     for (const cardId of Object.keys(decklist.cards)) {
       const version = validCardVersionForFormat(cardId, decklist.format)
@@ -207,14 +206,20 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
         cardPackIds[cardId] = version.pack_id
       }
     }
-    privateApi.Decklist.create({
-      body: {
-        ...decklistToSave,
-        deck_id: deckId,
-        card_pack_ids: cardPackIds,
-        published_date: undefined,
-      },
-    })
+    // Only the fields of the contract: a decklist loaded from the server carries more
+    // (its id, timestamps, owner, stronghold, ...), which the server rejects
+    const body: Decklists$create['request']['body'] = {
+      deck_id: deckId,
+      format: decklist.format,
+      name: decklist.name,
+      primary_clan: decklist.primary_clan,
+      secondary_clan: decklist.secondary_clan,
+      description: decklist.description,
+      version_number: decklist.version_number,
+      cards: decklist.cards,
+      card_pack_ids: cardPackIds,
+    }
+    privateApi.Decklist.create({ body })
       // /decklists/{deckId} resolves to the latest version of the deck
       .then(() => refreshCache(`/decks/${deckId}`, `/decklists/${deckId}`))
       .then(() => {
