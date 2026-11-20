@@ -1,32 +1,27 @@
 import 'source-map-support/register'
 
 import createApp from './app'
-import { createBot } from './bot'
+import { noBot, startBot } from './bot'
 import env from './env'
 import { Service } from './typings/Service'
+import { shutDownOnSignals } from './shutdown'
 
-const noBot: Service = {
-  async run() {
-    console.log('BOT: skip')
-  },
-  async shutdown() {
-    console.log('BOT: skip shutdown')
-  },
+async function main() {
+  // The API first: the optional bot must not keep it from starting
+  const app = await createApp()
+  await app.run()
+
+  let bot: Service = noBot
+  if (env.discord.isBotEnabled) {
+    bot = await startBot(env.discord)
+  } else {
+    await noBot.run()
+  }
+
+  shutDownOnSignals([app, bot])
 }
 
-Promise.all([createApp(), env.discord.isBotEnabled ? createBot(env.discord) : noBot]).then(
-  ([app, bot]) => {
-    app.run()
-    bot.run()
-
-    const shutdown = () => {
-      app.shutdown()
-      bot.shutdown()
-      process.exit(0)
-    }
-
-    process.on('SIGINT', shutdown)
-    process.on('SIGTERM', shutdown)
-    process.on('SIGQUIT', shutdown)
-  }
-)
+main().catch((error: unknown) => {
+  console.error('SERVER: could not start', error)
+  process.exit(1)
+})

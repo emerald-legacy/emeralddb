@@ -29,8 +29,9 @@ export interface CardPackInput {
 export interface RulingInput {
   id: number
   text: string
-  source: string
-  link: string
+  // Optional for data admins: empty or missing in the database
+  source?: string | null
+  link?: string | null
 }
 
 export interface CachedCard {
