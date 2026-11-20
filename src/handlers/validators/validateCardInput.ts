@@ -1,8 +1,8 @@
-import { Card, Trait } from '@5rdb/api'
+import { CardInput, Trait } from '@5rdb/api'
 import { getAllTraits } from '../../gateways/storage'
 import { FORMATS, FACTIONS, CLANS, ELEMENTS } from '../../model/enums'
 
-export async function validateCardInput(card: Card): Promise<string[]> {
+export async function validateCardInput(card: CardInput): Promise<string[]> {
   const errors: string[] = []
   const traits: Trait[] = await getAllTraits()
 

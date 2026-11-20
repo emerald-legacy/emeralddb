@@ -1,5 +1,5 @@
 import { pg } from './pg'
-import { Pack } from '@5rdb/api'
+import { Pack, PackInput } from '@5rdb/api'
 
 export const TABLE = 'packs'
 
@@ -35,9 +35,7 @@ export async function getPack(packId: string): Promise<Pack | undefined> {
 }
 
 // Callers often pass a Pack from the API, so a computed size is dropped here
-export async function insertOrUpdatePack(
-  pack: Omit<Pack, 'size'> & { size?: number }
-): Promise<Omit<Pack, 'size'>> {
+export async function insertOrUpdatePack(pack: PackInput): Promise<Omit<Pack, 'size'>> {
   const { size: _size, ...packWithoutSize } = pack
   const [row] = await pg(TABLE)
     .insert({ ...packWithoutSize })

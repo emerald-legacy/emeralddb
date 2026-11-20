@@ -9,7 +9,8 @@ export function CardTextEditor(props: {
   text?: string
   faction?: string
 }): JSX.Element {
-  const inputRef = useRef<any>(null)
+  // The field is multiline, so MUI renders a textarea
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const [text, setText] = useState(props.text || '')
   const [selectionStart, setSelectionStart] = useState(0)
   const [selectionEnd, setSelectionEnd] = useState(0)

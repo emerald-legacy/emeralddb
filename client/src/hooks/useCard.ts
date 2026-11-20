@@ -1,8 +1,4 @@
-import { createApiHook } from '../utils/createApiHook'
-import { Cards$find } from '@5rdb/api'
 import { publicApi } from '../api'
+import { createApiHook } from '../utils/createApiHook'
 
-export const useCard = createApiHook<Cards$find['response'], string>(
-  publicApi.Card.find,
-  (cardId) => ({ cardId })
-)
+export const useCard = createApiHook((cardId: string) => publicApi.Card.find({ cardId }))

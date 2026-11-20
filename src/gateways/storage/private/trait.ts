@@ -11,6 +11,10 @@ export async function getTrait(traitId: string): Promise<Trait | undefined> {
   return pg(TABLE).where('id', traitId).first()
 }
 
+export async function getTraits(traitIds: string[]): Promise<Trait[]> {
+  return pg(TABLE).whereIn('id', traitIds)
+}
+
 export async function insertOrUpdateTrait(trait: Trait): Promise<Trait> {
   const [row] = await pg(TABLE)
     .insert({ ...trait })

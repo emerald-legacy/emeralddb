@@ -2,8 +2,9 @@ import {
   insertOrUpdateCard,
   insertOrUpdateCardInPack,
   insertOrUpdatePack,
+  insertOrUpdateTrait,
 } from '../gateways/storage/index'
-import { Pack, Pack$import } from '@5rdb/api'
+import { Pack, Pack$import, Trait } from '@5rdb/api'
 import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import * as Express from 'express'
@@ -13,6 +14,9 @@ export const schema = {
     pack: Joi.object<Pack>().required(),
     cards: Joi.array().required(),
     cardsInPack: Joi.array().required(),
+    traits: Joi.array()
+      .items(Joi.object<Trait>({ id: Joi.string().required(), name: Joi.string().required() }))
+      .default([]),
   }),
 }
 
@@ -25,6 +29,8 @@ export async function handler(
     return
   }
   console.log(`Import pack ${req.body.pack.name}...`)
+  // Traits first: the cards refer to them
+  await Promise.all((req.body.traits ?? []).map(async (trait) => await insertOrUpdateTrait(trait)))
   await insertOrUpdatePack(req.body.pack)
   await Promise.all(req.body.cards.map(async (card) => await insertOrUpdateCard(card)))
   await Promise.all(

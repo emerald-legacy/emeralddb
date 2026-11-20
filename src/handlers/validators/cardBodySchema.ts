@@ -1,9 +1,9 @@
 import Joi from 'joi'
-import { Card } from '@5rdb/api'
+import { CardInput } from '@5rdb/api'
 
 // Optional card fields are stored as NULL in the database, so the client sends them back as null.
 // Joi rejects null by default, therefore every optional field explicitly allows it.
-export const cardBodySchema = Joi.object<Card>({
+export const cardBodySchema = Joi.object<CardInput>({
   id: Joi.string().required(),
   name: Joi.string().required(),
   name_extra: Joi.string().allow('', null),

@@ -13,7 +13,7 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useState, useMemo, type JSX } from 'react'
-import { useUiStore } from '../../providers/UiStoreProvider'
+import { type UiStore, useUiStore } from '../../providers/UiStoreProvider'
 import { convertTraitList } from '../../utils/cardTextUtils'
 import { applyFilters, CardFilter, FilterState } from '../CardFilter'
 import { ColumnData, TableCardData, VirtualizedCardTable } from './VirtualizedCardTable'
@@ -83,7 +83,7 @@ function VirtualizedCardImages(props: {
   tableData: TableCardData[]
   isSmOrSmaller: boolean
   format: string
-  validCardVersionForFormat: (cardId: string, formatId: string) => any
+  validCardVersionForFormat: UiStore['validCardVersionForFormat']
   onCardClick: (cardId: string) => void
 }): JSX.Element {
   return (

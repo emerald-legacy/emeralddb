@@ -23,14 +23,30 @@ const Root = styled('div')(({ theme }) => ({
   },
 }))
 
+type Row = PublishedDecklistWithExtraInfo
+
+// For columns that show more than one field: the cell value is the whole row,
+// sorted by the given texts in order (the second one breaks ties of the first)
+function sortByTexts(
+  ...texts: ((row: Row) => string)[]
+): Pick<GridColDef<Row, Row>, 'valueGetter' | 'sortComparator'> {
+  return {
+    valueGetter: (_value, row) => row,
+    sortComparator: (row1, row2) => {
+      for (const text of texts) {
+        const result = text(row1).localeCompare(text(row2))
+        if (result !== 0) return result
+      }
+      return 0
+    },
+  }
+}
+
 export function DecksView(): JSX.Element {
   const { formats } = useUiStore()
-  const { data: decks = [] } = useQuery<PublishedDecklistWithExtraInfo[]>({
+  const { data: decks = [] } = useQuery({
     queryKey: UiStoreQueries.PUBLISHED_DECKLISTS,
-    queryFn: () =>
-      publicApi.Decklist.findPublished().then(
-        (response) => response.data() as PublishedDecklistWithExtraInfo[]
-      ),
+    queryFn: () => publicApi.Decklist.findPublished().then((response) => response.data()),
   })
   const [filter, setFilter] = useState<DeckFilterState | undefined>(undefined)
   const isMdOrBigger = useMediaQuery('(min-width:600px)')
@@ -43,7 +59,7 @@ export function DecksView(): JSX.Element {
     sortedDecks = applyDeckFilters(sortedDecks, filter)
   }
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<Row>[] = [
     {
       field: 'name',
       headerName: 'Name',
@@ -62,16 +78,10 @@ export function DecksView(): JSX.Element {
       headerName: 'Clans',
       disableColumnMenu: true,
       flex: 1,
-      valueGetter: (_, row) => row,
-      sortComparator: (v1, v2) => {
-        const deck1 = v1 as unknown as PublishedDecklistWithExtraInfo
-        const deck2 = v2 as unknown as PublishedDecklistWithExtraInfo
-        const mainClan1 = deck1.primary_clan || ''
-        const mainClan2 = deck2.primary_clan || ''
-        const splashClan1 = deck1.secondary_clan || ''
-        const splashClan2 = deck2.secondary_clan || ''
-        return mainClan1.localeCompare(mainClan2) || splashClan1.localeCompare(splashClan2)
-      },
+      ...sortByTexts(
+        (deck) => deck.primary_clan || '',
+        (deck) => deck.secondary_clan || ''
+      ),
       renderCell: (params) => (
         <Tooltip
           title={`Main: ${getFactionName(params.row.primary_clan) || 'N/A'} / Splash: ${
@@ -97,14 +107,7 @@ export function DecksView(): JSX.Element {
       headerName: 'Stronghold',
       flex: 2,
       disableColumnMenu: true,
-      valueGetter: (_, row) => row,
-      sortComparator: (v1, v2) => {
-        const deck1 = v1 as unknown as PublishedDecklistWithExtraInfo
-        const deck2 = v2 as unknown as PublishedDecklistWithExtraInfo
-        const strongholdName1 = deck1.stronghold?.name || ''
-        const strongholdName2 = deck2.stronghold?.name || ''
-        return strongholdName1.localeCompare(strongholdName2)
-      },
+      ...sortByTexts((deck) => deck.stronghold?.name || ''),
       renderCell: (params) => <span>{params.row.stronghold?.name || 'N/A'}</span>,
     },
     {
@@ -112,14 +115,7 @@ export function DecksView(): JSX.Element {
       headerName: 'Role',
       flex: 2,
       disableColumnMenu: true,
-      valueGetter: (_, row) => row,
-      sortComparator: (v1, v2) => {
-        const deck1 = v1 as unknown as PublishedDecklistWithExtraInfo
-        const deck2 = v2 as unknown as PublishedDecklistWithExtraInfo
-        const roleName1 = deck1.role?.name || ''
-        const roleName2 = deck2.role?.name || ''
-        return roleName1.localeCompare(roleName2)
-      },
+      ...sortByTexts((deck) => deck.role?.name || ''),
       renderCell: (params) => <span>{params.row.role?.name || 'N/A'}</span>,
     },
     {

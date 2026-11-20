@@ -1,5 +1,5 @@
 import { pg } from './pg'
-import { Card } from '@5rdb/api'
+import { Card, CardInput } from '@5rdb/api'
 
 export const TABLE = 'cards'
 
@@ -19,7 +19,7 @@ export async function deleteCard(cardId: string): Promise<void> {
   await pg(TABLE).where('id', cardId).delete()
 }
 
-export async function insertOrUpdateCard(card: Card): Promise<Card> {
+export async function insertOrUpdateCard(card: CardInput): Promise<Card> {
   const [row] = await pg(TABLE)
     .insert({ ...card })
     .onConflict('id')
@@ -28,9 +28,10 @@ export async function insertOrUpdateCard(card: Card): Promise<Card> {
   return row
 }
 
-export async function updateCard(card: Card): Promise<Card | undefined> {
+export async function updateCard(card: CardInput): Promise<Card | undefined> {
   const result = await pg(TABLE)
     .where('id', card.id)
-    .update({ ...card }, '*')
+    .update({ ...card })
+    .returning('*')
   return result[0]
 }

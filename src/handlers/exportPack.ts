@@ -1,4 +1,4 @@
-import { getAllCardsInPack, getCard, getPack } from '../gateways/storage/index'
+import { getAllCardsInPack, getCard, getPack, getTraits } from '../gateways/storage/index'
 import { Request, Response } from 'express'
 import { Pack$export } from '@5rdb/api'
 
@@ -13,12 +13,14 @@ export async function handler(
   }
   console.log(`Export pack ${pack.name}`)
   const cardsInPack = await getAllCardsInPack(pack.id)
-  const cards = await Promise.all(
-    cardsInPack.map(async (cardInPack) => await getCard(cardInPack.card_id))
-  )
+  const cards = (
+    await Promise.all(cardsInPack.map(async (cardInPack) => await getCard(cardInPack.card_id)))
+  ).filter((card) => card !== undefined)
+  const traitIds = new Set(cards.flatMap((card) => card.traits ?? []))
   return {
     pack: pack,
-    cards: cards.filter((card) => card !== undefined),
+    cards: cards,
     cardsInPack: cardsInPack,
+    traits: await getTraits([...traitIds]),
   }
 }

@@ -12,7 +12,7 @@ import {
   CardContent,
   Divider,
 } from '@mui/material'
-import { DataGrid, GridColDef } from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridRowParams, MuiEvent } from '@mui/x-data-grid'
 import { useNavigate, useLocation } from 'react-router'
 import { useUiStore } from '../providers/UiStoreProvider'
 import { convertTraitList } from '../utils/cardTextUtils'
@@ -232,13 +232,13 @@ export function CardsView(): JSX.Element {
   )
 
   const handleCardClick = useCallback(
-    (param: any, event: any) => {
+    (params: GridRowParams<TableCard>, event: MuiEvent<React.MouseEvent<HTMLElement>>) => {
       const target = event.target as HTMLElement
       if (target.tagName === 'A' || target.closest('a')) {
         event.stopPropagation()
         return
       }
-      setModalCard(cards.find((card) => card.id === param.row.id))
+      setModalCard(cards.find((card) => card.id === params.row.id))
       setCardModalOpen(true)
     },
     [cards]

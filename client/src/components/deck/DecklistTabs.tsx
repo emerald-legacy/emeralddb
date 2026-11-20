@@ -4,7 +4,7 @@ import { Box, Button, Grid, Tab, Tabs, Typography } from '@mui/material'
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { useState, type JSX } from 'react'
-import { privateApi, refreshCache } from '../../api'
+import { errorMessage, privateApi, refreshCache } from '../../api'
 import { Decklist } from './Decklist'
 import DeleteIcon from '@mui/icons-material/Delete'
 import LinkIcon from '@mui/icons-material/Link'
@@ -108,9 +108,10 @@ export function DecklistTabs(props: {
       enqueueSnackbar('The decklist was published successfully!', { variant: 'success' })
       queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
     },
-    onError: (error: any) => {
-      const message = error.data()
-      enqueueSnackbar(`The decklist couldn't be published: ${message}!`, { variant: 'error' })
+    onError: (error) => {
+      enqueueSnackbar(`The decklist couldn't be published: ${errorMessage(error)}!`, {
+        variant: 'error',
+      })
     },
   })
 
@@ -140,8 +141,9 @@ export function DecklistTabs(props: {
         queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
       })
       .catch((error) => {
-        const message = error.data()
-        enqueueSnackbar(`The decklist couldn't be deleted: ${message}!`, { variant: 'error' })
+        enqueueSnackbar(`The decklist couldn't be deleted: ${errorMessage(error)}!`, {
+          variant: 'error',
+        })
       })
   }
 
@@ -170,8 +172,7 @@ export function DecklistTabs(props: {
         queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
       })
       .catch((error) => {
-        const message = error.data()
-        enqueueSnackbar(`The decklist couldn't be unpublished: ${message}!`, {
+        enqueueSnackbar(`The decklist couldn't be unpublished: ${errorMessage(error)}!`, {
           variant: 'error',
         })
       })
@@ -183,7 +184,7 @@ export function DecklistTabs(props: {
         <Grid size={12}>
           <Tabs
             value={versions.findIndex((list) => list.id === currentDecklistId) || 0}
-            onChange={(e, newValue) =>
+            onChange={(_, newValue: number) =>
               setCurrentDecklistId(versions[newValue]?.id || versions[0].id)
             }
             indicatorColor="primary"

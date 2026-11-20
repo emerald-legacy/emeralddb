@@ -26,8 +26,7 @@ export interface TestResponse {
 function parseBody(text: string): unknown {
   if (text === '') return undefined
   try {
-    const json: unknown = JSON.parse(text)
-    return json
+    return JSON.parse(text)
   } catch {
     return text
   }

@@ -83,7 +83,7 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
       confirmationText: 'Delete',
     })
     if (!confirmed) return
-    privateApi.Ruling.delete({ rulingId: ruling.id })
+    privateApi.Ruling.delete({ rulingId: String(ruling.id) })
       .then(() => refreshCache(`/cards/${props.cardId}`))
       .then(() => {
         window.location.reload()
@@ -126,7 +126,7 @@ export function RulingList(props: { cardId: string; rulings: Ruling[] }): JSX.El
       })
       if (!confirmed) return
       privateApi.Ruling.update({
-        rulingId: rulingId,
+        rulingId: String(rulingId),
         body: {
           id: rulingId,
           card_id: props.cardId,
