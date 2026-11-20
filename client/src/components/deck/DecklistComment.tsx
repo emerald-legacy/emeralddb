@@ -135,7 +135,7 @@ export function DecklistComment(props: {
                   <p key={key}>{line}</p>
                 ))}
               </Typography>
-              {currentUser?.id === props.comment.user_id && (
+              {currentUser !== undefined && currentUser.public_id === props.comment.author_id && (
                 <Typography align="right" variant="subtitle2">
                   <IconButton color="secondary" size="small" onClick={() => setIsEditMode(true)}>
                     <EditIcon />

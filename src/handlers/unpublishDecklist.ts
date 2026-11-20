@@ -1,18 +1,10 @@
 import { getDecklist, unpublishDecklist } from '../gateways/storage/index'
-import Joi from 'joi'
-import { Response } from 'express'
-import { ValidatedRequest } from '../middlewares/validator'
-import { Decklist, Decklists$publish } from '@5rdb/api'
-import { getUserId } from '../utils/getUserId'
-
-export const schema = {
-  body: Joi.object<Decklists$publish['request']['params']>({
-    decklistId: Joi.string().required(),
-  }),
-}
+import { Request, Response } from 'express'
+import { Decklist, Decklists$unpublish } from '@5rdb/api'
+import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export async function handler(
-  req: ValidatedRequest<typeof schema>,
+  req: Request<Decklists$unpublish['request']['params']>,
   res: Response
 ): Promise<Decklist | undefined> {
   const decklist = await getDecklist(req.params.decklistId)
@@ -20,12 +12,12 @@ export async function handler(
     res.sendStatus(404)
     return
   }
-  const userId = getUserId(req)
-  if (userId !== decklist.user_id) {
+  const user = await requireCurrentUser(req)
+  if (decklist.owner_id !== user.public_id) {
     res.sendStatus(403)
     return
   }
-  console.log(`Unpublish decklist ${decklist.id} for user ${userId}!`)
+  console.log(`Unpublish decklist ${decklist.id} for user ${user.public_id}!`)
   const unpublished = await unpublishDecklist(req.params.decklistId)
   if (!unpublished) {
     res.sendStatus(404)

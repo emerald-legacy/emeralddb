@@ -24,8 +24,8 @@ export {
   deleteCardInPack,
   insertOrUpdateCardInPack,
 } from './private/card_in_pack'
-export { getUser, insertUser, updateUser, getOrInsertDBUser } from './private/user'
-export { getAllDecks, getDeck, getDecksForUser, insertDeck, deleteDeck } from './private/deck'
+export { getUser, getUserNames, insertUser, updateUser, getOrInsertDBUser } from './private/user'
+export { getAllDecks, getDeck, getDecksForOwner, insertDeck, deleteDeck } from './private/deck'
 export {
   getDecklist,
   getAllDecklistsForDeck,
