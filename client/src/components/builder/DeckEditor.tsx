@@ -13,7 +13,7 @@ import {
   Tabs,
   TextField,
 } from '@mui/material'
-import { useState, type JSX } from 'react'
+import { useRef, useState, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { BuilderCardList } from './BuilderCardList'
 import { Decklist } from '../deck/Decklist'
@@ -144,6 +144,9 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   const [newVersion, setNewVersion] = useState(decklist.version_number || '0.1')
   const [currentView, setCurrentView] = useState(ViewTypes.EDITOR)
   const [showAllCards, setShowAllCards] = useState(false)
+  // The ref guards against a second click before the next render; the state shows it
+  const savingRef = useRef(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   if (props.existingDecklist && decklist.version_number === props.existingDecklist.version_number) {
     const nextVersionNumber = getNextVersionNumber(props.existingDecklist.version_number)
@@ -200,6 +203,12 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   const filteredCards = showAllCards ? cards : prefilterCards(cards, decklist, formats, true)
 
   async function saveDeck(decklist: DecklistViewModel) {
+    // A second click would save the same version again, or create a second deck
+    if (savingRef.current) {
+      return
+    }
+    savingRef.current = true
+    setIsSaving(true)
     const cardPackIds: Record<string, string> = {}
     for (const cardId of Object.keys(decklist.cards)) {
       const version = validCardVersionForFormat(cardId, decklist.format)
@@ -229,6 +238,9 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
       setVersionModalOpen(false)
     } catch (error) {
       enqueueSnackbar('Error while saving deck: ' + errorMessage(error), { variant: 'error' })
+    } finally {
+      savingRef.current = false
+      setIsSaving(false)
     }
   }
 
@@ -323,9 +335,10 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
                   variant="contained"
                   color="secondary"
                   onClick={() => void saveDeck(decklist)}
+                  disabled={isSaving}
                   fullWidth
                 >
-                  Save Deck
+                  {isSaving ? 'Saving…' : 'Save Deck'}
                 </Button>
               </Grid>
               <Grid size={12}>
