@@ -11,6 +11,9 @@ export type {
   Deck,
   Decklist,
   DecklistComment,
+  DeckSize,
+  DeckValidationStatistics,
+  DeckValidation,
 } from './private/baseTypes'
 export type {
   CardWithVersions,

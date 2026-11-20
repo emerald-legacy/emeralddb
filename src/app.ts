@@ -8,6 +8,7 @@ import path from 'path'
 import env from './env'
 import api from './api'
 import { cacheControl } from './middlewares/cacheControl'
+import { clearValidationDataAfterWrites } from './middlewares/clearValidationData'
 import { Service } from './typings/Service'
 
 export default async (): Promise<Service> => {
@@ -25,6 +26,7 @@ export default async (): Promise<Service> => {
 
   // Add Cache-Control headers for API GET requests
   app.use('/api', cacheControl)
+  app.use('/api', clearValidationDataAfterWrites)
 
   app.use('/api', api())
   app.use(express.static(path.resolve(__dirname, 'public')))

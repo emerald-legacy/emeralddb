@@ -28,7 +28,7 @@ import { DeckBuilderWizard } from './DeckBuilderWizard'
 import Autocomplete from '@mui/material/Autocomplete'
 import { useSnackbar } from 'notistack'
 import { useNavigate } from 'react-router'
-import { createDeckStatistics } from '../deck/DeckValidator'
+import { createDeckStatistics } from '../deck/deckStatistics'
 import { Loading } from '../Loading'
 import { VersionPicker } from './VersionPicker'
 import { EmeraldDBLink } from '../EmeraldDBLink'
@@ -83,7 +83,7 @@ function prefilterCards(
   formats: Format[],
   showIllegal: boolean = false
 ) {
-  const stats = createDeckStatistics(decklist.cards, decklist.format, cards, formats)
+  const stats = createDeckStatistics(decklist.cards, decklist.format, cards)
   let filteredCards = decklist.primary_clan
     ? cards.filter((card) => card.allowed_clans?.includes(decklist.primary_clan || ''))
     : cards
@@ -170,7 +170,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   }
 
   function setDeckListFromNewCards(newCards: Record<string, number>) {
-    const stats = createDeckStatistics(newCards, decklist.format, cards, formats)
+    const stats = createDeckStatistics(newCards, decklist.format, cards)
     setDecklist({
       ...decklist,
       cards: newCards,
@@ -184,7 +184,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
       <DeckBuilderWizard
         onComplete={setWizardResult}
         onImport={(decklist: DecklistViewModel) => {
-          const stats = createDeckStatistics(decklist.cards, decklist.format, cards, formats)
+          const stats = createDeckStatistics(decklist.cards, decklist.format, cards)
           setDecklist({
             ...decklist,
             primary_clan: stats.primaryClan,

@@ -137,3 +137,25 @@ export interface DecklistComment {
   created_at: Date
   edited_at?: Date
 }
+
+/** A deck's size with the limits of its format */
+export interface DeckSize {
+  size: number
+  minimum: number
+  maximum: number
+}
+
+/** The numbers that follow from the rules of a format, for showing them while building */
+export interface DeckValidationStatistics {
+  influence: { used: number; maximum: number }
+  dynastyDeck: DeckSize
+  conflictDeck: DeckSize
+}
+
+/** The result of POST /decklists/validate */
+export interface DeckValidation {
+  valid: boolean
+  errors: string[]
+  // Missing for an unknown format
+  statistics?: DeckValidationStatistics
+}

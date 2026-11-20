@@ -1,6 +1,6 @@
-import { CardWithVersions, Format } from '@5rdb/api'
+import { CardWithVersions, DeckValidation, Format } from '@5rdb/api'
 import lodash from 'lodash'
-import { getAllCards, getAllCardsInPacks, getAllFormats } from '../../gateways/storage/index'
+import { getValidationData } from './validationData'
 
 export type CardWithQuantity = CardWithVersions & {
   quantity: number
@@ -69,7 +69,10 @@ function extractPrimaryClan(
   return primaryClan
 }
 
-function splitCardsToDecks(cards: Record<string, number>, allCards: CardWithVersions[]): DeckCards {
+function splitCardsToDecks(
+  cards: Record<string, number>,
+  allCards: readonly CardWithVersions[]
+): DeckCards {
   const strongholds: CardWithQuantity[] = []
   const roles: CardWithQuantity[] = []
   const provinces: CardWithQuantity[] = []
@@ -165,6 +168,14 @@ function splitDynastyCards(cards: CardWithQuantity[]): DynastyCards {
   }
 }
 
+// Cards are counted by quantity: three copies of a stronghold are three strongholds
+function countCopies(cards: CardWithQuantity[]): number {
+  return cards.reduce((sum, card) => sum + card.quantity, 0)
+}
+
+// Every card on prod has a deck_limit; 3 is the general limit
+const DEFAULT_DECK_LIMIT = 3
+
 function validateDecklist(
   stats: DeckStatistics,
   allDeckCards: CardWithQuantity[],
@@ -172,6 +183,16 @@ function validateDecklist(
   conflictCards: CardWithQuantity[]
 ): string[] {
   const validationErrors: string[] = []
+  const tooManyCopies = allDeckCards.filter(
+    (c) => c.quantity > (c.deck_limit ?? DEFAULT_DECK_LIMIT)
+  )
+  if (tooManyCopies.length > 0) {
+    validationErrors.push(
+      `The deck contains more copies than allowed of: ${tooManyCopies
+        .map((c) => `${c.name} (at most ${c.deck_limit ?? DEFAULT_DECK_LIMIT})`)
+        .join(', ')}`
+    )
+  }
   allDeckCards
     .filter((c) => c.role_restrictions.length > 0)
     .forEach((c) => {
@@ -253,24 +274,27 @@ function validateDecklist(
     }
   }
 
+  const provinceCount = countCopies(stats.provinces)
+  const strongholdCount = countCopies(stats.strongholds)
+  const roleCount = countCopies(stats.roles)
   if (stats.format === 'skirmish') {
-    if (stats.provinces.length > 0) {
-      validationErrors.push(`Roles are not allowed in Skirmish Format.`)
+    if (provinceCount > 0) {
+      validationErrors.push(`Provinces are not allowed in Skirmish Format.`)
     }
-    if (stats.strongholds.length > 0) {
+    if (strongholdCount > 0) {
       validationErrors.push(`Strongholds are not allowed in Skirmish Format.`)
     }
-    if (stats.roles.length > 0) {
+    if (roleCount > 0) {
       validationErrors.push(`Roles are not allowed in Skirmish Format.`)
     }
   } else {
-    if (stats.provinces.length !== 5) {
+    if (provinceCount !== 5) {
       validationErrors.push(`A deck must contain exactly 5 provinces.`)
     }
-    if (stats.strongholds.length !== 1) {
+    if (strongholdCount !== 1) {
       validationErrors.push(`A deck must contain exactly 1 stronghold.`)
     }
-    if (stats.roles.length > 1) {
+    if (roleCount > 1) {
       validationErrors.push(`A deck may contain only 1 role.`)
     }
     const singleElementProvinces = stats.provinces.filter(
@@ -320,20 +344,26 @@ export const cardsThatModifyInfluence: { id: string; modifier: number }[] = [
   { id: 'yatakabune-port', modifier: 4 },
 ]
 
+/**
+ * A card is in a format's pool if one of its printings is in a legal pack and, in Emerald
+ * Legacy, not rotated. Rotation only applies to Emerald Legacy.
+ */
+function isInCardPool(card: CardWithVersions, format: Format): boolean {
+  const legalPacks = format.legal_packs || []
+  return card.versions.some(
+    (version) =>
+      legalPacks.includes(version.pack_id) && (format.id !== 'emerald' || !version.rotated)
+  )
+}
+
 function createDeckStatistics(
   cards: Record<string, number>,
   format: Format,
-  allCardsWithVersions: CardWithVersions[]
+  allCardsWithVersions: readonly CardWithVersions[]
 ): DeckStatistics {
   const formatId = format.id
   const { strongholds, provinces, roles, conflictCards, dynastyCards, allDeckCards } =
     splitCardsToDecks(cards || {}, allCardsWithVersions)
-  const allIllegalCardIds = allCardsWithVersions
-    .filter((c) => !c.versions.some((v) => (format.legal_packs || []).includes(v.pack_id)))
-    .map((c) => c.id)
-  const allRotatedCardIds = allCardsWithVersions
-    .filter((c) => !c.versions.some((v) => !v.rotated))
-    .map((c) => c.id)
   const dynastyCardsWrapper = splitDynastyCards(dynastyCards)
   const conflictCardsWrapper = splitConflictCards(conflictCards)
   const stronghold = strongholds.length > 0 ? strongholds[0] : null
@@ -369,8 +399,7 @@ function createDeckStatistics(
     .reduce((a, b) => a + b, 0)
   const bannedCards = allDeckCards.filter((c) => c.banned_in?.includes(formatId))
   const restrictedCards = allDeckCards.filter((c) => c.restricted_in?.includes(formatId))
-  const illegalCards = allDeckCards.filter((c) => allIllegalCardIds.includes(c.id))
-  const rotatedCards = allDeckCards.filter((c) => allRotatedCardIds.includes(c.id))
+  const rotatedCards = allDeckCards.filter((c) => !isInCardPool(c, format))
 
   const deckMaximum =
     formatId === 'skirmish' ? 35 : formatId === 'obsidian' ? 45 + numberOfRallyCards : 45
@@ -401,8 +430,7 @@ function createDeckStatistics(
     secondaryClan: secondaryClan,
     bannedCards: bannedCards,
     restrictedCards: restrictedCards,
-    rotatedCards:
-      formatId === 'emerald' ? lodash.uniq([...illegalCards, ...rotatedCards]) : illegalCards,
+    rotatedCards: rotatedCards,
     validationErrors: [],
   }
 
@@ -411,23 +439,12 @@ function createDeckStatistics(
   return stats
 }
 
-export async function isDeckValid(
+/** Validates a deck against the rules of a format, see DeckValidation */
+export async function validateDeck(
   cards: Record<string, number>,
   formatId: string
-): Promise<{ valid: boolean; errors: string[] }> {
-  const allCards = await getAllCards()
-  const allFormats = await getAllFormats()
-  const allCardsWithVersions: CardWithVersions[] = allCards.map((card) => ({
-    ...card,
-    versions: [],
-  }))
-
-  const allCardsInPacks = await getAllCardsInPacks()
-  allCardsInPacks.forEach((cardInPack) =>
-    allCardsWithVersions
-      .find((card) => card.id === cardInPack.card_id)
-      ?.versions.push({ ...cardInPack })
-  )
+): Promise<DeckValidation> {
+  const { cards: allCardsWithVersions, formats: allFormats } = await getValidationData()
   const format = allFormats.find((format) => format.id === formatId)
   if (!format) {
     return {
@@ -435,9 +452,27 @@ export async function isDeckValid(
       errors: ['Illegal format supplied'],
     }
   }
-  const { validationErrors } = createDeckStatistics(cards, format, allCardsWithVersions)
+  // A card with 0 copies isn't in the deck
+  const cardsInDeck = Object.fromEntries(
+    Object.entries(cards).filter(([, quantity]) => quantity > 0)
+  )
+  const stats = createDeckStatistics(cardsInDeck, format, allCardsWithVersions)
+  const validationErrors = stats.validationErrors
   return {
     valid: validationErrors.length === 0,
     errors: validationErrors,
+    statistics: {
+      influence: { used: stats.usedInfluence, maximum: stats.maxInfluence },
+      dynastyDeck: {
+        size: stats.dynastyCards.size,
+        minimum: stats.dynastyDeckMinimum,
+        maximum: stats.deckMaximum,
+      },
+      conflictDeck: {
+        size: stats.conflictCards.size,
+        minimum: stats.conflictDeckMinimum,
+        maximum: stats.deckMaximum,
+      },
+    },
   }
 }

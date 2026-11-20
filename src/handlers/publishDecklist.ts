@@ -1,7 +1,7 @@
 import { getDecklist, publishDecklist } from '../gateways/storage/index'
 import { Request, Response } from 'express'
 import { Decklist, Decklists$publish } from '@5rdb/api'
-import { isDeckValid } from './validators/deckValidator'
+import { validateDeck } from './validators/deckValidator'
 import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export async function handler(
@@ -18,7 +18,7 @@ export async function handler(
     res.sendStatus(403)
     return
   }
-  const { valid } = await isDeckValid(decklist.cards, decklist.format)
+  const { valid } = await validateDeck(decklist.cards, decklist.format)
   if (!valid) {
     res.status(400).send('Deck has validation errors')
   } else {
