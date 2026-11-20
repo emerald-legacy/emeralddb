@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import { clearValidationData } from '../handlers/validators/validationData'
+import { debugLog } from '../utils/debugLog'
 
 // Writes below these API paths change cards, printings, packs or formats. '/cards' also
 // covers '/cards-in-packs'.
@@ -18,6 +19,7 @@ export function clearValidationDataAfterWrites(
     res.on('finish', () => {
       if (res.statusCode < 400) {
         clearValidationData()
+        debugLog(`[validate] cache cleared after ${req.method} ${req.originalUrl}`)
       }
     })
   }
