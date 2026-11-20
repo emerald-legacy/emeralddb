@@ -49,11 +49,14 @@ let theme = createTheme({
 
 theme = responsiveFontSizes(theme)
 
+const FIVE_MINUTES = 5 * 60 * 1000
+const TEN_MINUTES = 10 * 60 * 1000
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh for 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes - cache persists for 10 minutes
+      staleTime: FIVE_MINUTES, // data stays fresh this long
+      gcTime: TEN_MINUTES, // unused data stays in the cache this long
       retry: 1, // Only retry failed requests once
       refetchOnWindowFocus: false, // Don't refetch when window regains focus
     },
