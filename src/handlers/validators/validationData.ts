@@ -1,6 +1,5 @@
 import { CardWithVersions, Format } from '@5rdb/api'
 import { getAllCards, getAllCardsInPacks, getAllFormats } from '../../gateways/storage/index'
-import { debugLog } from '../../utils/debugLog'
 
 /**
  * What deck validation needs from the database: every card with its printings, all formats.
@@ -21,7 +20,6 @@ export const FIVE_MINUTES = 5 * 60 * 1000
 let cached: { data: Promise<ValidationData>; expiresAt: number } | undefined
 
 async function load(): Promise<ValidationData> {
-  const startedAt = Date.now()
   const [cards, cardsInPacks, formats] = await Promise.all([
     getAllCards(),
     getAllCardsInPacks(),
@@ -33,10 +31,6 @@ async function load(): Promise<ValidationData> {
     printings.push(cardInPack)
     printingsByCard.set(cardInPack.card_id, printings)
   }
-  debugLog(
-    `[validate] loaded ${cards.length} cards, ${cardsInPacks.length} printings and ` +
-      `${formats.length} formats into the cache (${Date.now() - startedAt} ms)`
-  )
   return {
     cards: cards.map((card) => ({ ...card, versions: printingsByCard.get(card.id) ?? [] })),
     formats,

@@ -1,7 +1,6 @@
 import { CardWithVersions, DeckValidation, Format } from '@5rdb/api'
 import lodash from 'lodash'
 import { getValidationData } from './validationData'
-import { debugLog } from '../../utils/debugLog'
 
 export type CardWithQuantity = CardWithVersions & {
   quantity: number
@@ -445,11 +444,9 @@ export async function validateDeck(
   cards: Record<string, number>,
   formatId: string
 ): Promise<DeckValidation> {
-  const startedAt = Date.now()
   const { cards: allCardsWithVersions, formats: allFormats } = await getValidationData()
   const format = allFormats.find((format) => format.id === formatId)
   if (!format) {
-    debugLog(`[validate] unknown format '${formatId}'`)
     return {
       valid: false,
       errors: ['Illegal format supplied'],
@@ -461,13 +458,6 @@ export async function validateDeck(
   )
   const stats = createDeckStatistics(cardsInDeck, format, allCardsWithVersions)
   const validationErrors = stats.validationErrors
-  const copies = Object.values(cards).reduce((sum, quantity) => sum + quantity, 0)
-  debugLog(
-    `[validate] ${formatId}, ${copies} cards: ` +
-      `${validationErrors.length === 0 ? 'valid' : `${validationErrors.length} error(s)`} ` +
-      `(${Date.now() - startedAt} ms)` +
-      validationErrors.map((error) => `\n  - ${error}`).join('')
-  )
   return {
     valid: validationErrors.length === 0,
     errors: validationErrors,
