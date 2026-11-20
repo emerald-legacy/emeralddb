@@ -21,6 +21,7 @@ import Autocomplete from '@mui/material/Autocomplete'
 import { CardQuantitySelector } from './CardQuantitySelector'
 import { CardImageOrText } from '../card/CardImageOrText'
 import { CardInformation } from '../card/CardInformation'
+import { withCardQuantity } from './cardQuantities'
 
 function initialFilter(primaryClan: string | undefined, format: string): FilterState {
   const sides = ['dynasty', 'conflict']
@@ -148,7 +149,6 @@ export function BuilderCardList(props: {
   const [filter, setFilter] = useState<FilterState | undefined>(
     initialFilter(props.primaryClan, props.format)
   )
-  const [selectedCards] = useState<Record<string, number>>(props.selectedCards)
   const isSmOrSmaller = useMediaQuery('(max-width:600px)')
   const [showTraits, setShowTraits] = useState(true)
   const [showFilters, setShowFilters] = useState(true)
@@ -214,13 +214,9 @@ export function BuilderCardList(props: {
     return sortCards(filtered)
   }, [props.prefilteredCards, relevantFormats, filter, sortMode, order])
 
+  // The deck's cards belong to the editor; the picker only reports changes
   function changeCardQuantity(cardId: string, quantity: number) {
-    if (quantity > 0) {
-      selectedCards[cardId] = quantity
-    } else {
-      delete selectedCards[cardId]
-    }
-    props.onCardChange(selectedCards)
+    props.onCardChange(withCardQuantity(props.selectedCards, cardId, quantity))
   }
 
   const handleImageClick = (cardId: string) => {
@@ -250,7 +246,7 @@ export function BuilderCardList(props: {
   const tableData: TableCardData[] = filteredAndSortedCards.map((card) => {
     return {
       quantityForId: {
-        quantity: selectedCards[card.id] || 0,
+        quantity: props.selectedCards[card.id] || 0,
         deckLimit:
           Math.min(card.deck_limit ?? defaultDeckLimit, defaultDeckLimit) || defaultDeckLimit,
         onQuantityChange: (newQuantity: number) => changeCardQuantity(card.id, newQuantity),

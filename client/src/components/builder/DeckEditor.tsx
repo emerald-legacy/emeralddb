@@ -1,10 +1,4 @@
-import {
-  DecklistViewModel,
-  Decklist as DecklistType,
-  Decklists$create,
-  CardWithVersions,
-  Format,
-} from '@5rdb/api'
+import { DecklistViewModel, Decklist as DecklistType, CardWithVersions, Format } from '@5rdb/api'
 import { styled } from '@mui/material/styles'
 import {
   Box,
@@ -19,7 +13,7 @@ import {
   Tabs,
   TextField,
 } from '@mui/material'
-import { useState, type JSX } from 'react'
+import { useRef, useState, type JSX } from 'react'
 import { useUiStore } from '../../providers/UiStoreProvider'
 import { BuilderCardList } from './BuilderCardList'
 import { Decklist } from '../deck/Decklist'
@@ -33,6 +27,14 @@ import { Loading } from '../Loading'
 import { VersionPicker } from './VersionPicker'
 import { EmeraldDBLink } from '../EmeraldDBLink'
 import { DeckStatistics } from './DeckStatistics'
+import { DeckApi, DecklistToSave, saveDecklist } from './saveDecklist'
+import { withCardQuantity } from './cardQuantities'
+
+const deckApi: DeckApi = {
+  createDeck: () => privateApi.Deck.create({ body: {} }).then((response) => response.data()),
+  deleteDeck: (deckId) => privateApi.Deck.delete({ deckId }),
+  createDecklist: (body) => privateApi.Decklist.create({ body }),
+}
 
 const PREFIX = 'DeckEditor'
 
@@ -143,6 +145,9 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   const [newVersion, setNewVersion] = useState(decklist.version_number || '0.1')
   const [currentView, setCurrentView] = useState(ViewTypes.EDITOR)
   const [showAllCards, setShowAllCards] = useState(false)
+  // The ref guards against a second click before the next render; the state shows it
+  const savingRef = useRef(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   if (props.existingDecklist && decklist.version_number === props.existingDecklist.version_number) {
     const nextVersionNumber = getNextVersionNumber(props.existingDecklist.version_number)
@@ -198,7 +203,13 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
 
   const filteredCards = showAllCards ? cards : prefilterCards(cards, decklist, formats, true)
 
-  function updateDeck(decklist: DecklistViewModel, deckId: string) {
+  async function saveDeck(decklist: DecklistViewModel) {
+    // A second click would save the same version again, or create a second deck
+    if (savingRef.current) {
+      return
+    }
+    savingRef.current = true
+    setIsSaving(true)
     const cardPackIds: Record<string, string> = {}
     for (const cardId of Object.keys(decklist.cards)) {
       const version = validCardVersionForFormat(cardId, decklist.format)
@@ -208,8 +219,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
     }
     // Only the fields of the contract: a decklist loaded from the server carries more
     // (its id, timestamps, owner, stronghold, ...), which the server rejects
-    const body: Decklists$create['request']['body'] = {
-      deck_id: deckId,
+    const decklistToSave: DecklistToSave = {
       format: decklist.format,
       name: decklist.name,
       primary_clan: decklist.primary_clan,
@@ -219,41 +229,28 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
       cards: decklist.cards,
       card_pack_ids: cardPackIds,
     }
-    privateApi.Decklist.create({ body })
+    try {
+      const deckId = await saveDecklist(deckApi, decklistToSave, props.existingDecklist?.deck_id)
       // /decklists/{deckId} resolves to the latest version of the deck
-      .then(() => refreshCache(`/decks/${deckId}`, `/decklists/${deckId}`))
-      .then(() => {
-        setDecklist({ ...decklist, version_number: getNextVersionNumber(decklist.version_number) })
-        navigate(`/builder/${deckId}/edit`)
-        enqueueSnackbar('Successfully created deck', { variant: 'success' })
-        setVersionModalOpen(false)
-      })
-  }
-
-  function createOrUpdateDeck(decklist: DecklistViewModel) {
-    if (props.existingDecklist) {
-      updateDeck(decklist, props.existingDecklist.deck_id)
-    } else {
-      privateApi.Deck.create({ body: {} })
-        .then((response) => {
-          const newDeck = response.data()
-          updateDeck(decklist, newDeck.id)
-        })
-        .catch((error) => {
-          console.log(error)
-          enqueueSnackbar('Error while creating deck: ' + errorMessage(error), { variant: 'error' })
-        })
+      await refreshCache(`/decks/${deckId}`, `/decklists/${deckId}`)
+      // The next save is the next version; "Custom Version" starts from it as well
+      const nextVersion = getNextVersionNumber(decklist.version_number)
+      setDecklist({ ...decklist, version_number: nextVersion })
+      setNewVersion(nextVersion)
+      navigate(`/builder/${deckId}/edit`)
+      enqueueSnackbar('Successfully saved deck', { variant: 'success' })
+      setVersionModalOpen(false)
+    } catch (error) {
+      enqueueSnackbar('Error while saving deck: ' + errorMessage(error), { variant: 'error' })
+    } finally {
+      savingRef.current = false
+      setIsSaving(false)
     }
   }
 
+  // Like a change in the card picker: the clans follow the cards
   function changeCardQuantity(cardId: string, quantity: number) {
-    const selectedCards = decklist.cards
-    if (quantity > 0) {
-      selectedCards[cardId] = quantity
-    } else {
-      delete selectedCards[cardId]
-    }
-    setDecklist({ ...decklist, cards: selectedCards })
+    setDeckListFromNewCards(withCardQuantity(decklist.cards, cardId, quantity))
   }
 
   return (
@@ -336,10 +333,11 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
                 <Button
                   variant="contained"
                   color="secondary"
-                  onClick={() => createOrUpdateDeck(decklist)}
+                  onClick={() => void saveDeck(decklist)}
+                  disabled={isSaving}
                   fullWidth
                 >
-                  Save Deck
+                  {isSaving ? 'Saving…' : 'Save Deck'}
                 </Button>
               </Grid>
               <Grid size={12}>
