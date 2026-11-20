@@ -2,6 +2,7 @@ export {
   getCard,
   getAllCards,
   getCards,
+  getCardsOfTypes,
   insertOrUpdateCard,
   updateCard,
   deleteCard,

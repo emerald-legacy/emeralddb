@@ -15,6 +15,17 @@ export async function getCards(cardIds: string[]): Promise<Card[]> {
   return pg(TABLE).whereIn('id', cardIds)
 }
 
+/** Id, name and type of those of the given cards that have one of the given types */
+export async function getCardsOfTypes(
+  cardIds: string[],
+  types: string[]
+): Promise<Pick<Card, 'id' | 'name' | 'type'>[]> {
+  return pg(TABLE)
+    .select('id', 'name', 'type')
+    .whereIn('id', [...new Set(cardIds)])
+    .whereIn('type', types)
+}
+
 export async function deleteCard(cardId: string): Promise<void> {
   await pg(TABLE).where('id', cardId).delete()
 }

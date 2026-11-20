@@ -15,6 +15,7 @@ export type {
 export type {
   CardWithVersions,
   CardWithDetails,
+  CardReference,
   DeckWithVersions,
   DecklistWithUser,
   DecklistViewModel,
