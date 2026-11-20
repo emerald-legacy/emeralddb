@@ -4,6 +4,7 @@ import createApp from './app'
 import { noBot, startBot } from './bot'
 import env from './env'
 import { Service } from './typings/Service'
+import { shutDownOnSignals } from './shutdown'
 
 async function main() {
   // The API first: the optional bot must not keep it from starting
@@ -17,15 +18,7 @@ async function main() {
     await noBot.run()
   }
 
-  const shutdown = () => {
-    app.shutdown()
-    bot.shutdown()
-    process.exit(0)
-  }
-
-  process.on('SIGINT', shutdown)
-  process.on('SIGTERM', shutdown)
-  process.on('SIGQUIT', shutdown)
+  shutDownOnSignals([app, bot])
 }
 
 main().catch((error: unknown) => {

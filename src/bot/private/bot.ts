@@ -40,7 +40,7 @@ export async function createBot(config: Config): Promise<Service> {
     },
     async shutdown() {
       console.log('BOT: shutdown start')
-      client.destroy()
+      await client.destroy()
       console.log('BOT: shutdown done')
     },
   }
