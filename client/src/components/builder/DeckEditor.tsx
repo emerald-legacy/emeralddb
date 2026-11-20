@@ -1,10 +1,4 @@
-import {
-  DecklistViewModel,
-  Decklist as DecklistType,
-  Decklists$create,
-  CardWithVersions,
-  Format,
-} from '@5rdb/api'
+import { DecklistViewModel, Decklist as DecklistType, CardWithVersions, Format } from '@5rdb/api'
 import { styled } from '@mui/material/styles'
 import {
   Box,
@@ -33,6 +27,13 @@ import { Loading } from '../Loading'
 import { VersionPicker } from './VersionPicker'
 import { EmeraldDBLink } from '../EmeraldDBLink'
 import { DeckStatistics } from './DeckStatistics'
+import { DeckApi, DecklistToSave, saveDecklist } from './saveDecklist'
+
+const deckApi: DeckApi = {
+  createDeck: () => privateApi.Deck.create({ body: {} }).then((response) => response.data()),
+  deleteDeck: (deckId) => privateApi.Deck.delete({ deckId }),
+  createDecklist: (body) => privateApi.Decklist.create({ body }),
+}
 
 const PREFIX = 'DeckEditor'
 
@@ -198,7 +199,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
 
   const filteredCards = showAllCards ? cards : prefilterCards(cards, decklist, formats, true)
 
-  function updateDeck(decklist: DecklistViewModel, deckId: string) {
+  async function saveDeck(decklist: DecklistViewModel) {
     const cardPackIds: Record<string, string> = {}
     for (const cardId of Object.keys(decklist.cards)) {
       const version = validCardVersionForFormat(cardId, decklist.format)
@@ -208,8 +209,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
     }
     // Only the fields of the contract: a decklist loaded from the server carries more
     // (its id, timestamps, owner, stronghold, ...), which the server rejects
-    const body: Decklists$create['request']['body'] = {
-      deck_id: deckId,
+    const decklistToSave: DecklistToSave = {
       format: decklist.format,
       name: decklist.name,
       primary_clan: decklist.primary_clan,
@@ -219,30 +219,16 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
       cards: decklist.cards,
       card_pack_ids: cardPackIds,
     }
-    privateApi.Decklist.create({ body })
+    try {
+      const deckId = await saveDecklist(deckApi, decklistToSave, props.existingDecklist?.deck_id)
       // /decklists/{deckId} resolves to the latest version of the deck
-      .then(() => refreshCache(`/decks/${deckId}`, `/decklists/${deckId}`))
-      .then(() => {
-        setDecklist({ ...decklist, version_number: getNextVersionNumber(decklist.version_number) })
-        navigate(`/builder/${deckId}/edit`)
-        enqueueSnackbar('Successfully created deck', { variant: 'success' })
-        setVersionModalOpen(false)
-      })
-  }
-
-  function createOrUpdateDeck(decklist: DecklistViewModel) {
-    if (props.existingDecklist) {
-      updateDeck(decklist, props.existingDecklist.deck_id)
-    } else {
-      privateApi.Deck.create({ body: {} })
-        .then((response) => {
-          const newDeck = response.data()
-          updateDeck(decklist, newDeck.id)
-        })
-        .catch((error) => {
-          console.log(error)
-          enqueueSnackbar('Error while creating deck: ' + errorMessage(error), { variant: 'error' })
-        })
+      await refreshCache(`/decks/${deckId}`, `/decklists/${deckId}`)
+      setDecklist({ ...decklist, version_number: getNextVersionNumber(decklist.version_number) })
+      navigate(`/builder/${deckId}/edit`)
+      enqueueSnackbar('Successfully saved deck', { variant: 'success' })
+      setVersionModalOpen(false)
+    } catch (error) {
+      enqueueSnackbar('Error while saving deck: ' + errorMessage(error), { variant: 'error' })
     }
   }
 
@@ -336,7 +322,7 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
                 <Button
                   variant="contained"
                   color="secondary"
-                  onClick={() => createOrUpdateDeck(decklist)}
+                  onClick={() => void saveDeck(decklist)}
                   fullWidth
                 >
                   Save Deck
