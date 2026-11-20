@@ -18,7 +18,7 @@ export async function handler(
   )
   return {
     pack: pack,
-    cards: cards,
+    cards: cards.filter((card) => card !== undefined),
     cardsInPack: cardsInPack,
   }
 }

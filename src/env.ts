@@ -2,33 +2,42 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-function parseDiscordConfig(): {
+interface DiscordConfig {
   clientId: string
   botToken: string
   isBotEnabled: boolean
-} {
+}
+
+function isDiscordConfig(value: unknown): value is DiscordConfig {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'clientId' in value &&
+    typeof value.clientId === 'string' &&
+    'botToken' in value &&
+    typeof value.botToken === 'string' &&
+    'isBotEnabled' in value &&
+    typeof value.isBotEnabled === 'boolean'
+  )
+}
+
+function parseDiscordConfig(): DiscordConfig {
   if (typeof process.env.DISCORD_CONFIG !== 'string') {
     throw Error('The DISCORD_CONFIG env variable is missing')
   }
 
   const errorMsgMalformed = 'The DISCORD_CONFIG env variable is malformed'
+  let json: unknown
   try {
-    const json = JSON.parse(process.env.DISCORD_CONFIG)
-    if (
-      typeof json.clientId === 'string' &&
-      typeof json.botToken === 'string' &&
-      typeof json.isBotEnabled === 'boolean'
-    ) {
-      return {
-        clientId: json.clientId,
-        botToken: json.botToken,
-        isBotEnabled: json.isBotEnabled,
-      }
-    }
+    json = JSON.parse(process.env.DISCORD_CONFIG)
   } catch {
     throw Error(errorMsgMalformed)
   }
-  throw Error(errorMsgMalformed)
+  if (!isDiscordConfig(json)) {
+    throw Error(errorMsgMalformed)
+  }
+  // Copy only the known fields, as before
+  return { clientId: json.clientId, botToken: json.botToken, isBotEnabled: json.isBotEnabled }
 }
 
 export default {

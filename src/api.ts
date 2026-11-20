@@ -156,7 +156,7 @@ export default (): Router => {
   api.get('/users/me', authorizedOnly, w(getCurrentUser.handler))
   api.put('/users/me', authorizedOnly, validate(updateUser.schema), w(updateUser.handler))
   api.get('/decks/:deckId', w(getDeck.handler))
-  api.post('/decks', w(getAllDecksForUser.handler))
+  api.post('/decks', authorizedOnly, w(getAllDecksForUser.handler))
   api.put('/decks', authorizedOnly, validate(createDeck.schema), w(createDeck.handler))
   api.delete('/decks/:deckId', authorizedOnly, w(deleteDeck.handler))
   api.get('/decklists', w(getAllPublishedDecklists.handler))

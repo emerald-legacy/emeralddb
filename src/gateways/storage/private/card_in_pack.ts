@@ -15,8 +15,8 @@ export async function getAllCardsInPack(packId: string): Promise<CardInPack[]> {
   return pg(TABLE).where('pack_id', packId)
 }
 
-export async function deleteCardInPack(cardId: string, packId: string): Promise<CardInPack[]> {
-  return pg(TABLE).where({ card_id: cardId, pack_id: packId }).delete()
+export async function deleteCardInPack(cardId: string, packId: string): Promise<void> {
+  await pg(TABLE).where({ card_id: cardId, pack_id: packId }).delete()
 }
 
 export async function insertOrUpdateCardInPack(cardInPack: CardInPack): Promise<CardInPack> {

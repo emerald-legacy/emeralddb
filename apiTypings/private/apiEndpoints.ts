@@ -108,8 +108,8 @@ export interface Decks$find {
   response: DeckWithVersions
 }
 
+// The decks of the logged-in user
 export interface Decks$findForUser {
-  request: { body: { userId: string } }
   response: DeckWithVersions[]
 }
 

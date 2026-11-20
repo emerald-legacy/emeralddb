@@ -8,8 +8,10 @@ export async function getAllFormats(): Promise<Format[]> {
 }
 
 export async function insertOrUpdateFormat(format: Format): Promise<Format> {
-  const insert = pg(TABLE).insert({ ...format })
-  const update = pg.queryBuilder().update({ ...format })
-  const result = await pg.raw(`? ON CONFLICT ("id") DO ? returning *`, [insert, update])
-  return result.rows[0]
+  const [row] = await pg(TABLE)
+    .insert({ ...format })
+    .onConflict('id')
+    .merge()
+    .returning('*')
+  return row
 }

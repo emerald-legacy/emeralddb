@@ -18,11 +18,14 @@ export async function insertComment(
     .then(([row]) => row)
 }
 
-export async function getComment(commentId: string): Promise<DecklistComment> {
+export async function getComment(commentId: string): Promise<DecklistComment | undefined> {
   return pg(TABLE).where('id', commentId).first()
 }
 
-export async function editComment(commentId: string, newText: string): Promise<DecklistComment> {
+export async function editComment(
+  commentId: string,
+  newText: string
+): Promise<DecklistComment | undefined> {
   const now = new Date()
   const result = await pg(TABLE)
     .where('id', commentId)
@@ -31,9 +34,9 @@ export async function editComment(commentId: string, newText: string): Promise<D
 }
 
 export async function deleteComment(commentId: string): Promise<void> {
-  const childComments = (await pg(TABLE).where('parent_comment_id', commentId)) as DecklistComment[]
+  const childComments = await pg(TABLE).where('parent_comment_id', commentId)
   for (const comment of childComments) {
     await deleteComment(comment.id)
   }
-  return pg(TABLE).where('id', commentId).delete()
+  await pg(TABLE).where('id', commentId).delete()
 }

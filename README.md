@@ -2,7 +2,7 @@
 
 ## Prerequisites:
 To run the application you need:
-* Node version 18.0.0 or higher
+* Node version 26 or higher (pinned to 26.13.1 via Volta, `.nvmrc` and `.node-version`)
 * A local Postgres database
 
 ## Set Up:
@@ -10,9 +10,6 @@ To run the application you need:
 ### Install yarn globally
 ``` npm install yarn -g ```
 
-
-### Install react-scripts globally
-``` npm install react-scripts -g```
 
 ### Install backend packages
 ```yarn install```

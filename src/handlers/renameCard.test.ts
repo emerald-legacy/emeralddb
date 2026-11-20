@@ -1,56 +1,31 @@
+import '../testEnv'
 import test from 'ava'
-import type { Response } from 'express'
+import express from 'express'
 import type { Card } from '@5rdb/api'
+import { asyncHandler } from '../utils/asyncHandler'
+import { makeCard, sendRequest } from '../testUtils'
+import { handler } from './renameCard'
+// `import = require` keeps the module objects assignable, so the tests can stub their
+// exports. The handler sees the stubs through the re-exports in gateways/storage.
+import cardStore = require('../gateways/storage/private/card')
+import rulingStore = require('../gateways/storage/private/ruling')
+import cardInPackStore = require('../gateways/storage/private/card_in_pack')
+import decklistStore = require('../gateways/storage/private/decklist')
 
-process.env.DISCORD_CONFIG =
-  process.env.DISCORD_CONFIG || JSON.stringify({ clientId: '', botToken: '', isBotEnabled: false })
-
-interface CardStore {
-  getCard: (id: string) => Promise<Card | undefined>
-  insertOrUpdateCard: (card: Card) => Promise<Card>
-  deleteCard: (id: string) => Promise<void>
-}
-interface RulingStore {
-  getAllRulingsForCard: (id: string) => Promise<unknown[]>
-}
-interface CardInPackStore {
-  getAllCardVersions: (id: string) => Promise<unknown[]>
-}
-interface DecklistStore {
-  getAllDecklists: () => Promise<unknown[]>
-}
-
-const cardStore = require('../gateways/storage/private/card') as CardStore
-const rulingStore = require('../gateways/storage/private/ruling') as RulingStore
-const cardInPackStore = require('../gateways/storage/private/card_in_pack') as CardInPackStore
-const decklistStore = require('../gateways/storage/private/decklist') as DecklistStore
-const { handler } = require('./renameCard') as {
-  handler: (req: { body: Record<string, string> }, res: Response) => Promise<Card | undefined>
-}
-
-const existing = {
+const existing = makeCard({
   id: 'card-a',
   name: 'Old Name',
   name_extra: 'Old Extra',
   faction: 'crab',
   side: 'dynasty',
   type: 'character',
-} as unknown as Card
+})
 
-function makeRes() {
-  const statusCalls: number[] = []
-  const sendCalls: unknown[] = []
-  const res = {
-    status(code: number) {
-      statusCalls.push(code)
-      return res
-    },
-    send(payload: unknown) {
-      sendCalls.push(payload)
-      return res
-    },
-  } as unknown as Response
-  return { res, statusCalls, sendCalls }
+function rename(body: Record<string, string>) {
+  const app = express()
+  app.use(express.json())
+  app.post('/rename', asyncHandler(handler))
+  return sendRequest(app, 'POST', '/rename', body)
 }
 
 test.serial('in-place edit keeps the id, updates name, and never deletes the card', async (t) => {
@@ -65,26 +40,20 @@ test.serial('in-place edit keeps the id, updates name, and never deletes the car
     deleted.push(id)
   }
 
-  const { res, statusCalls } = makeRes()
-  const result = await handler(
-    {
-      body: {
-        existingCardId: 'card-a',
-        newCardId: 'card-a',
-        name: 'New Name',
-        nameExtra: 'New Extra',
-      },
-    },
-    res
-  )
+  const response = await rename({
+    existingCardId: 'card-a',
+    newCardId: 'card-a',
+    name: 'New Name',
+    nameExtra: 'New Extra',
+  })
 
   t.is(inserted.length, 1)
   t.is(inserted[0].id, 'card-a')
   t.is(inserted[0].name, 'New Name')
   t.is(inserted[0].name_extra, 'New Extra')
   t.deepEqual(deleted, [], 'in-place edit must not delete the card')
-  t.deepEqual(statusCalls, [])
-  t.is(result?.id, 'card-a')
+  t.is(response.status, 200)
+  t.like(response.body, { id: 'card-a' })
 })
 
 test.serial('renaming onto a different existing card is rejected with 400', async (t) => {
@@ -103,17 +72,17 @@ test.serial('renaming onto a different existing card is rejected with 400', asyn
     deleted.push(id)
   }
 
-  const { res, statusCalls, sendCalls } = makeRes()
-  const result = await handler(
-    { body: { existingCardId: 'card-a', newCardId: 'card-b', name: 'X', nameExtra: '' } },
-    res
-  )
+  const response = await rename({
+    existingCardId: 'card-a',
+    newCardId: 'card-b',
+    name: 'X',
+    nameExtra: '',
+  })
 
-  t.deepEqual(statusCalls, [400])
-  t.is(sendCalls.length, 1)
+  t.is(response.status, 400)
+  t.is(response.body, 'Card with id card-b already exists.')
   t.is(inserted.length, 0, 'must not write when the target id belongs to another card')
   t.deepEqual(deleted, [])
-  t.is(result, undefined)
 })
 
 test.serial('renaming a non-existent card is rejected with 400', async (t) => {
@@ -124,15 +93,15 @@ test.serial('renaming a non-existent card is rejected with 400', async (t) => {
     return card
   }
 
-  const { res, statusCalls } = makeRes()
-  const result = await handler(
-    { body: { existingCardId: 'nope', newCardId: 'x', name: 'X', nameExtra: '' } },
-    res
-  )
+  const response = await rename({
+    existingCardId: 'nope',
+    newCardId: 'x',
+    name: 'X',
+    nameExtra: '',
+  })
 
-  t.deepEqual(statusCalls, [400])
+  t.is(response.status, 400)
   t.is(inserted, 0)
-  t.is(result, undefined)
 })
 
 test.serial(
@@ -152,16 +121,17 @@ test.serial(
     cardInPackStore.getAllCardVersions = async () => []
     decklistStore.getAllDecklists = async () => []
 
-    const { res, statusCalls } = makeRes()
-    const result = await handler(
-      { body: { existingCardId: 'card-a', newCardId: 'card-b', name: 'New', nameExtra: '' } },
-      res
-    )
+    const response = await rename({
+      existingCardId: 'card-a',
+      newCardId: 'card-b',
+      name: 'New',
+      nameExtra: '',
+    })
 
     t.is(inserted.length, 1)
     t.is(inserted[0].id, 'card-b')
     t.deepEqual(deleted, ['card-a'], 'old card is removed after migration')
-    t.deepEqual(statusCalls, [])
-    t.is(result?.id, 'card-b')
+    t.is(response.status, 200)
+    t.like(response.body, { id: 'card-b' })
   }
 )

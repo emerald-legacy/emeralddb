@@ -3,6 +3,7 @@ import Joi from 'joi'
 import { Response } from 'express'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Decklist, Decklists$publish } from '@5rdb/api'
+import { getUserId } from '../utils/getUserId'
 
 export const schema = {
   body: Joi.object<Decklists$publish['request']['params']>({
@@ -19,11 +20,15 @@ export async function handler(
     res.sendStatus(404)
     return
   }
-  const user = (req as any).auth as { sub: string }
-  if (user.sub !== decklist.user_id) {
+  const userId = getUserId(req)
+  if (userId !== decklist.user_id) {
     res.sendStatus(403)
     return
   }
-  console.log(`Unpublish decklist ${decklist.id} for user ${user.sub}!`)
-  return await unpublishDecklist(req.params.decklistId)
+  console.log(`Unpublish decklist ${decklist.id} for user ${userId}!`)
+  const unpublished = await unpublishDecklist(req.params.decklistId)
+  if (!unpublished) {
+    res.sendStatus(404)
+  }
+  return unpublished
 }

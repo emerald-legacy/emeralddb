@@ -3,6 +3,7 @@ import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Decklist } from '@5rdb/api'
 import { resolveCardPackIds } from './resolveCardPackIds'
+import { getUserId } from '../utils/getUserId'
 
 export const schema = {
   body: Joi.object<Decklist & { username?: string }>({
@@ -26,13 +27,13 @@ export const schema = {
 }
 
 export async function handler(req: ValidatedRequest<typeof schema>): Promise<Decklist | undefined> {
-  const user = (req as any).auth as { sub: string }
-  console.log('Create decklist for user ' + user.sub)
+  const userId = getUserId(req)
+  console.log('Create decklist for user ' + userId)
 
   let cardPackIds = req.body.card_pack_ids
   if (!cardPackIds) {
     cardPackIds = await resolveCardPackIds(Object.keys(req.body.cards), req.body.format)
   }
 
-  return await insertDecklist({ ...req.body, card_pack_ids: cardPackIds, user_id: user.sub })
+  return await insertDecklist({ ...req.body, card_pack_ids: cardPackIds, user_id: userId })
 }

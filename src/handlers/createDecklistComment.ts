@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import { DecklistComment, DecklistComments$create } from '@5rdb/api'
 import { insertComment } from '../gateways/storage'
+import { getUserId } from '../utils/getUserId'
 
 export const schema = {
   body: Joi.object<DecklistComments$create['request']['body']>({
@@ -14,11 +15,11 @@ export const schema = {
 export async function handler(
   req: ValidatedRequest<typeof schema>
 ): Promise<DecklistComment | undefined> {
-  const user = (req as any).auth as { sub: string }
+  const userId = getUserId(req)
   return insertComment({
     comment: req.body.comment,
     decklist_id: req.body.decklist_id,
     parent_comment_id: req.body.parent_comment_id,
-    user_id: user.sub,
+    user_id: userId,
   })
 }

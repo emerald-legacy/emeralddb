@@ -1,51 +1,29 @@
+import '../testEnv'
 import test from 'ava'
-import type { NextFunction, Request, Response } from 'express'
 import { validate } from '../middlewares/validator'
+import { schema as renameSchema } from './renameCard'
+import { schema as deleteSchema } from './deleteCard'
+import { schema as createSchema } from './createCard'
+import { schema as updateSchema } from './updateCard'
 
-process.env.DISCORD_CONFIG =
-  process.env.DISCORD_CONFIG || JSON.stringify({ clientId: '', botToken: '', isBotEnabled: false })
-
-const { schema: renameSchema } = require('./renameCard')
-const { schema: deleteSchema } = require('./deleteCard')
-const { schema: createSchema } = require('./createCard')
-const { schema: updateSchema } = require('./updateCard')
-
-interface ResSpy {
-  res: Response
-  statusCalls: number[]
-  sendCalls: unknown[]
-}
-
-function makeResSpy(): ResSpy {
+function runValidation(schema: Parameters<typeof validate>[0], body: unknown) {
   const statusCalls: number[] = []
   const sendCalls: unknown[] = []
   const res = {
     status(code: number) {
       statusCalls.push(code)
-      return res
+      return {
+        send(payload: unknown) {
+          sendCalls.push(payload)
+        },
+      }
     },
-    send(payload: unknown) {
-      sendCalls.push(payload)
-      return res
-    },
-  } as unknown as Response
-  return { res, statusCalls, sendCalls }
-}
-
-function makeNextSpy(): { next: NextFunction; state: { calls: number } } {
-  const state = { calls: 0 }
-  const next = (() => {
-    state.calls += 1
-  }) as unknown as NextFunction
-  return { next, state }
-}
-
-function runValidation(schema: Parameters<typeof validate>[0], body: unknown) {
-  const req = { body, query: {} } as unknown as Request
-  const { res, statusCalls, sendCalls } = makeResSpy()
-  const nextSpy = makeNextSpy()
-  validate(schema)(req, res, nextSpy.next)
-  return { statusCalls, sendCalls, nextCalls: nextSpy.state.calls, req }
+  }
+  let nextCalls = 0
+  validate(schema)({ body, query: {} }, res, () => {
+    nextCalls += 1
+  })
+  return { statusCalls, sendCalls, nextCalls }
 }
 
 test('rename: empty nameExtra is accepted (regression for the 400 bug)', (t) => {
