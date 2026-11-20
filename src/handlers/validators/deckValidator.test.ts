@@ -12,10 +12,12 @@ import formatStore = require('../../gateways/storage/private/formats')
 const emerald: Format = {
   id: 'emerald',
   name: 'Emerald Legacy',
-  legal_packs: ['core'],
+  legal_packs: ['core', 'expansion'],
   supported: true,
   position: 1,
 }
+// Rotation only applies to Emerald Legacy
+const obsidian: Format = { ...emerald, id: 'obsidian', name: 'Obsidian Heresy' }
 
 function crabCard(overrides: Partial<Card> & Pick<Card, 'id' | 'type' | 'side'>): Card {
   return makeCard({ name: overrides.id, faction: 'crab', allowed_clans: ['crab'], ...overrides })
@@ -51,6 +53,13 @@ const holdingLimitedToOne = crabCard({
   side: 'dynasty',
   deck_limit: 1,
 })
+// Its printings differ from 'core, not rotated', for the card pool tests
+const reprinted = crabCard({ id: 'reprinted', type: 'character', side: 'conflict' })
+const reprintedPrintings: CardInPack[] = [
+  // Rotated in a legal pack, not rotated in a pack outside the format
+  { card_id: 'reprinted', pack_id: 'core', rotated: true },
+  { card_id: 'reprinted', pack_id: 'old-pack', rotated: false },
+]
 const allCards = [
   stronghold,
   role,
@@ -58,13 +67,19 @@ const allCards = [
   ...dynastyCharacters,
   ...conflictCharacters,
   holdingLimitedToOne,
+  reprinted,
 ]
 
-function stubStores() {
+function stubStores(extraPrintings: CardInPack[] = [], formats: Format[] = [emerald, obsidian]) {
   cardStore.getAllCards = async () => allCards
-  cardInPackStore.getAllCardsInPacks = async () =>
-    allCards.map((card): CardInPack => ({ card_id: card.id, pack_id: 'core', rotated: false }))
-  formatStore.getAllFormats = async () => [emerald]
+  cardInPackStore.getAllCardsInPacks = async () => [
+    ...allCards
+      .filter((card) => card.id !== reprinted.id)
+      .map((card): CardInPack => ({ card_id: card.id, pack_id: 'core', rotated: false })),
+    ...reprintedPrintings,
+    ...extraPrintings,
+  ]
+  formatStore.getAllFormats = async () => formats
 }
 
 function validDeck(): Record<string, number> {
@@ -75,6 +90,13 @@ function validDeck(): Record<string, number> {
     ...Object.fromEntries(dynastyCharacters.map((card) => [card.id, 3])),
     ...Object.fromEntries(conflictCharacters.map((card) => [card.id, 3])),
   }
+}
+
+// The base deck with one conflict character swapped for the reprinted card
+function deckWithReprintedCard(): Record<string, number> {
+  const deck = validDeck()
+  delete deck['conflict-0']
+  return { ...deck, [reprinted.id]: 3 }
 }
 
 test.serial('the base deck is valid', async (t) => {
@@ -135,4 +157,40 @@ test.serial('other cards may appear three times, not four', async (t) => {
   const { valid, errors } = await isDeckValid({ ...validDeck(), 'conflict-0': 4 }, 'emerald')
   t.false(valid)
   t.true(errors.some((error) => error.includes('conflict-0 (at most 3)')))
+})
+
+// --- card pool ---------------------------------------------------------------------------
+
+const outOfPool = "The deck contains cards from packs that aren't legal in the format: reprinted"
+
+test.serial(
+  'a card whose only legal printing is rotated is out of the Emerald pool (regression)',
+  async (t) => {
+    // The old server rule took "some printing in a legal pack" and "not all printings
+    // rotated" from different printings, and accepted this card
+    stubStores()
+    const { valid, errors } = await isDeckValid(deckWithReprintedCard(), 'emerald')
+    t.false(valid)
+    t.true(errors.includes(outOfPool))
+  }
+)
+
+test.serial('rotation only applies to Emerald Legacy', async (t) => {
+  stubStores()
+  t.deepEqual(await isDeckValid(deckWithReprintedCard(), 'obsidian'), {
+    valid: true,
+    errors: [],
+  })
+})
+
+test.serial('a card is in the pool if one printing is legal and not rotated', async (t) => {
+  stubStores([{ card_id: 'reprinted', pack_id: 'expansion', rotated: false }])
+  t.deepEqual(await isDeckValid(deckWithReprintedCard(), 'emerald'), { valid: true, errors: [] })
+})
+
+test.serial('a card without a printing in a legal pack is out of the pool', async (t) => {
+  stubStores([], [{ ...obsidian, legal_packs: ['expansion'] }])
+  const { valid, errors } = await isDeckValid(deckWithReprintedCard(), 'obsidian')
+  t.false(valid)
+  t.true(errors.some((error) => error.includes('reprinted')))
 })

@@ -341,6 +341,18 @@ export const cardsThatModifyInfluence: { id: string; modifier: number }[] = [
   { id: 'yatakabune-port', modifier: 4 },
 ]
 
+/**
+ * A card is in a format's pool if one of its printings is in a legal pack and, in Emerald
+ * Legacy, not rotated. Rotation only applies to Emerald Legacy.
+ */
+function isInCardPool(card: CardWithVersions, format: Format): boolean {
+  const legalPacks = format.legal_packs || []
+  return card.versions.some(
+    (version) =>
+      legalPacks.includes(version.pack_id) && (format.id !== 'emerald' || !version.rotated)
+  )
+}
+
 function createDeckStatistics(
   cards: Record<string, number>,
   format: Format,
@@ -349,12 +361,6 @@ function createDeckStatistics(
   const formatId = format.id
   const { strongholds, provinces, roles, conflictCards, dynastyCards, allDeckCards } =
     splitCardsToDecks(cards || {}, allCardsWithVersions)
-  const allIllegalCardIds = allCardsWithVersions
-    .filter((c) => !c.versions.some((v) => (format.legal_packs || []).includes(v.pack_id)))
-    .map((c) => c.id)
-  const allRotatedCardIds = allCardsWithVersions
-    .filter((c) => !c.versions.some((v) => !v.rotated))
-    .map((c) => c.id)
   const dynastyCardsWrapper = splitDynastyCards(dynastyCards)
   const conflictCardsWrapper = splitConflictCards(conflictCards)
   const stronghold = strongholds.length > 0 ? strongholds[0] : null
@@ -390,8 +396,7 @@ function createDeckStatistics(
     .reduce((a, b) => a + b, 0)
   const bannedCards = allDeckCards.filter((c) => c.banned_in?.includes(formatId))
   const restrictedCards = allDeckCards.filter((c) => c.restricted_in?.includes(formatId))
-  const illegalCards = allDeckCards.filter((c) => allIllegalCardIds.includes(c.id))
-  const rotatedCards = allDeckCards.filter((c) => allRotatedCardIds.includes(c.id))
+  const rotatedCards = allDeckCards.filter((c) => !isInCardPool(c, format))
 
   const deckMaximum =
     formatId === 'skirmish' ? 35 : formatId === 'obsidian' ? 45 + numberOfRallyCards : 45
@@ -422,8 +427,7 @@ function createDeckStatistics(
     secondaryClan: secondaryClan,
     bannedCards: bannedCards,
     restrictedCards: restrictedCards,
-    rotatedCards:
-      formatId === 'emerald' ? lodash.uniq([...illegalCards, ...rotatedCards]) : illegalCards,
+    rotatedCards: rotatedCards,
     validationErrors: [],
   }
 
