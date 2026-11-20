@@ -135,6 +135,14 @@ test('importPack rejects a missing required array', (t) => {
 
 test('updateCardsInPack accepts a cardsInPacks array', (t) => {
   assertAccepted(t, updateCardsInPackSchema, { cardsInPacks: [] })
+  assertAccepted(t, updateCardsInPackSchema, {
+    cardsInPacks: [{ card_id: 'c', pack_id: 'p', quantity: 3, position: '1' }],
+  })
+})
+
+test('updateCardsInPack rejects a missing array and entries without ids', (t) => {
+  assertRejected(t, updateCardsInPackSchema, {}, 'missing cardsInPacks')
+  assertRejected(t, updateCardsInPackSchema, { cardsInPacks: [{ card_id: 'c' }] }, 'no pack_id')
 })
 
 test('updateCardInPack accepts a wrapped cardInPack with empty strings', (t) => {

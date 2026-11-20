@@ -15,10 +15,15 @@ export const schema = {
 }
 
 export async function handler(
-  req: ValidatedRequest<typeof schema>,
+  req: ValidatedRequest<typeof schema, Ruling$update['request']['params']>,
   res: Express.Response
 ): Promise<Ruling | undefined> {
-  const ruling = getRuling(req.body.id)
+  if (String(req.body.id) !== req.params.rulingId) {
+    res.status(400).send({ message: ['The ruling id in the URL and in the body differ'] })
+    return
+  }
+  // Without this check the upsert below would create a ruling under an unknown id
+  const ruling = await getRuling(req.body.id)
   if (!ruling) {
     res.status(404).send()
     return

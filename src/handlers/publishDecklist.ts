@@ -1,19 +1,11 @@
 import { getDecklist, publishDecklist } from '../gateways/storage/index'
-import Joi from 'joi'
-import { Response } from 'express'
-import { ValidatedRequest } from '../middlewares/validator'
+import { Request, Response } from 'express'
 import { Decklist, Decklists$publish } from '@5rdb/api'
 import { isDeckValid } from './validators/deckValidator'
 import { getUserId } from '../utils/getUserId'
 
-export const schema = {
-  body: Joi.object<Decklists$publish['request']['params']>({
-    decklistId: Joi.string().required(),
-  }),
-}
-
 export async function handler(
-  req: ValidatedRequest<typeof schema>,
+  req: Request<Decklists$publish['request']['params']>,
   res: Response
 ): Promise<Decklist | undefined> {
   const decklist = await getDecklist(req.params.decklistId)
