@@ -233,7 +233,10 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
       const deckId = await saveDecklist(deckApi, decklistToSave, props.existingDecklist?.deck_id)
       // /decklists/{deckId} resolves to the latest version of the deck
       await refreshCache(`/decks/${deckId}`, `/decklists/${deckId}`)
-      setDecklist({ ...decklist, version_number: getNextVersionNumber(decklist.version_number) })
+      // The next save is the next version; "Custom Version" starts from it as well
+      const nextVersion = getNextVersionNumber(decklist.version_number)
+      setDecklist({ ...decklist, version_number: nextVersion })
+      setNewVersion(nextVersion)
       navigate(`/builder/${deckId}/edit`)
       enqueueSnackbar('Successfully saved deck', { variant: 'success' })
       setVersionModalOpen(false)
