@@ -1,4 +1,5 @@
-import { insertDecklist } from '../gateways/storage/index'
+import { getDeck, insertDecklist } from '../gateways/storage/index'
+import { Response } from 'express'
 import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Decklist, Decklists$create } from '@5rdb/api'
@@ -19,8 +20,21 @@ export const schema = {
   }),
 }
 
-export async function handler(req: ValidatedRequest<typeof schema>): Promise<Decklist | undefined> {
+export async function handler(
+  req: ValidatedRequest<typeof schema>,
+  res: Response
+): Promise<Decklist | undefined> {
   const userId = getUserId(req)
+  // A new version can only be added to one's own deck
+  const deck = await getDeck(req.body.deck_id)
+  if (!deck) {
+    res.sendStatus(404)
+    return
+  }
+  if (deck.user_id !== userId) {
+    res.sendStatus(403)
+    return
+  }
   console.log('Create decklist for user ' + userId)
 
   let cardPackIds = req.body.card_pack_ids
