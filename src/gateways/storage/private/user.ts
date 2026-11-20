@@ -7,12 +7,19 @@ export async function getUser(id: string): Promise<User | undefined> {
   return pg(TABLE).where('id', id).first()
 }
 
+/**
+ * Inserts the user, or returns the existing one unchanged. Two first requests of a new
+ * user can race in getOrInsertDBUser; the second must not reset name and roles.
+ */
 export async function insertUser(user: User): Promise<User> {
-  const [row] = await pg(TABLE)
+  await pg(TABLE)
     .insert({ ...user })
     .onConflict('id')
-    .merge()
-    .returning('*')
+    .ignore()
+  const row = await getUser(user.id)
+  if (!row) {
+    throw new Error(`User ${user.id} was neither inserted nor found`)
+  }
   return row
 }
 
