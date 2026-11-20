@@ -3,6 +3,7 @@ import test from 'ava'
 import type { Card, CardInPack, Format } from '@5rdb/api'
 import { makeCard } from '../../testUtils'
 import { isDeckValid } from './deckValidator'
+import { clearValidationData } from './validationData'
 // `import = require` keeps the module objects assignable, so the tests can stub their
 // exports. isDeckValid sees the stubs through the re-exports in gateways/storage.
 import cardStore = require('../../gateways/storage/private/card')
@@ -80,6 +81,8 @@ function stubStores(extraPrintings: CardInPack[] = [], formats: Format[] = [emer
     ...extraPrintings,
   ]
   formatStore.getAllFormats = async () => formats
+  // The stubs replace the data, so the cached copy must go
+  clearValidationData()
 }
 
 function validDeck(): Record<string, number> {

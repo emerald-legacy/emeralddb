@@ -1,6 +1,6 @@
 import { CardWithVersions, Format } from '@5rdb/api'
 import lodash from 'lodash'
-import { getAllCards, getAllCardsInPacks, getAllFormats } from '../../gateways/storage/index'
+import { getValidationData } from './validationData'
 
 export type CardWithQuantity = CardWithVersions & {
   quantity: number
@@ -69,7 +69,10 @@ function extractPrimaryClan(
   return primaryClan
 }
 
-function splitCardsToDecks(cards: Record<string, number>, allCards: CardWithVersions[]): DeckCards {
+function splitCardsToDecks(
+  cards: Record<string, number>,
+  allCards: readonly CardWithVersions[]
+): DeckCards {
   const strongholds: CardWithQuantity[] = []
   const roles: CardWithQuantity[] = []
   const provinces: CardWithQuantity[] = []
@@ -356,7 +359,7 @@ function isInCardPool(card: CardWithVersions, format: Format): boolean {
 function createDeckStatistics(
   cards: Record<string, number>,
   format: Format,
-  allCardsWithVersions: CardWithVersions[]
+  allCardsWithVersions: readonly CardWithVersions[]
 ): DeckStatistics {
   const formatId = format.id
   const { strongholds, provinces, roles, conflictCards, dynastyCards, allDeckCards } =
@@ -440,19 +443,7 @@ export async function isDeckValid(
   cards: Record<string, number>,
   formatId: string
 ): Promise<{ valid: boolean; errors: string[] }> {
-  const allCards = await getAllCards()
-  const allFormats = await getAllFormats()
-  const allCardsWithVersions: CardWithVersions[] = allCards.map((card) => ({
-    ...card,
-    versions: [],
-  }))
-
-  const allCardsInPacks = await getAllCardsInPacks()
-  allCardsInPacks.forEach((cardInPack) =>
-    allCardsWithVersions
-      .find((card) => card.id === cardInPack.card_id)
-      ?.versions.push({ ...cardInPack })
-  )
+  const { cards: allCardsWithVersions, formats: allFormats } = await getValidationData()
   const format = allFormats.find((format) => format.id === formatId)
   if (!format) {
     return {
