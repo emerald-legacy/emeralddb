@@ -455,7 +455,11 @@ export async function validateDeck(
       errors: ['Illegal format supplied'],
     }
   }
-  const stats = createDeckStatistics(cards, format, allCardsWithVersions)
+  // A card with 0 copies isn't in the deck
+  const cardsInDeck = Object.fromEntries(
+    Object.entries(cards).filter(([, quantity]) => quantity > 0)
+  )
+  const stats = createDeckStatistics(cardsInDeck, format, allCardsWithVersions)
   const validationErrors = stats.validationErrors
   const copies = Object.values(cards).reduce((sum, quantity) => sum + quantity, 0)
   debugLog(

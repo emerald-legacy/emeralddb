@@ -259,3 +259,11 @@ test.serial('an unknown format has no statistics', async (t) => {
     errors: ['Illegal format supplied'],
   })
 })
+
+test.serial('cards with 0 copies are ignored', async (t) => {
+  stubStores()
+  t.like(await validateDeck({ ...validDeck(), [supportRole.id]: 0 }, 'emerald'), {
+    valid: true,
+    errors: [],
+  })
+})

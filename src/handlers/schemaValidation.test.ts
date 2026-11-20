@@ -246,6 +246,16 @@ test('createDecklist rejects an unknown key', (t) => {
   })
 })
 
+test('createDecklist rejects fractional quantities', (t) => {
+  assertRejected(t, createDecklistSchema, {
+    deck_id: 'deck-1',
+    format: 'standard',
+    name: 'D',
+    version_number: '0.1',
+    cards: { 'some-card': 1.5 },
+  })
+})
+
 test('createDecklist rejects card quantities above 3', (t) => {
   assertRejected(t, createDecklistSchema, {
     deck_id: 'deck-1',
@@ -260,6 +270,31 @@ test('createDecklist rejects card quantities above 3', (t) => {
 
 test('validateDecklist accepts cards + format', (t) => {
   assertAccepted(t, validateDecklistSchema, { cards: {}, format: 'standard' })
+})
+
+test('validateDecklist accepts any number of copies a deck builder can send', (t) => {
+  assertAccepted(t, validateDecklistSchema, {
+    cards: { 'a-card': 0, 'b-card': 3, 'c-card': 4, 'd-card': 10 },
+    format: 'emerald',
+  })
+})
+
+test('validateDecklist rejects quantities no deck can have', (t) => {
+  for (const quantity of [1.5, -1, 11, 'three']) {
+    assertRejected(
+      t,
+      validateDecklistSchema,
+      { cards: { 'a-card': quantity }, format: 'emerald' },
+      String(quantity)
+    )
+  }
+})
+
+test('validateDecklist rejects more than 200 different cards', (t) => {
+  const cards = (count: number) =>
+    Object.fromEntries(Array.from({ length: count }, (_, index) => [`card-${index}`, 1]))
+  assertAccepted(t, validateDecklistSchema, { cards: cards(200), format: 'emerald' })
+  assertRejected(t, validateDecklistSchema, { cards: cards(201), format: 'emerald' })
 })
 
 test('validateDecklist rejects a missing format', (t) => {

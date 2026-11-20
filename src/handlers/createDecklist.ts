@@ -15,7 +15,7 @@ export const schema = {
     secondary_clan: Joi.string().allow('', null),
     description: Joi.string().allow('', null),
     version_number: Joi.string().required(),
-    cards: Joi.object().pattern(Joi.string(), Joi.number().min(1).max(3)).required(),
+    cards: Joi.object().pattern(Joi.string(), Joi.number().integer().min(1).max(3)).required(),
     card_pack_ids: Joi.object().pattern(Joi.string(), Joi.string()),
   }),
 }
