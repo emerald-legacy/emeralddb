@@ -7,7 +7,8 @@ import { useCurrentUser } from '../../providers/UserProvider'
 import { CardLink } from '../card/CardLink'
 import { InfluenceElement } from '../card/InfluenceElement'
 import { useSnackbar } from 'notistack'
-import { CardWithQuantity, createDeckStatistics } from './DeckValidator'
+import { CardWithQuantity, createDeckStatistics } from './deckStatistics'
+import { useDeckValidation } from '../../hooks/useDeckValidation'
 import { CardQuantitySelector } from '../builder/CardQuantitySelector'
 import { Loading } from '../Loading'
 import { useState, type JSX } from 'react'
@@ -158,6 +159,10 @@ export function Decklist(props: {
   const [sortConfByName, setSortConfByName] = useState(false)
   const navigate = useNavigate()
   const { decklist } = props
+  const { validation, failed: validationFailed } = useDeckValidation(
+    decklist.cards,
+    decklist.format
+  )
 
   if (cards.length === 0) {
     return <Loading />
@@ -179,20 +184,23 @@ export function Decklist(props: {
       })
   }
 
-  const stats = createDeckStatistics(decklist.cards, decklist.format, cards, formats)
+  const stats = createDeckStatistics(decklist.cards, decklist.format, cards)
   const { dynastyCharacters, dynastyEvents, holdings } = stats.dynastyCards
   const { conflictCharacters, conflictEvents, attachments } = stats.conflictCards
 
-  const illegalDynastySize =
-    stats.dynastyCards.size < stats.dynastyDeckMinimum ||
-    stats.dynastyCards.size > stats.deckMaximum
-  const illegalConflictSize =
-    stats.conflictCards.size < stats.conflictDeckMinimum ||
-    stats.conflictCards.size > stats.deckMaximum
+  // Errors and limits come from the server, which holds the rules
+  const errors = validationFailed
+    ? ['The deck could not be validated. Please try again later.']
+    : (validation?.errors ?? [])
+  const limits = validation?.statistics
+  const isOutside = (size: number, limit: { minimum: number; maximum: number } | undefined) =>
+    limit !== undefined && (size < limit.minimum || size > limit.maximum)
+  const illegalDynastySize = isOutside(stats.dynastyCards.size, limits?.dynastyDeck)
+  const illegalConflictSize = isOutside(stats.conflictCards.size, limits?.conflictDeck)
 
   return (
     <Grid container spacing={2}>
-      <Grid hidden={stats.validationErrors.length === 0} size={12}>
+      <Grid hidden={errors.length === 0} size={12}>
         <Box
           sx={{
             p: 1,
@@ -203,7 +211,7 @@ export function Decklist(props: {
             fontSize: 12,
           }}
         >
-          {stats.validationErrors.map((error) => (
+          {errors.map((error) => (
             <Typography variant="caption" key={error}>
               {error}
               <br />
@@ -298,7 +306,7 @@ export function Decklist(props: {
             )}
           </Grid>
           <Grid>
-            Influence: {stats.usedInfluence}/{stats.maxInfluence}
+            Influence: {limits ? `${limits.influence.used}/${limits.influence.maximum}` : '…'}
           </Grid>
         </Grid>
       </Grid>
@@ -307,7 +315,9 @@ export function Decklist(props: {
           <b>Dynasty Cards ({stats.dynastyCards.size})</b>
         </Typography>
         <Typography variant="subtitle2">
-          Minimum: {stats.dynastyDeckMinimum}, Maximum: {stats.deckMaximum}
+          {limits
+            ? `Minimum: ${limits.dynastyDeck.minimum}, Maximum: ${limits.dynastyDeck.maximum}`
+            : '…'}
         </Typography>
         <Grid
           component="label"
@@ -360,7 +370,9 @@ export function Decklist(props: {
           <b>Conflict Cards ({stats.conflictCards.size})</b>
         </Typography>
         <Typography variant="subtitle2">
-          Minimum: {stats.conflictDeckMinimum}, Maximum: {stats.deckMaximum}
+          {limits
+            ? `Minimum: ${limits.conflictDeck.minimum}, Maximum: ${limits.conflictDeck.maximum}`
+            : '…'}
         </Typography>
         <Grid
           component="label"

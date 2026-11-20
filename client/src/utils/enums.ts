@@ -109,7 +109,3 @@ export function sidesForType(type: string): string[] {
   }
   return []
 }
-
-export const cardsThatModifyInfluence: { id: string; modifier: number }[] = [
-  { id: 'yatakabune-port', modifier: 4 },
-]

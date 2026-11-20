@@ -23,6 +23,7 @@ import type {
   Decklists$findAllPublished,
   Decklists$publish,
   Decklists$unpublish,
+  Decklists$validate,
   Decks$create,
   Decks$delete,
   Decks$find,
@@ -227,6 +228,8 @@ export const publicApi = {
   Decklist: {
     find: endpoint<Decklists$find>('GET', '/decklists/{decklistId}'),
     findPublished: endpoint<Decklists$findAllPublished>('GET', '/decklists'),
+    // Public, but a POST: the deck is sent in the body
+    validate: endpoint<Decklists$validate>('POST', '/decklists/validate'),
     findComments: endpoint<DecklistComments$findForDecklist>(
       'GET',
       '/decklists/{decklistId}/comments'
