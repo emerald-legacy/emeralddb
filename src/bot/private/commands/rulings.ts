@@ -103,6 +103,12 @@ export const command: Command = {
       }
 
       const rulings = await getAllRulingsForCard(result.card.id)
+      if (rulings.length === 0) {
+        return interaction.reply({
+          ephemeral: true,
+          content: `There are no rulings for ${result.card.name} yet.`,
+        })
+      }
       /**
        * We're sending each ruling as a separate reply using embeds.
        *
