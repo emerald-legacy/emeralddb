@@ -28,6 +28,7 @@ import { VersionPicker } from './VersionPicker'
 import { EmeraldDBLink } from '../EmeraldDBLink'
 import { DeckStatistics } from './DeckStatistics'
 import { DeckApi, DecklistToSave, saveDecklist } from './saveDecklist'
+import { withCardQuantity } from './cardQuantities'
 
 const deckApi: DeckApi = {
   createDeck: () => privateApi.Deck.create({ body: {} }).then((response) => response.data()),
@@ -244,14 +245,9 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
     }
   }
 
+  // Like a change in the card picker: the clans follow the cards
   function changeCardQuantity(cardId: string, quantity: number) {
-    const selectedCards = decklist.cards
-    if (quantity > 0) {
-      selectedCards[cardId] = quantity
-    } else {
-      delete selectedCards[cardId]
-    }
-    setDecklist({ ...decklist, cards: selectedCards })
+    setDeckListFromNewCards(withCardQuantity(decklist.cards, cardId, quantity))
   }
 
   return (
