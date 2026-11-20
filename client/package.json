@@ -34,8 +34,7 @@
     "start": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src",
-    "heroku-prebuild": "yarn install"
+    "lint": "eslint src"
   },
   "dependenciesMeta": {
     "browser-tabs-lock": {

@@ -1,0 +1,9 @@
+{
+  // Development scripts (yarn import:prod). Not part of the production build in dist/.
+  "extends": "./tsconfig.json",
+  "include": ["src/scripts/*.ts", "src/typings/*.ts"],
+  "compilerOptions": {
+    "outDir": ".scripts-build",
+    "tsBuildInfoFile": ".scripts-build/tsconfig.tsbuildinfo"
+  }
+}

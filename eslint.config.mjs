@@ -44,6 +44,7 @@ export default [
     ignores: [
       'dist/**',
       '.ava-build/**',
+      '.scripts-build/**',
       'public/**',
       'node_modules/**',
       'client/build/**',

@@ -1,5 +1,5 @@
 {
-  "include": ["src/index.ts","src/scripts/*.ts","src/typings/*.ts"],
+  "include": ["src/index.ts","src/typings/*.ts"],
   "compilerOptions": {
     "allowJs": false,
     "esModuleInterop": true,

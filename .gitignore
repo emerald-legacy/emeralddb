@@ -25,6 +25,7 @@ trash
 
 dist
 .ava-build
+.scripts-build
 
 .eslintcache
 
