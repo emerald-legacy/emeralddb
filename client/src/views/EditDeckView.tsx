@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router'
+import { Navigate, useParams } from 'react-router'
 import { DeckEditor } from '../components/builder/DeckEditor'
 import { latestDecklistForDeck } from '../components/deck/DecklistTabs'
 import { EmptyState } from '../components/EmptyState'
@@ -11,7 +11,6 @@ import type { JSX } from 'react'
 
 export function EditDeckView(): JSX.Element {
   const params = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const [data] = useDeck(params.id!)
   const { currentUser } = useCurrentUser()
 
@@ -26,8 +25,9 @@ export function EditDeckView(): JSX.Element {
   }
 
   const deck = data.data
-  if (!currentUser || deck?.user_id !== currentUser?.id) {
-    navigate(`/decks/${params.id!}`)
+  // The route is only rendered once the user has loaded (AuthenticatedRoute)
+  if (!currentUser || deck.user_id !== currentUser.id) {
+    return <Navigate to={`/decks/${params.id!}`} replace />
   }
 
   const latestDecklist = latestDecklistForDeck(deck)
