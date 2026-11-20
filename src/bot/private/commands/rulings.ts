@@ -28,26 +28,45 @@ function truncate(n: number, str: string): string {
   return subString.substring(0, subString.lastIndexOf(' ')) + '…'
 }
 
+// Discord rejects an embed whose URL isn't an http(s) URL
+function isWebLink(link: string | null | undefined): link is string {
+  if (!link) {
+    return false
+  }
+  try {
+    const { protocol } = new URL(link)
+    return protocol === 'http:' || protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 /**
+ * The link and the source of a ruling are optional; an empty one would make the embed
+ * invalid, so they are left out.
  *
  * @see https://discordjs.guide/popular-topics/embeds.html#embed-limits
  */
-const toEmbed =
+export const toEmbed =
   (card: CachedCard) =>
-  (ruling: RulingInput): EmbedBuilder =>
-    new EmbedBuilder()
+  (ruling: RulingInput): EmbedBuilder => {
+    const embed = new EmbedBuilder()
       .setColor(color(ruling))
       .setAuthor({
         name: truncate(256, card.name),
         url: `https://www.emeralddb.org/card/${card.id}`,
       })
       .setTitle(truncate(256, `Rulling #${ruling.id}`))
-      .setURL(ruling.link)
       .setThumbnail(card.image)
       .setDescription(truncate(4096, formatRulingText(ruling.text)))
-      .setFooter({
-        text: truncate(2048, ruling.source),
-      })
+    if (isWebLink(ruling.link)) {
+      embed.setURL(ruling.link)
+    }
+    if (ruling.source) {
+      embed.setFooter({ text: truncate(2048, ruling.source) })
+    }
+    return embed
+  }
 
 export const command: Command = {
   name,
