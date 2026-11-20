@@ -1,4 +1,4 @@
-import { CardWithVersions, Format } from '@5rdb/api'
+import { CardWithVersions, DeckValidation, Format } from '@5rdb/api'
 import lodash from 'lodash'
 import { getValidationData } from './validationData'
 import { debugLog } from '../../utils/debugLog'
@@ -440,10 +440,11 @@ function createDeckStatistics(
   return stats
 }
 
-export async function isDeckValid(
+/** Validates a deck against the rules of a format, see DeckValidation */
+export async function validateDeck(
   cards: Record<string, number>,
   formatId: string
-): Promise<{ valid: boolean; errors: string[] }> {
+): Promise<DeckValidation> {
   const startedAt = Date.now()
   const { cards: allCardsWithVersions, formats: allFormats } = await getValidationData()
   const format = allFormats.find((format) => format.id === formatId)
@@ -454,7 +455,8 @@ export async function isDeckValid(
       errors: ['Illegal format supplied'],
     }
   }
-  const { validationErrors } = createDeckStatistics(cards, format, allCardsWithVersions)
+  const stats = createDeckStatistics(cards, format, allCardsWithVersions)
+  const validationErrors = stats.validationErrors
   const copies = Object.values(cards).reduce((sum, quantity) => sum + quantity, 0)
   debugLog(
     `[validate] ${formatId}, ${copies} cards: ` +
@@ -465,5 +467,18 @@ export async function isDeckValid(
   return {
     valid: validationErrors.length === 0,
     errors: validationErrors,
+    statistics: {
+      influence: { used: stats.usedInfluence, maximum: stats.maxInfluence },
+      dynastyDeck: {
+        size: stats.dynastyCards.size,
+        minimum: stats.dynastyDeckMinimum,
+        maximum: stats.deckMaximum,
+      },
+      conflictDeck: {
+        size: stats.conflictCards.size,
+        minimum: stats.conflictDeckMinimum,
+        maximum: stats.deckMaximum,
+      },
+    },
   }
 }

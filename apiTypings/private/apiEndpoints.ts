@@ -9,6 +9,7 @@ import {
   CardInPack,
   Trait,
   Format,
+  DeckValidation,
 } from './baseTypes'
 import {
   CardWithVersions,
@@ -165,7 +166,7 @@ export interface Decklists$delete {
 
 export interface Decklists$validate {
   request: { body: { cards: Record<string, number>; format: string } }
-  response: { valid: boolean; errors: string[] }
+  response: DeckValidation
 }
 
 export interface Decklists$findAllPublished {
