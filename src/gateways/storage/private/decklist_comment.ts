@@ -29,7 +29,8 @@ export async function editComment(
   const now = new Date()
   const result = await pg(TABLE)
     .where('id', commentId)
-    .update({ comment: newText, edited_at: now }, '*')
+    .update({ comment: newText, edited_at: now })
+    .returning('*')
   return result[0]
 }
 

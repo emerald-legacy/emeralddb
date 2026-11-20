@@ -95,14 +95,18 @@ export interface Format {
 }
 
 export interface User {
+  // The Auth0 id. Only ever sent to the user themselves (/users/me), never in public responses
   id: string
+  // Stands for the user in public responses (owner_id, author_id); reveals nothing about the account
+  public_id: string
   name: string
   roles: string[]
 }
 
 export interface Deck {
   id: string
-  user_id: string
+  // The public_id of the user who owns the deck
+  owner_id: string
   forked_from?: string | undefined
 }
 
@@ -119,14 +123,16 @@ export interface Decklist {
   card_pack_ids?: Record<string, string> | undefined
   published_date?: Date | undefined
   created_at: Date
-  user_id: string
+  // The public_id of the user who owns the deck
+  owner_id: string
 }
 
 export interface DecklistComment {
   id: string
   decklist_id: string
   parent_comment_id?: string
-  user_id: string
+  // The public_id of the user who wrote the comment
+  author_id: string
   comment: string
   created_at: Date
   edited_at?: Date

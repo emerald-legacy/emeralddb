@@ -26,7 +26,7 @@ export function EditDeckView(): JSX.Element {
 
   const deck = data.data
   // The route is only rendered once the user has loaded (AuthenticatedRoute)
-  if (!currentUser || deck.user_id !== currentUser.id) {
+  if (!currentUser || deck.owner_id !== currentUser.public_id) {
     return <Navigate to={`/decks/${params.id!}`} replace />
   }
 

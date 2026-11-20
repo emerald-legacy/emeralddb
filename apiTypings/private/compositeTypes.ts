@@ -19,7 +19,7 @@ export type DecklistWithUser = Decklist & {
 
 export type DecklistViewModel = Omit<
   Decklist,
-  'deck_id' | 'created_at' | 'published_date' | 'user_id'
+  'deck_id' | 'created_at' | 'published_date' | 'owner_id'
 >
 
 export type PublishedDecklist = Pick<

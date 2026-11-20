@@ -34,14 +34,21 @@ declare module 'knex/types/tables' {
     cards_in_packs: CardInPack
     // rotated has a database default of false
     cycles: Knex.CompositeTableType<Cycle, CycleInput & { rotated?: boolean }, Partial<Cycle>>
-    decks: Deck
+    // Owners never change: the update types leave out owner_id and author_id
+    decks: Knex.CompositeTableType<Deck, Deck, Partial<Omit<Deck, 'id' | 'owner_id'>>>
     decklists: Knex.CompositeTableType<
       Decklist,
       Decklist,
       // unpublishDecklist resets published_date to NULL
-      Partial<Omit<Decklist, 'published_date'>> & { published_date?: Date | null }
+      Partial<Omit<Decklist, 'id' | 'deck_id' | 'owner_id' | 'published_date'>> & {
+        published_date?: Date | null
+      }
     >
-    decklist_comments: DecklistComment
+    decklist_comments: Knex.CompositeTableType<
+      DecklistComment,
+      DecklistComment,
+      Partial<Pick<DecklistComment, 'comment' | 'edited_at'>>
+    >
     formats: Knex.CompositeTableType<Format, FormatInput, Partial<FormatInput>>
     // size isn't stored, getAllPacks/getPack compute it from cards_in_packs
     packs: Knex.CompositeTableType<
@@ -51,6 +58,12 @@ declare module 'knex/types/tables' {
     >
     rulings: Ruling
     traits: Trait
-    users: User
+    // public_id has a database default (gen_random_uuid()) and never changes.
+    // Known mismatch: name and roles are nullable columns.
+    users: Knex.CompositeTableType<
+      User,
+      Omit<User, 'public_id'>,
+      Partial<Omit<User, 'id' | 'public_id'>>
+    >
   }
 }

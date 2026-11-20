@@ -1,17 +1,7 @@
-import {
-  getDeck,
-  getAllDecklistsForDeck,
-  getDecklist,
-  getUser,
-  getCards,
-} from '../gateways/storage/index'
+import { getDeck, getAllDecklistsForDeck, getDecklist, getCards } from '../gateways/storage/index'
 import { Request, Response } from 'express'
 import { Decklist, Decklists$find, DecklistWithUser, DecklistWithExtraInfo } from '@5rdb/api'
-
-export async function addUsernameToDecklist(decklist: Decklist): Promise<DecklistWithUser> {
-  const user = await getUser(decklist.user_id)
-  return { ...decklist, username: user?.name ?? 'Unknown user' }
-}
+import { withUsername } from '../utils/withUsernames'
 
 export async function handler(
   req: Request<Decklists$find['request']['params']>,
@@ -33,7 +23,7 @@ export async function handler(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     )[0]
   }
-  return addUsernameToDecklist(decklist)
+  return withUsername(decklist, 'owner_id')
 }
 
 export async function addExtraInfoToDecklist(decklist: Decklist): Promise<DecklistWithExtraInfo> {

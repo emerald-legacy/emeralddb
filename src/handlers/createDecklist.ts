@@ -4,7 +4,7 @@ import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Decklist, Decklists$create } from '@5rdb/api'
 import { resolveCardPackIds } from './resolveCardPackIds'
-import { getUserId } from '../utils/getUserId'
+import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export const schema = {
   body: Joi.object<Decklists$create['request']['body']>({
@@ -24,23 +24,27 @@ export async function handler(
   req: ValidatedRequest<typeof schema>,
   res: Response
 ): Promise<Decklist | undefined> {
-  const userId = getUserId(req)
+  const user = await requireCurrentUser(req)
   // A new version can only be added to one's own deck
   const deck = await getDeck(req.body.deck_id)
   if (!deck) {
     res.sendStatus(404)
     return
   }
-  if (deck.user_id !== userId) {
+  if (deck.owner_id !== user.public_id) {
     res.sendStatus(403)
     return
   }
-  console.log('Create decklist for user ' + userId)
+  console.log('Create decklist for user ' + user.public_id)
 
   let cardPackIds = req.body.card_pack_ids
   if (!cardPackIds) {
     cardPackIds = await resolveCardPackIds(Object.keys(req.body.cards), req.body.format)
   }
 
-  return await insertDecklist({ ...req.body, card_pack_ids: cardPackIds, user_id: userId })
+  return await insertDecklist({
+    ...req.body,
+    card_pack_ids: cardPackIds,
+    owner_id: user.public_id,
+  })
 }

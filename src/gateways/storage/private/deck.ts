@@ -13,8 +13,8 @@ export async function getDeck(deckId: string): Promise<Deck | undefined> {
   return pg(TABLE).where('id', deckId).first()
 }
 
-export async function getDecksForUser(userId: string): Promise<Deck[]> {
-  return pg(TABLE).where('user_id', userId)
+export async function getDecksForOwner(ownerId: string): Promise<Deck[]> {
+  return pg(TABLE).where('owner_id', ownerId)
 }
 
 export async function insertDeck(deck: Omit<Deck, 'id'>): Promise<Deck> {

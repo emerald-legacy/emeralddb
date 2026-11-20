@@ -2,7 +2,7 @@ import { insertDeck, getDecklist, insertDecklist } from '../gateways/storage'
 import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Deck, Decks$create } from '@5rdb/api'
-import { getUserId } from '../utils/getUserId'
+import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export const schema = {
   body: Joi.object<Decks$create['request']['body']>({
@@ -11,9 +11,9 @@ export const schema = {
 }
 
 export async function handler(req: ValidatedRequest<typeof schema>): Promise<Deck | undefined> {
-  const userId = getUserId(req)
-  console.log('Create deck for user ' + userId)
-  const deck = await insertDeck({ user_id: userId, forked_from: req.body?.forkedFrom })
+  const user = await requireCurrentUser(req)
+  console.log('Create deck for user ' + user.public_id)
+  const deck = await insertDeck({ owner_id: user.public_id, forked_from: req.body?.forkedFrom })
   if (req.body?.forkedFrom) {
     const decklist = await getDecklist(req.body?.forkedFrom)
     if (decklist) {
@@ -27,7 +27,7 @@ export async function handler(req: ValidatedRequest<typeof schema>): Promise<Dec
         version_number: '0.1',
         cards: decklist.cards,
         published_date: undefined,
-        user_id: userId,
+        owner_id: user.public_id,
       })
     }
   }

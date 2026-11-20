@@ -1,7 +1,7 @@
 import { getDecklist, unpublishDecklist } from '../gateways/storage/index'
 import { Request, Response } from 'express'
 import { Decklist, Decklists$unpublish } from '@5rdb/api'
-import { getUserId } from '../utils/getUserId'
+import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export async function handler(
   req: Request<Decklists$unpublish['request']['params']>,
@@ -12,12 +12,12 @@ export async function handler(
     res.sendStatus(404)
     return
   }
-  const userId = getUserId(req)
-  if (userId !== decklist.user_id) {
+  const user = await requireCurrentUser(req)
+  if (decklist.owner_id !== user.public_id) {
     res.sendStatus(403)
     return
   }
-  console.log(`Unpublish decklist ${decklist.id} for user ${userId}!`)
+  console.log(`Unpublish decklist ${decklist.id} for user ${user.public_id}!`)
   const unpublished = await unpublishDecklist(req.params.decklistId)
   if (!unpublished) {
     res.sendStatus(404)

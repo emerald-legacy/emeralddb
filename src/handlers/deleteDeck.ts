@@ -1,6 +1,6 @@
 import { getDeck, deleteDeck } from '../gateways/storage/index'
 import { Request, Response } from 'express'
-import { getUserId } from '../utils/getUserId'
+import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export async function handler(req: Request, res: Response): Promise<void> {
   const deckId = req.params.deckId
@@ -13,8 +13,8 @@ export async function handler(req: Request, res: Response): Promise<void> {
     res.status(404).send()
     return
   }
-  const userId = getUserId(req)
-  if (deck.user_id !== userId) {
+  const user = await requireCurrentUser(req)
+  if (deck.owner_id !== user.public_id) {
     res.status(403).send()
     return
   }

@@ -150,7 +150,7 @@ export interface Decks$delete {
 
 export interface Decklists$create {
   // The server sets id, created_at and the owner; publishing has its own endpoint
-  request: { body: Omit<Decklist, 'id' | 'created_at' | 'user_id' | 'published_date'> }
+  request: { body: Omit<Decklist, 'id' | 'created_at' | 'owner_id' | 'published_date'> }
   response: Decklist
 }
 

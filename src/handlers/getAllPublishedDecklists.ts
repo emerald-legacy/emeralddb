@@ -1,21 +1,19 @@
 import { getAllPublishedDecklists } from '../gateways/storage/index'
 import { PublishedDecklistWithExtraInfo } from '@5rdb/api'
-import { addUsernameToDecklist, addExtraInfoToDecklist } from './getDecklist'
+import { addExtraInfoToDecklist } from './getDecklist'
+import { withUsernames } from '../utils/withUsernames'
 
 export async function handler(): Promise<PublishedDecklistWithExtraInfo[] | undefined> {
-  const decklists = await getAllPublishedDecklists()
+  const decklists = await withUsernames(await getAllPublishedDecklists(), 'owner_id')
 
-  const result = await Promise.all(
+  return Promise.all(
     decklists.map(async (decklist) => {
-      const withUser = await addUsernameToDecklist(decklist)
       const withExtraInfo = await addExtraInfoToDecklist(decklist)
       return {
-        ...withUser,
+        ...decklist,
         stronghold: withExtraInfo.stronghold,
         role: withExtraInfo.role,
       }
     })
   )
-
-  return result
 }

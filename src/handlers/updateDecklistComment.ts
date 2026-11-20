@@ -3,7 +3,7 @@ import * as Express from 'express'
 import Joi from 'joi'
 import { ValidatedRequest } from '../middlewares/validator'
 import { DecklistComment, DecklistComments$update } from '@5rdb/api'
-import { getUserId } from '../utils/getUserId'
+import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export const schema = {
   body: Joi.object<DecklistComments$update['request']['body']>({
@@ -15,13 +15,13 @@ export async function handler(
   req: ValidatedRequest<typeof schema>,
   res: Express.Response
 ): Promise<DecklistComment | undefined> {
-  const userId = getUserId(req)
+  const user = await requireCurrentUser(req)
   const comment = await getComment(req.params.id)
   if (!comment) {
     res.status(404).send()
     return
   }
-  if (comment.user_id !== userId) {
+  if (comment.author_id !== user.public_id) {
     res.status(403).send()
     return
   }
