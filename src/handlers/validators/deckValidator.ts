@@ -165,6 +165,14 @@ function splitDynastyCards(cards: CardWithQuantity[]): DynastyCards {
   }
 }
 
+// Cards are counted by quantity: three copies of a stronghold are three strongholds
+function countCopies(cards: CardWithQuantity[]): number {
+  return cards.reduce((sum, card) => sum + card.quantity, 0)
+}
+
+// Every card on prod has a deck_limit; 3 is the general limit
+const DEFAULT_DECK_LIMIT = 3
+
 function validateDecklist(
   stats: DeckStatistics,
   allDeckCards: CardWithQuantity[],
@@ -172,6 +180,16 @@ function validateDecklist(
   conflictCards: CardWithQuantity[]
 ): string[] {
   const validationErrors: string[] = []
+  const tooManyCopies = allDeckCards.filter(
+    (c) => c.quantity > (c.deck_limit ?? DEFAULT_DECK_LIMIT)
+  )
+  if (tooManyCopies.length > 0) {
+    validationErrors.push(
+      `The deck contains more copies than allowed of: ${tooManyCopies
+        .map((c) => `${c.name} (at most ${c.deck_limit ?? DEFAULT_DECK_LIMIT})`)
+        .join(', ')}`
+    )
+  }
   allDeckCards
     .filter((c) => c.role_restrictions.length > 0)
     .forEach((c) => {
@@ -253,24 +271,27 @@ function validateDecklist(
     }
   }
 
+  const provinceCount = countCopies(stats.provinces)
+  const strongholdCount = countCopies(stats.strongholds)
+  const roleCount = countCopies(stats.roles)
   if (stats.format === 'skirmish') {
-    if (stats.provinces.length > 0) {
-      validationErrors.push(`Roles are not allowed in Skirmish Format.`)
+    if (provinceCount > 0) {
+      validationErrors.push(`Provinces are not allowed in Skirmish Format.`)
     }
-    if (stats.strongholds.length > 0) {
+    if (strongholdCount > 0) {
       validationErrors.push(`Strongholds are not allowed in Skirmish Format.`)
     }
-    if (stats.roles.length > 0) {
+    if (roleCount > 0) {
       validationErrors.push(`Roles are not allowed in Skirmish Format.`)
     }
   } else {
-    if (stats.provinces.length !== 5) {
+    if (provinceCount !== 5) {
       validationErrors.push(`A deck must contain exactly 5 provinces.`)
     }
-    if (stats.strongholds.length !== 1) {
+    if (strongholdCount !== 1) {
       validationErrors.push(`A deck must contain exactly 1 stronghold.`)
     }
-    if (stats.roles.length > 1) {
+    if (roleCount > 1) {
       validationErrors.push(`A deck may contain only 1 role.`)
     }
     const singleElementProvinces = stats.provinces.filter(
