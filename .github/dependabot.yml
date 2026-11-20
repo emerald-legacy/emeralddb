@@ -6,6 +6,12 @@ updates:
     schedule:
       interval: 'weekly'
 
+  # The Postgres image for local development (docker-compose.yml)
+  - package-ecosystem: 'docker-compose'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+
   # Backend dependencies (package.json / yarn.lock in the repository root)
   - package-ecosystem: 'npm'
     directory: '/'

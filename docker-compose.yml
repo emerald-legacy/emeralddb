@@ -1,10 +1,14 @@
-version: '3.1'
-
 services:
   db:
-    image: postgres:11.6
-    restart: always
+    image: postgres:18.7-alpine
+    restart: unless-stopped
     ports:
-    - 5432:5432
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: password
+    volumes:
+      # Postgres 18 images keep their data in a version-specific folder below this path
+      - db-data:/var/lib/postgresql
+
+volumes:
+  db-data:

@@ -24,7 +24,10 @@
     /* Additional */
     "allowJs": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+
+    /* The shared API types, without installing them as a package */
+    "paths": { "@5rdb/api": ["../apiTypings/index.ts"] }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

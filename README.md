@@ -3,12 +3,17 @@
 ## Prerequisites:
 To run the application you need:
 * Node version 26 or higher (pinned to 26.13.1 via Volta, `.nvmrc` and `.node-version`)
-* A local Postgres database
+* Yarn 4 (pinned to 4.18.1 via Volta and `packageManager` in `package.json`)
+* A local Postgres database, e.g. from `docker compose up -d` (Postgres 18, user `postgres`, password `password`, port 5432; the data stays in a Docker volume until `docker compose down -v`)
 
 ## Set Up:
 
-### Install yarn globally
-``` npm install yarn -g ```
+### Install Node and Yarn
+With [Volta](https://volta.sh), which picks up the pinned versions in the project:
+```volta install node yarn```
+
+Without Volta, use Corepack (Node 25+ doesn't ship it anymore):
+```npm install -g corepack && corepack enable```
 
 
 ### Install backend packages
@@ -28,7 +33,16 @@ If you want to access Admin features (such as importing data) as well as the dec
 2. In the project root, run ```yarn start:server:dev``` to start the backend on port 8080
 3. In the 'client' folder, run ```yarn start``` to start the frontend on port 3000
 
+Or run both with ```yarn start:all:dev```; the frontend starts once the backend listens on port 8080.
+
 ## How to Import Data
+
+### All card data from emeralddb.org (local development)
+```yarn import:prod```
+
+This copies traits, cycles, packs, cards, their printings, formats and rulings from https://www.emeralddb.org into the database in `DATABASE_URL`, in one transaction. It needs no login and runs only with `NODE_ENV=development`. Existing rows are updated, local rows that don't exist there stay, and users and decks aren't touched. Another instance works too: `yarn import:prod https://url.to.instance/`
+
+### Single packs from beta (Admin page)
 Packs are imported from the beta instance configured in `BETA_URL`, one pack at a time.
 1. Log into the application once to create your user in the database (requires Auth0 setup)
 2. In the 'roles' column of the 'users' table, enter ```data_admin``` for your user and save those changes

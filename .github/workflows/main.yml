@@ -23,6 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Node 25+ doesn't ship Corepack. It provides the Yarn version pinned in
+      # packageManager, and setup-node's yarn cache needs it before setup-node runs.
+      - name: Enable Corepack
+        run: npm i -g corepack && corepack enable
       - name: Use Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -32,10 +36,10 @@ jobs:
             yarn.lock
             client/yarn.lock
       - name: Install dependencies
-        run: yarn
+        run: yarn --version && yarn install --immutable
       # The type-aware lint rules need the client's dependencies for type information
       - name: Install client dependencies
-        run: cd client && yarn
+        run: cd client && yarn install --immutable
       - name: Run linter
         run: yarn lint
 
@@ -44,13 +48,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Node 25+ doesn't ship Corepack. It provides the Yarn version pinned in
+      # packageManager, and setup-node's yarn cache needs it before setup-node runs.
+      - name: Enable Corepack
+        run: npm i -g corepack && corepack enable
       - name: Use Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '26.x'
           cache: 'yarn'
       - name: Install dependencies
-        run: yarn
+        run: yarn --version && yarn install --immutable
       - name: Run unit tests
         run: yarn test:unit
 
@@ -59,13 +67,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Node 25+ doesn't ship Corepack. It provides the Yarn version pinned in
+      # packageManager, and setup-node's yarn cache needs it before setup-node runs.
+      - name: Enable Corepack
+        run: npm i -g corepack && corepack enable
       - name: Use Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '26.x'
           cache: 'yarn'
       - name: Install dependencies
-        run: yarn
+        run: yarn --version && yarn install --immutable
       - name: Build project
         run: yarn build
 
