@@ -1,9 +1,11 @@
 import { User } from '@5rdb/api'
-import { createContext, ReactNode, useState, useContext, type JSX } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
+import { createContext, ReactNode, useState, useContext, useEffect, type JSX } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { privateApi } from '../api'
 import { Queries } from '../components/HeaderBar'
-import { getToken } from '../utils/auth'
+import { setAccessTokenGetter } from '../utils/accessToken'
+import { removeLegacyToken } from '../utils/auth'
 
 export const UserContext = createContext<{
   currentUser: User | undefined
@@ -33,11 +35,20 @@ export function UserProvider(props: { children: ReactNode }): JSX.Element {
     return currentUser !== undefined
   }
 
+  const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0()
+
+  useEffect(() => {
+    setAccessTokenGetter(() => getAccessTokenSilently())
+    removeLegacyToken()
+  }, [getAccessTokenSilently])
+
+  // Auth0 knows whether the user is logged in. It also logs the user out when renewing
+  // the token fails because the login has expired; the user is then loaded again.
   useQuery({
-    queryKey: [Queries.USER],
+    queryKey: [Queries.USER, isAuthenticated],
+    enabled: !isLoading,
     queryFn: async () => {
-      const token = getToken()
-      if (!token) {
+      if (!isAuthenticated) {
         setCurrentUser(undefined)
         return null
       }
