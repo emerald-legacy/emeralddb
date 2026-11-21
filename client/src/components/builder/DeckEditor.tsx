@@ -27,11 +27,12 @@ import { Loading } from '../Loading'
 import { VersionPicker } from './VersionPicker'
 import { EmeraldDBLink } from '../EmeraldDBLink'
 import { DeckStatistics } from './DeckStatistics'
-import { DeckApi, DecklistToSave, saveDecklist } from './saveDecklist'
+import { attemptFor, DeckApi, DecklistToSave, SaveAttempt, saveDecklist } from './saveDecklist'
 import { withCardQuantity } from './cardQuantities'
 
 const deckApi: DeckApi = {
-  createDeck: () => privateApi.Deck.create({ body: {} }).then((response) => response.data()),
+  createDeck: (deckId) =>
+    privateApi.Deck.create({ body: { id: deckId } }).then((response) => response.data()),
   deleteDeck: (deckId) => privateApi.Deck.delete({ deckId }),
   createDecklist: (body) => privateApi.Decklist.create({ body }),
 }
@@ -145,9 +146,10 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   const [newVersion, setNewVersion] = useState(decklist.version_number || '0.1')
   const [currentView, setCurrentView] = useState(ViewTypes.EDITOR)
   const [showAllCards, setShowAllCards] = useState(false)
-  // The ref guards against a second click before the next render; the state shows it
-  const savingRef = useRef(false)
   const [isSaving, setIsSaving] = useState(false)
+  // The ids of the last save. Saving the same content again reuses them, so the server
+  // doesn't add a second version for a second click or a retry.
+  const lastSaveAttempt = useRef<SaveAttempt | undefined>(undefined)
 
   if (props.existingDecklist && decklist.version_number === props.existingDecklist.version_number) {
     const nextVersionNumber = getNextVersionNumber(props.existingDecklist.version_number)
@@ -204,11 +206,6 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
   const filteredCards = showAllCards ? cards : prefilterCards(cards, decklist, formats, true)
 
   async function saveDeck(decklist: DecklistViewModel) {
-    // A second click would save the same version again, or create a second deck
-    if (savingRef.current) {
-      return
-    }
-    savingRef.current = true
     setIsSaving(true)
     const cardPackIds: Record<string, string> = {}
     for (const cardId of Object.keys(decklist.cards)) {
@@ -229,8 +226,14 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
       cards: decklist.cards,
       card_pack_ids: cardPackIds,
     }
+    const existingDeckId = props.existingDecklist?.deck_id
+    const attempt = attemptFor(
+      lastSaveAttempt.current,
+      JSON.stringify({ existingDeckId, decklistToSave })
+    )
+    lastSaveAttempt.current = attempt
     try {
-      const deckId = await saveDecklist(deckApi, decklistToSave, props.existingDecklist?.deck_id)
+      const deckId = await saveDecklist(deckApi, decklistToSave, attempt, existingDeckId)
       // /decklists/{deckId} resolves to the latest version of the deck
       await refreshCache(`/decks/${deckId}`, `/decklists/${deckId}`)
       // The next save is the next version; "Custom Version" starts from it as well
@@ -243,7 +246,6 @@ export function DeckEditor(props: { existingDecklist?: DecklistType | undefined 
     } catch (error) {
       enqueueSnackbar('Error while saving deck: ' + errorMessage(error), { variant: 'error' })
     } finally {
-      savingRef.current = false
       setIsSaving(false)
     }
   }
