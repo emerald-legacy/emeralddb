@@ -113,7 +113,8 @@ export interface Users$me {
 }
 
 export interface Users$update {
-  request: { body: { id: string; name: string } }
+  // Always the logged-in user's name
+  request: { body: { name: string } }
   response: User
 }
 

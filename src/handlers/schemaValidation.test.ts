@@ -303,7 +303,11 @@ test('validateDecklist rejects a missing format', (t) => {
 
 // --- updateUser ------------------------------------------------------------
 
-test('updateUser accepts { id, name }', (t) => {
+test('updateUser accepts { name }', (t) => {
+  assertAccepted(t, updateUserSchema, { name: 'Alice' })
+})
+
+test('updateUser still accepts { id, name } from older clients', (t) => {
   assertAccepted(t, updateUserSchema, { id: 'auth0|1', name: 'Alice' })
 })
 
