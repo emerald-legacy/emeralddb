@@ -77,6 +77,10 @@ function stubStores(): Writes {
     writes.decklists.push(decklist)
     return { ...decklist, id: 'decklist-new', created_at: new Date() }
   }
+  decklistStore.insertDecklistOnce = async (decklist) => {
+    writes.decklists.push(decklist)
+    return { decklist: { ...decklist, created_at: new Date() }, inserted: true }
+  }
   decklistStore.deleteDecklist = async (id) => {
     writes.deleted.push(id)
   }

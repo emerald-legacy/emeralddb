@@ -34,6 +34,7 @@ export {
   getAllDecklists,
   updateCardsInDecklist,
   insertDecklist,
+  insertDecklistOnce,
   publishDecklist,
   unpublishDecklist,
   deleteDecklist,

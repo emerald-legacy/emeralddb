@@ -1,6 +1,7 @@
-import { getDeck, insertDecklist } from '../gateways/storage/index'
+import { getDeck, insertDecklistOnce } from '../gateways/storage/index'
 import { Response } from 'express'
 import Joi from 'joi'
+import { v4 as uuid } from 'uuid'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Decklist, Decklists$create } from '@5rdb/api'
 import { resolveCardPackIds } from './resolveCardPackIds'
@@ -8,6 +9,7 @@ import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export const schema = {
   body: Joi.object<Decklists$create['request']['body']>({
+    id: Joi.string().uuid(),
     deck_id: Joi.string().required(),
     format: Joi.string().required(),
     name: Joi.string().required(),
@@ -42,9 +44,18 @@ export async function handler(
     cardPackIds = await resolveCardPackIds(Object.keys(req.body.cards), req.body.format)
   }
 
-  return await insertDecklist({
-    ...req.body,
+  // Saving is idempotent with an id from the client: a retry or a second click returns the
+  // version that was saved first instead of adding another one
+  const { id = uuid(), ...decklist } = req.body
+  const saved = await insertDecklistOnce({
+    ...decklist,
+    id,
     card_pack_ids: cardPackIds,
     owner_id: user.public_id,
   })
+  if (!saved.inserted && saved.decklist.deck_id !== decklist.deck_id) {
+    res.status(409).send('A version with this id belongs to another deck')
+    return
+  }
+  return saved.decklist
 }

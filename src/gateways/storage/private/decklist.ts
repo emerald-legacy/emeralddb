@@ -42,6 +42,28 @@ export async function insertDecklist(
     .then(([row]) => row)
 }
 
+/**
+ * Inserts the decklist unless one with its id exists already, also when two requests
+ * insert the same id at once. Returns the decklist with that id and whether this call
+ * inserted it.
+ */
+export async function insertDecklistOnce(
+  decklist: Omit<Decklist, 'created_at'>
+): Promise<{ decklist: Decklist; inserted: boolean }> {
+  const [inserted] = await pg(TABLE)
+    .insert({ ...decklist, created_at: new Date() }, '*')
+    .onConflict('id')
+    .ignore()
+  if (inserted) {
+    return { decklist: inserted, inserted: true }
+  }
+  const existing = await getDecklist(decklist.id)
+  if (!existing) {
+    throw new Error(`Decklist ${decklist.id} was deleted while it was saved again`)
+  }
+  return { decklist: existing, inserted: false }
+}
+
 export async function publishDecklist(decklistId: string): Promise<Decklist | undefined> {
   const publishedDate = new Date()
   const result = await pg(TABLE)

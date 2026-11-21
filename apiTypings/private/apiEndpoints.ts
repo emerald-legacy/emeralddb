@@ -150,8 +150,13 @@ export interface Decks$delete {
 }
 
 export interface Decklists$create {
-  // The server sets id, created_at and the owner; publishing has its own endpoint
-  request: { body: Omit<Decklist, 'id' | 'created_at' | 'owner_id' | 'published_date'> }
+  // The server sets created_at and the owner; publishing has its own endpoint. With an id
+  // (a UUID chosen by the client), saving again returns the version saved before.
+  request: {
+    body: Omit<Decklist, 'id' | 'created_at' | 'owner_id' | 'published_date'> & {
+      id?: string | undefined
+    }
+  }
   response: Decklist
 }
 
