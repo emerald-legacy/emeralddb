@@ -44,7 +44,7 @@ import type {
   Users$update,
 } from '@5rdb/api'
 import { ApiError } from './apiError'
-import { getToken, unsetToken } from './utils/auth'
+import { getAccessToken } from './utils/accessToken'
 
 export { ApiError, errorMessage } from './apiError'
 
@@ -117,8 +117,43 @@ function buildRequest(path: string, request: unknown): { path: string; body: unk
   return { path: result, body }
 }
 
-// Helper to add auth header
-function getHeaders(withAuth: boolean, hasBody: boolean): Record<string, string> {
+// Auth0's error codes for a login that is gone and must be repeated
+const LOGIN_REQUIRED_ERRORS = [
+  'login_required',
+  'consent_required',
+  'missing_refresh_token',
+  'invalid_grant',
+]
+
+function isLoginRequired(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'error' in error &&
+    typeof error.error === 'string' &&
+    LOGIN_REQUIRED_ERRORS.includes(error.error)
+  )
+}
+
+// The bearer token for a request that needs one. Without a login the request isn't sent:
+// that's an ApiError like the server's 401. If Auth0 can't be reached, like a network failure.
+async function authorization(): Promise<string> {
+  let token: string | undefined
+  try {
+    token = await getAccessToken()
+  } catch (error) {
+    console.error('Could not get an access token:', error)
+    if (!isLoginRequired(error)) {
+      throw new ApiError(0, undefined, 'Could not renew your login, please try again.')
+    }
+  }
+  if (!token) {
+    throw new ApiError(401, undefined, 'You are not logged in anymore. Please log in again.')
+  }
+  return `Bearer ${token}`
+}
+
+async function getHeaders(withAuth: boolean, hasBody: boolean): Promise<Record<string, string>> {
   const headers: Record<string, string> = {
     Accept: 'application/json, text/plain, */*',
   }
@@ -126,10 +161,7 @@ function getHeaders(withAuth: boolean, hasBody: boolean): Record<string, string>
     headers['Content-Type'] = 'application/json'
   }
   if (withAuth) {
-    const token = getToken()
-    if (token) {
-      headers.Authorization = `Bearer ${token}`
-    }
+    headers.Authorization = await authorization()
   }
   return headers
 }
@@ -147,12 +179,13 @@ async function apiCall<ResponseBody>(
   // Browsers don't allow a body on GET requests
   const hasBody = body !== undefined && method !== 'GET'
 
+  const headers = await getHeaders(withAuth, hasBody)
   let response: Response
   let data: unknown
   try {
     response = await fetch(url, {
       method,
-      headers: getHeaders(withAuth, hasBody),
+      headers,
       body: hasBody ? JSON.stringify(body) : undefined,
     })
     data = await parseBody(response)
@@ -163,9 +196,6 @@ async function apiCall<ResponseBody>(
   }
 
   if (!response.ok) {
-    if (response.status === 401) {
-      unsetToken()
-    }
     throw new ApiError(response.status, data, `Request failed with status code ${response.status}`)
   }
   // The trust boundary: the response isn't validated at runtime. The server's

@@ -10,11 +10,8 @@ import {
   MenuItem,
   TextField,
 } from '@mui/material'
-import { useState, useEffect, type JSX } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useState, type JSX } from 'react'
 import { privateApi, refreshCache } from '../../api'
-import { getToken, setToken } from '../../utils/auth'
-import { Queries } from '../HeaderBar'
 import { LoginButton } from './LoginButton'
 import { LogoutButton } from './LogoutButton'
 import { useCurrentUser } from '../../providers/UserProvider'
@@ -27,11 +24,9 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
   const [modalOpen, setModalOpen] = useState(false)
   const [modalUsername, setModalUsername] = useState<string>()
 
-  const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0()
+  const { isAuthenticated, isLoading } = useAuth0()
 
   const { currentUser, setCurrentUser } = useCurrentUser()
-
-  const queryClient = useQueryClient()
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -40,29 +35,6 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
   const handleClose = () => {
     setAnchorEl(null)
   }
-
-  useEffect(() => {
-    const getUserToken = async () => {
-      try {
-        if (isAuthenticated && !isLoading && !getToken()) {
-          const accessToken = await getAccessTokenSilently({
-            authorizationParams: {
-              audience: props.audience,
-              scope: props.scope,
-            },
-          })
-          if (accessToken) {
-            setToken(accessToken)
-            queryClient.invalidateQueries({ queryKey: [Queries.USER] })
-          }
-        }
-      } catch (e) {
-        console.error('Failed to get access token:', e)
-      }
-    }
-
-    getUserToken()
-  }, [isAuthenticated, isLoading, getAccessTokenSilently, props.audience, props.scope, queryClient])
 
   if (currentUser !== undefined) {
     const updateUser = () => {
