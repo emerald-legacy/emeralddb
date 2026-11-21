@@ -1,6 +1,7 @@
 import { pg } from './pg'
 import { Decklist } from '@5rdb/api'
 import { v4 as uuid } from 'uuid'
+import { TABLE as COMMENTS_TABLE } from './decklist_comment'
 
 export const TABLE = 'decklists'
 
@@ -81,6 +82,10 @@ export async function unpublishDecklist(decklistId: string): Promise<Decklist | 
   return result[0]
 }
 
+// With its comments: decklist_comments has no foreign key that would delete them
 export async function deleteDecklist(decklistId: string): Promise<void> {
-  await pg(TABLE).where('id', decklistId).delete()
+  await pg.transaction(async (transaction) => {
+    await transaction(COMMENTS_TABLE).where('decklist_id', decklistId).delete()
+    await transaction(TABLE).where('id', decklistId).delete()
+  })
 }
