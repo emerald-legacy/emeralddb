@@ -1,24 +1,41 @@
-import { insertDeck, getDecklist, insertDecklist } from '../gateways/storage'
+import { insertDeckOnce, getDecklist, insertDecklist } from '../gateways/storage'
+import { Response } from 'express'
 import Joi from 'joi'
+import { v4 as uuid } from 'uuid'
 import { ValidatedRequest } from '../middlewares/validator'
 import { Deck, Decks$create } from '@5rdb/api'
 import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export const schema = {
   body: Joi.object<Decks$create['request']['body']>({
+    id: Joi.string().uuid(),
     forkedFrom: Joi.string().optional(),
   }),
 }
 
-export async function handler(req: ValidatedRequest<typeof schema>): Promise<Deck | undefined> {
+export async function handler(
+  req: ValidatedRequest<typeof schema>,
+  res: Response
+): Promise<Deck | undefined> {
   const user = await requireCurrentUser(req)
-  console.log('Create deck for user ' + user.public_id)
-  const deck = await insertDeck({ owner_id: user.public_id, forked_from: req.body?.forkedFrom })
-  if (req.body?.forkedFrom) {
-    const decklist = await getDecklist(req.body?.forkedFrom)
+  // Creating is idempotent with an id from the client: a retry returns the deck created
+  // first, without a second copy of the forked version
+  const { id = uuid(), forkedFrom } = req.body ?? {}
+  const saved = await insertDeckOnce({ id, owner_id: user.public_id, forked_from: forkedFrom })
+  if (!saved.inserted) {
+    if (saved.deck.owner_id !== user.public_id) {
+      res.status(409).send('A deck with this id exists already')
+      return
+    }
+    return saved.deck
+  }
+  console.log('Created deck for user ' + user.public_id)
+
+  if (forkedFrom) {
+    const decklist = await getDecklist(forkedFrom)
     if (decklist) {
       await insertDecklist({
-        deck_id: deck.id,
+        deck_id: saved.deck.id,
         format: decklist.format,
         name: 'Copy of ' + decklist.name,
         primary_clan: decklist.primary_clan,
@@ -31,5 +48,5 @@ export async function handler(req: ValidatedRequest<typeof schema>): Promise<Dec
       })
     }
   }
-  return deck
+  return saved.deck
 }

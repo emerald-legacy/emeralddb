@@ -64,9 +64,9 @@ function stubStores(): Writes {
   deckStore.getDeck = async (id) => (id === alicesDeck.id ? alicesDeck : undefined)
   deckStore.getDecksForOwner = async (ownerId) =>
     ownerId === alicesDeck.owner_id ? [alicesDeck] : []
-  deckStore.insertDeck = async (deck) => {
+  deckStore.insertDeckOnce = async (deck) => {
     writes.decks.push(deck)
-    return { ...deck, id: 'deck-new' }
+    return { deck, inserted: true }
   }
   deckStore.deleteDeck = async (id) => {
     writes.deleted.push(id)

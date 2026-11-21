@@ -118,7 +118,8 @@ export interface Users$update {
 }
 
 export interface Decks$create {
-  request: { body: { forkedFrom?: string | undefined } }
+  // With an id (a UUID chosen by the client), creating again returns the deck created before
+  request: { body: { id?: string | undefined; forkedFrom?: string | undefined } }
   response: Deck
 }
 
