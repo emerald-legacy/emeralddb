@@ -6,10 +6,8 @@ import { Users$update, User } from '@5rdb/api'
 import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export const schema = {
-  body: Joi.object<Users$update['request']['body'] & { id?: string }>({
+  body: Joi.object<Users$update['request']['body']>({
     name: Joi.string().required(),
-    // Sent by clients from before it was dropped from the contract; must be the caller's
-    id: Joi.string(),
   }),
 }
 
@@ -18,10 +16,6 @@ export async function handler(
   res: Express.Response
 ): Promise<User | undefined> {
   const dbUser = await requireCurrentUser(req)
-  if (req.body.id !== undefined && req.body.id !== dbUser.id) {
-    res.status(403).send()
-    return
-  }
   const updated = await updateUser({ id: dbUser.id, name: req.body.name })
   if (!updated) {
     res.status(404).send()

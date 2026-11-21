@@ -41,16 +41,9 @@ test.serial('the name alone renames the logged-in user', async (t) => {
   t.like(response.body, { name: 'Alicia' })
 })
 
-test.serial('older clients that send their own id still work', async (t) => {
+test.serial('an id in the body is rejected', async (t) => {
   const updates = stubStore()
   const response = await rename({ id: alice.id, name: 'Alicia' })
-  t.is(response.status, 200)
-  t.deepEqual(updates, [{ id: alice.id, name: 'Alicia' }])
-})
-
-test.serial("someone else's id is a 403", async (t) => {
-  const updates = stubStore()
-  const response = await rename({ id: 'auth0|bob', name: 'Alicia' })
-  t.is(response.status, 403)
+  t.is(response.status, 400)
   t.deepEqual(updates, [])
 })

@@ -307,12 +307,8 @@ test('updateUser accepts { name }', (t) => {
   assertAccepted(t, updateUserSchema, { name: 'Alice' })
 })
 
-test('updateUser still accepts { id, name } from older clients', (t) => {
-  assertAccepted(t, updateUserSchema, { id: 'auth0|1', name: 'Alice' })
-})
-
 test('updateUser rejects an unknown roles key', (t) => {
-  assertRejected(t, updateUserSchema, { id: 'auth0|1', name: 'Alice', roles: ['data_admin'] })
+  assertRejected(t, updateUserSchema, { name: 'Alice', roles: ['data_admin'] })
 })
 
 // --- rulings ---------------------------------------------------------------
