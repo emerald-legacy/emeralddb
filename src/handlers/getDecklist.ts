@@ -26,15 +26,23 @@ export async function handler(
   return withUsername(decklist, 'owner_id')
 }
 
-export async function addExtraInfoToDecklist(decklist: Decklist): Promise<DecklistWithExtraInfo> {
-  const cardIds = Object.keys(decklist.cards)
-  const cards = await getCards(cardIds)
-  const stronghold = cards.find((card) => card.type === 'stronghold')
-  const role = cards.find((card) => card.type === 'role')
-
-  return {
-    ...decklist,
-    stronghold,
-    role,
+/** Adds the stronghold and role to each decklist, with one query for all of them */
+export async function addExtraInfoToDecklists(
+  decklists: Decklist[]
+): Promise<DecklistWithExtraInfo[]> {
+  const cardIds = new Set(decklists.flatMap((decklist) => Object.keys(decklist.cards)))
+  if (cardIds.size === 0) {
+    return decklists
   }
+  const keyCards = (await getCards([...cardIds])).filter(
+    (card) => card.type === 'stronghold' || card.type === 'role'
+  )
+  return decklists.map((decklist) => {
+    const keyCardsInDeck = keyCards.filter((card) => decklist.cards[card.id])
+    return {
+      ...decklist,
+      stronghold: keyCardsInDeck.find((card) => card.type === 'stronghold'),
+      role: keyCardsInDeck.find((card) => card.type === 'role'),
+    }
+  })
 }
