@@ -35,7 +35,12 @@ export function EmeraldDBImportButton(props: {
         .replace(emeraldDBPermalinkPrefix, emeraldDBApiPrefix)
         .replace('/view', '')
       fetch(apiUrl)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`EmeraldDB answered with status ${res.status}`)
+          }
+          return res.json()
+        })
         .then((data: Decklist) => {
           const importedDeck = data
           props.onImport({
@@ -49,6 +54,11 @@ export function EmeraldDBImportButton(props: {
             cards: importedDeck.cards,
           })
         })
+        .catch((error: unknown) => {
+          const reason = error instanceof Error ? error.message : String(error)
+          enqueueSnackbar(`The deck couldn't be imported: ${reason}`, { variant: 'error' })
+        })
+        .finally(() => setLoading(false))
     }
   }
 
