@@ -82,9 +82,8 @@ export function DecklistTabs(props: {
   onDecklistUpdated: () => void
 }): JSX.Element {
   const { deck, currentDeckId } = props
-  const [currentDecklistId, setCurrentDecklistId] = useState(
-    latestDecklistForDeck(deck)?.id || undefined
-  )
+  // The version the user picked; undefined shows the latest
+  const [pickedDecklistId, setPickedDecklistId] = useState<string | undefined>(undefined)
 
   const confirm = useConfirm()
   const { enqueueSnackbar } = useSnackbar()
@@ -116,6 +115,12 @@ export function DecklistTabs(props: {
   })
 
   const versions = sortedVersionsForDeck(deck)
+  // The picked version, or the latest if none was picked or it was deleted
+  const selectedIndex = Math.max(
+    versions.findIndex((version) => version.id === pickedDecklistId),
+    0
+  )
+  const currentDecklistId = versions[selectedIndex]?.id
 
   if (versions.length < 1) {
     return (
@@ -136,7 +141,6 @@ export function DecklistTabs(props: {
       .then(() => refreshDecklistCaches(decklistId))
       .then(() => {
         props.onDecklistUpdated()
-        setCurrentDecklistId(latestDecklistForDeck(deck)?.id || undefined)
         enqueueSnackbar('The decklist was deleted successfully!', { variant: 'success' })
         queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
       })
@@ -183,10 +187,8 @@ export function DecklistTabs(props: {
       <Grid container>
         <Grid size={12}>
           <Tabs
-            value={versions.findIndex((list) => list.id === currentDecklistId) || 0}
-            onChange={(_, newValue: number) =>
-              setCurrentDecklistId(versions[newValue]?.id || versions[0].id)
-            }
+            value={selectedIndex}
+            onChange={(_, newValue: number) => setPickedDecklistId(versions[newValue]?.id)}
             indicatorColor="primary"
             textColor="primary"
             variant="scrollable"
