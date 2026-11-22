@@ -19,7 +19,8 @@ import { convertTraitList } from '../utils/cardTextUtils'
 import { capitalize } from '../utils/stringUtils'
 import { useState, useEffect, useMemo, useCallback, type JSX } from 'react'
 import { applyFilters, CardFilter, FilterState, initialState } from '../components/CardFilter'
-import { CardWithVersions, Pack } from '@5rdb/api'
+import { CardWithVersions } from '@5rdb/api'
+import { createFilterFromUrlSearchParams } from './cardsUrlFilter'
 import { CardInformation } from '../components/card/CardInformation'
 import { Loading } from '../components/Loading'
 import { CardLink } from '../components/card/CardLink'
@@ -54,28 +55,6 @@ enum DisplayMode {
 enum SortMode {
   NAME = 'name',
   PACK_POSITION = 'pack_position',
-}
-
-function createFilterFromUrlSearchParams(
-  params: URLSearchParams,
-  allPacks: Pack[],
-  initialFilter: FilterState
-): FilterState {
-  const cycle = params.get('cycle')
-  const pack = params.get('pack')
-  const query = params.get('query') || ''
-  const packs = cycle
-    ? allPacks.filter((p) => p.cycle_id === cycle).map((p) => p.id)
-    : pack
-      ? [pack]
-      : []
-
-  return {
-    ...initialFilter,
-    text: decodeURIComponent(query) || initialFilter.text,
-    packs: packs || initialFilter.packs,
-    cycles: cycle ? [cycle] : initialFilter.cycles,
-  }
 }
 
 export function CardsView(): JSX.Element {
