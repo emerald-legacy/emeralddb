@@ -75,6 +75,11 @@ export function CardsView(): JSX.Element {
 
   // Handle URL parameter changes in useEffect to prevent render-phase setState
   useEffect(() => {
+    // The filter needs the packs (a cycle stands for its packs) and the cards (one match
+    // opens it); until both are loaded, the URL is read again on the next run
+    if (cards.length === 0 || packs.length === 0) {
+      return
+    }
     if (location.search !== urlParams) {
       const urlSearchParams = new URLSearchParams(location.search)
       const previousSearchParams = new URLSearchParams(urlParams)
