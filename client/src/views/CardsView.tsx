@@ -115,7 +115,8 @@ export function CardsView(): JSX.Element {
 
         const urlFilteredCards = applyFilters(cards, formats, urlParamFilter)
         if (urlFilteredCards.length === 1) {
-          navigate(`/card/${urlFilteredCards[0].id}`)
+          // Replaces the search in the history: Back would land on it and jump here again
+          navigate(`/card/${urlFilteredCards[0].id}`, { replace: true })
         }
       }
 
