@@ -11,7 +11,10 @@ import {
   TextField,
 } from '@mui/material'
 import { useState, type JSX } from 'react'
-import { privateApi, refreshCache } from '../../api'
+import { useQueryClient } from '@tanstack/react-query'
+import { useSnackbar } from 'notistack'
+import { errorMessage, privateApi, refreshCache } from '../../api'
+import { UiStoreQueries } from '../../providers/UiStoreProvider'
 import { LoginButton } from './LoginButton'
 import { LogoutButton } from './LogoutButton'
 import { useCurrentUser } from '../../providers/UserProvider'
@@ -27,6 +30,8 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
   const { isAuthenticated, isLoading } = useAuth0()
 
   const { currentUser, setCurrentUser } = useCurrentUser()
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -40,12 +45,19 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
     const updateUser = () => {
       privateApi.User.update({
         body: { name: modalUsername ?? currentUser.name },
-      }).then((response) => {
-        setCurrentUser(response.data())
-        setModalOpen(false)
-        // The username is part of the published decklists
-        return refreshCache('/decklists')
       })
+        .then(async (response) => {
+          setCurrentUser(response.data())
+          setModalOpen(false)
+          // The username is part of the published decklists
+          await refreshCache('/decklists')
+          queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
+        })
+        .catch((error) => {
+          enqueueSnackbar(`The username couldn't be changed: ${errorMessage(error)}`, {
+            variant: 'error',
+          })
+        })
     }
     return (
       <div style={{ float: 'right' }}>

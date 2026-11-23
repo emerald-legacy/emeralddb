@@ -4,7 +4,9 @@ import { Box, Typography, Button, Grid, useMediaQuery, Tooltip } from '@mui/mate
 import { useConfirm } from 'material-ui-confirm'
 import { useSnackbar } from 'notistack'
 import { useState, type JSX } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { privateApi, refreshCache } from '../../api'
+import { UiStoreQueries } from '../../providers/UiStoreProvider'
 import { CardFactionIcon } from '../card/CardFactionIcon'
 import { DecklistTabs, latestDecklistForDeck } from './DecklistTabs'
 import EditIcon from '@mui/icons-material/Edit'
@@ -55,6 +57,7 @@ export function DeckTabs(props: {
   const { decks } = props
   const confirm = useConfirm()
   const { enqueueSnackbar } = useSnackbar()
+  const queryClient = useQueryClient()
   const [currentDeckId, setCurrentDeckId] = useState<string | undefined>()
   const isSmOrBigger = useMediaQuery('(min-width:600px)')
 
@@ -89,6 +92,8 @@ export function DeckTabs(props: {
         props.onDeckUpdated()
         setCurrentDeckId(undefined)
         enqueueSnackbar('The deck was deleted successfully!', { variant: 'success' })
+        // Its published versions are gone from the public deck list
+        queryClient.invalidateQueries({ queryKey: UiStoreQueries.PUBLISHED_DECKLISTS })
       })
       .catch((error) => {
         console.log(error)
