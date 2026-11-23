@@ -215,18 +215,32 @@ export function DeckTabs(props: {
                       </EmeraldDBLink>
                     </Grid>
                     <Grid size={4}>
-                      <EmeraldDBLink href={`/decks/${latestDecklistId}`}>
+                      {/* A disabled button lets clicks through to a surrounding link, so
+                          without a version there is no link (it led to /decks/undefined) */}
+                      {latestDecklistId ? (
+                        <EmeraldDBLink href={`/decks/${latestDecklistId}`}>
+                          <Button
+                            variant="contained"
+                            color="secondary"
+                            fullWidth
+                            className={classes.newDeckButton}
+                            startIcon={<LinkIcon />}
+                          >
+                            Link (Latest Version)
+                          </Button>
+                        </EmeraldDBLink>
+                      ) : (
                         <Button
                           variant="contained"
                           color="secondary"
                           fullWidth
                           className={classes.newDeckButton}
                           startIcon={<LinkIcon />}
-                          disabled={!latestDecklistId}
+                          disabled
                         >
                           Link (Latest Version)
                         </Button>
-                      </EmeraldDBLink>
+                      )}
                     </Grid>
                     <Grid size={4}>
                       <Button
