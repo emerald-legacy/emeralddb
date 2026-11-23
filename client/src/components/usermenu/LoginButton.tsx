@@ -12,6 +12,8 @@ export function LoginButton(props: { audience: string; scope: string }): JSX.Ele
       color="secondary"
       onClick={() =>
         loginWithRedirect({
+          // Back to this page after logging in (see onRedirectCallback)
+          appState: { returnTo: window.location.pathname + window.location.search },
           authorizationParams: {
             audience: props.audience,
             scope: props.scope,

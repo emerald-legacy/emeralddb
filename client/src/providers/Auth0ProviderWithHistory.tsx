@@ -22,9 +22,10 @@ export function Auth0ProviderWithHistory(props: {
   const auth0Domain: string = auth0Config.data?.domain || 'undefined'
   const auth0ClientId: string = auth0Config.data?.clientId || 'undefined'
 
+  // Auth0 sends the user back to the start page; continue on the page they logged in from.
+  // replace drops the start page with Auth0's ?code= from the history.
   const onRedirectCallback = (appState?: { returnTo?: string }) => {
-    let location = appState?.returnTo || window.location.pathname
-    navigate(location + 'cards')
+    navigate(appState?.returnTo || '/cards', { replace: true })
   }
 
   const redirectUri = window.location.origin.includes('localhost')
