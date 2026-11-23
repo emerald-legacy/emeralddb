@@ -1,7 +1,8 @@
 import { Pack, Cycle, Trait, CardWithVersions, Format, CardInPack } from '@5rdb/api'
 import { createContext, ReactNode, useContext, useMemo, type JSX } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { refreshCache } from '../api'
+import { Box, Button, Typography } from '@mui/material'
+import { errorMessage, publicApi, refreshCache } from '../api'
 
 export interface UiStore {
   cards: CardWithVersions[]
@@ -40,39 +41,40 @@ export const UiStoreQueries = {
   PUBLISHED_DECKLISTS: ['published-decklists'] as const,
 }
 
-async function fetchJson<T>(endpoint: string): Promise<T> {
-  const response = await fetch(endpoint)
-  return (await response.json()) as T
-}
-
 export function UiStoreProvider(props: { children: ReactNode }): JSX.Element {
   const queryClient = useQueryClient()
 
-  // Use TanStack Query for all data fetching with automatic caching
-  const { data: cards = [] } = useQuery<CardWithVersions[]>({
+  // Use TanStack Query for all data fetching with automatic caching. The API calls
+  // reject for an error status, so a failed load is an error and not empty data.
+  const cardsQuery = useQuery({
     queryKey: UiStoreQueries.CARDS,
-    queryFn: () => fetchJson<CardWithVersions[]>('/api/cards'),
+    queryFn: () => publicApi.Card.findAll().then((response) => response.data()),
   })
-
-  const { data: packs = [] } = useQuery<Pack[]>({
+  const packsQuery = useQuery({
     queryKey: UiStoreQueries.PACKS,
-    queryFn: () => fetchJson<Pack[]>('/api/packs'),
+    queryFn: () => publicApi.Pack.findAll().then((response) => response.data()),
   })
-
-  const { data: cycles = [] } = useQuery<Cycle[]>({
+  const cyclesQuery = useQuery({
     queryKey: UiStoreQueries.CYCLES,
-    queryFn: () => fetchJson<Cycle[]>('/api/cycles'),
+    queryFn: () => publicApi.Cycle.findAll().then((response) => response.data()),
   })
-
-  const { data: traits = [] } = useQuery<Trait[]>({
+  const traitsQuery = useQuery({
     queryKey: UiStoreQueries.TRAITS,
-    queryFn: () => fetchJson<Trait[]>('/api/traits'),
+    queryFn: () => publicApi.Trait.findAll().then((response) => response.data()),
   })
-
-  const { data: formats = [], isLoading: formatsLoading } = useQuery<Format[]>({
+  const formatsQuery = useQuery({
     queryKey: UiStoreQueries.FORMATS,
-    queryFn: () => fetchJson<Format[]>('/api/formats'),
+    queryFn: () => publicApi.Format.findAll().then((response) => response.data()),
   })
+  const queries = [cardsQuery, packsQuery, cyclesQuery, traitsQuery, formatsQuery]
+  const cards = cardsQuery.data ?? []
+  const packs = packsQuery.data ?? []
+  const cycles = cyclesQuery.data ?? []
+  const traits = traitsQuery.data ?? []
+  const formats = formatsQuery.data ?? []
+  const formatsLoading = formatsQuery.isLoading
+  // Data that couldn't be loaded at all; a failed refetch keeps the data it had
+  const failedQuery = queries.find((query) => query.error && query.data === undefined)
 
   // Compute relevant formats
   const relevantFormats = useMemo(() => formats.filter((format) => format.supported), [formats])
@@ -143,7 +145,26 @@ export function UiStoreProvider(props: { children: ReactNode }): JSX.Element {
         isLoading,
       }}
     >
-      {props.children}
+      {failedQuery ? (
+        // Every page needs this data; without it, they would show a spinner forever
+        <Box sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="h6" gutterBottom>
+            EmeraldDB couldn't load its card data
+          </Typography>
+          <Typography gutterBottom>{errorMessage(failedQuery.error)}</Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() =>
+              queries.filter((query) => query.error).forEach((query) => query.refetch())
+            }
+          >
+            Try again
+          </Button>
+        </Box>
+      ) : (
+        props.children
+      )}
     </UiStoreContext.Provider>
   )
 }
