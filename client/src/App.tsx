@@ -13,6 +13,7 @@ import { Container, Grid, Toolbar, useMediaQuery } from '@mui/material'
 import { UserProvider } from './providers/UserProvider'
 import { ConfirmProvider } from 'material-ui-confirm'
 import { Routes } from './Routes'
+import { PageErrorBoundary } from './components/PageErrorBoundary'
 import { SnackbarProvider } from 'notistack'
 
 import type { JSX } from 'react'
@@ -94,7 +95,9 @@ export default function App(): JSX.Element {
                           }}
                         >
                           <Grid size={{ xs: 12, md: 12, lg: is1440PxOrBigger ? 10 : 12, xl: 10 }}>
-                            <Routes />
+                            <PageErrorBoundary>
+                              <Routes />
+                            </PageErrorBoundary>
                           </Grid>
                         </Grid>
                       </Container>
