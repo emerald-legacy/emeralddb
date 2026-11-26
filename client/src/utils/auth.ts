@@ -8,12 +8,3 @@ export function removeLegacyToken(): void {
     // Storage can be blocked; there's nothing to remove then
   }
 }
-
-export function hasAuth0Token(): boolean {
-  for (let i = 0; i < window.localStorage.length; i++) {
-    if (window.localStorage.key(i)?.includes('auth0')) {
-      return true
-    }
-  }
-  return false
-}

@@ -37,16 +37,13 @@ export function Auth0ProviderWithHistory(props: {
     navigate(appState?.returnTo || '/cards', { replace: true })
   }
 
-  const redirectUri = window.location.origin.includes('localhost')
-    ? window.location.origin
-    : window.location.origin.replace('http://', 'https://')
   return (
     <Paper>
       <Auth0Provider
         domain={domain}
         clientId={clientId}
         authorizationParams={{
-          redirect_uri: redirectUri,
+          redirect_uri: window.location.origin,
           audience: props.audience,
           scope: props.scope,
         }}

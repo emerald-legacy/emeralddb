@@ -85,7 +85,7 @@ export default function App(): JSX.Element {
                     }}
                   >
                     <UserProvider>
-                      <HeaderBar audience={audience} scope={scope} />
+                      <HeaderBar />
                       <Toolbar variant="dense" />
                       <Container maxWidth={false} style={{ paddingTop: 15 }}>
                         <Grid

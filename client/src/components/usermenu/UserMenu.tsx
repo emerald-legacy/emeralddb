@@ -22,7 +22,7 @@ import { LogoutButton } from './LogoutButton'
 import { useCurrentUser } from '../../providers/UserProvider'
 import AccountCircle from '@mui/icons-material/AccountCircle'
 
-export function UserMenu(props: { audience: string; scope: string }): JSX.Element {
+export function UserMenu(): JSX.Element {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
@@ -146,7 +146,7 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
 
   return (
     <div>
-      <LoginButton audience={props.audience} scope={props.scope} />
+      <LoginButton />
     </div>
   )
 }
