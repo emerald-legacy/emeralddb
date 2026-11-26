@@ -1,11 +1,9 @@
-import * as express from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { expressjwt as jwt } from 'express-jwt'
 import jwks from 'jwks-rsa'
-import { getOrInsertDBUser } from '../gateways/storage'
 import env from '../env'
-
-const RULES_ADMIN = 'rules_admin'
-const DATA_ADMIN = 'data_admin'
+import { HttpError } from '../utils/HttpError'
+import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export const authorizedOnly = jwt({
   secret: jwks.expressJwtSecret({
@@ -19,38 +17,22 @@ export const authorizedOnly = jwt({
   algorithms: ['RS256'],
 })
 
-export async function rulesAdminOnly(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-): Promise<void> {
-  const userId = req.auth?.sub
-  if (!userId) {
-    res.status(401).send()
-    return
+export type Role = 'data_admin' | 'rules_admin'
+
+/**
+ * Lets only users with the role through, read from the database. Use it behind
+ * `authorizedOnly`, wrapped in `asyncHandler`: without a login it fails with 401,
+ * without the role with 403.
+ */
+export function requireRole(role: Role) {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+    const user = await requireCurrentUser(req)
+    if (!user.roles.includes(role)) {
+      throw new HttpError(403, `This needs the ${role} role`)
+    }
+    next()
   }
-  const dbUser = await getOrInsertDBUser(userId)
-  if (!dbUser.roles.includes(RULES_ADMIN)) {
-    res.status(401).send()
-    return
-  }
-  next()
 }
 
-export async function dataAdminOnly(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-): Promise<void> {
-  const userId = req.auth?.sub
-  if (!userId) {
-    res.status(401).send()
-    return
-  }
-  const dbUser = await getOrInsertDBUser(userId)
-  if (!dbUser.roles.includes(DATA_ADMIN)) {
-    res.status(401).send()
-    return
-  }
-  next()
-}
+export const dataAdminOnly = requireRole('data_admin')
+export const rulesAdminOnly = requireRole('rules_admin')
