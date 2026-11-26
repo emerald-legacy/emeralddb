@@ -44,7 +44,12 @@ import * as updateDecklistComment from './handlers/updateDecklistComment'
 import * as deleteDecklistComment from './handlers/deleteDecklistComment'
 import * as getAllCommentsForDecklist from './handlers/getAllCommentsForDecklist'
 import * as imageProxy from './handlers/imageProxy'
-import { authorizedOnly, dataAdminOnly, rulesAdminOnly } from './middlewares/authorization'
+import {
+  AUTH0_AUDIENCE,
+  authorizedOnly,
+  dataAdminOnly,
+  rulesAdminOnly,
+} from './middlewares/authorization'
 import { validate } from './middlewares/validator'
 import env from './env'
 
@@ -200,6 +205,7 @@ export default (): Router => {
     res.json({
       domain: env.auth0Domain,
       clientId: env.auth0ClientId,
+      audience: AUTH0_AUDIENCE,
     })
   })
   api.get('/beta-url', (_req, res) => {

@@ -5,11 +5,9 @@ import { useAuth0Config } from '../hooks/useAuth0Config'
 import { Button, Paper, Typography } from '@mui/material'
 import { RequestError } from '../components/RequestError'
 
-export function Auth0ProviderWithHistory(props: {
-  audience: string
-  scope: string
-  children: ReactNode
-}): JSX.Element {
+const SCOPE = 'read:current_user'
+
+export function Auth0ProviderWithHistory(props: { children: ReactNode }): JSX.Element {
   const navigate = useNavigate()
   const [auth0Config, reloadAuth0Config] = useAuth0Config()
   if (auth0Config.loading) {
@@ -29,7 +27,8 @@ export function Auth0ProviderWithHistory(props: {
       </Paper>
     )
   }
-  const { domain, clientId } = auth0Config.data
+  // The audience comes from the server, which checks the tokens against it
+  const { domain, clientId, audience } = auth0Config.data
 
   // Auth0 sends the user back to the start page; continue on the page they logged in from.
   // replace drops the start page with Auth0's ?code= from the history.
@@ -44,8 +43,8 @@ export function Auth0ProviderWithHistory(props: {
         clientId={clientId}
         authorizationParams={{
           redirect_uri: window.location.origin,
-          audience: props.audience,
-          scope: props.scope,
+          audience,
+          scope: SCOPE,
         }}
         cacheLocation="localstorage"
         useRefreshTokens

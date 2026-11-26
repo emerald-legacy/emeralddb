@@ -266,7 +266,7 @@ export interface Traits$findAll {
 
 // Public client configuration, read from the server's environment
 export interface Config$auth0 {
-  response: { domain: string; clientId: string }
+  response: { domain: string; clientId: string; audience: string }
 }
 
 export interface Config$betaUrl {

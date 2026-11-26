@@ -5,6 +5,9 @@ import env from '../env'
 import { HttpError } from '../utils/HttpError'
 import { requireCurrentUser } from '../utils/requireCurrentUser'
 
+// The Auth0 API the access tokens are for. The client gets it from /api/auth0.
+export const AUTH0_AUDIENCE = 'http://fiveringsdb.com'
+
 export const authorizedOnly = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
@@ -12,7 +15,7 @@ export const authorizedOnly = jwt({
     jwksRequestsPerMinute: 5,
     jwksUri: `https://${env.auth0Domain}/.well-known/jwks.json`,
   }),
-  audience: 'http://fiveringsdb.com',
+  audience: AUTH0_AUDIENCE,
   issuer: `https://${env.auth0Domain}/`,
   algorithms: ['RS256'],
 })
