@@ -4,7 +4,7 @@ import { createContext, ReactNode, useContext, useEffect, type JSX } from 'react
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { errorMessage, privateApi } from '../api'
 import { Queries } from '../components/HeaderBar'
-import { setAccessTokenGetter } from '../utils/accessToken'
+import { isLoginRequired, setAccessTokenGetter } from '../utils/accessToken'
 import { removeLegacyToken } from '../utils/auth'
 
 export const UserContext = createContext<{
@@ -31,16 +31,26 @@ export const UserContext = createContext<{
 })
 
 export function UserProvider(props: { children: ReactNode }): JSX.Element {
-  const { getAccessTokenSilently, isAuthenticated, isLoading } = useAuth0()
+  const { getAccessTokenSilently, logout, isAuthenticated, isLoading } = useAuth0()
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    setAccessTokenGetter(() => getAccessTokenSilently())
+    setAccessTokenGetter(async () => {
+      try {
+        return await getAccessTokenSilently()
+      } catch (error) {
+        // With refresh tokens, Auth0 keeps the user when the login is gone (no or an
+        // expired refresh token). Log out locally, so the menu offers to log in again.
+        if (isLoginRequired(error)) {
+          await logout({ openUrl: false })
+        }
+        throw error
+      }
+    })
     removeLegacyToken()
-  }, [getAccessTokenSilently])
+  }, [getAccessTokenSilently, logout])
 
-  // Auth0 knows whether the user is logged in. It also logs the user out when renewing
-  // the token fails because the login has expired; the user is then loaded again.
+  // Auth0 knows whether the user is logged in; after a logout the user is loaded again.
   const queryKey = [Queries.USER, isAuthenticated]
   const userQuery = useQuery({
     queryKey,

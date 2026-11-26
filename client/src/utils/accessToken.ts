@@ -1,3 +1,21 @@
+// Auth0's error codes for a login that is gone and must be repeated
+const LOGIN_REQUIRED_ERRORS = [
+  'login_required',
+  'consent_required',
+  'missing_refresh_token',
+  'invalid_grant',
+]
+
+export function isLoginRequired(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'error' in error &&
+    typeof error.error === 'string' &&
+    LOGIN_REQUIRED_ERRORS.includes(error.error)
+  )
+}
+
 type AccessTokenGetter = () => Promise<string | undefined>
 
 let accessTokenGetter: AccessTokenGetter | undefined

@@ -44,7 +44,7 @@ import type {
   Users$update,
 } from '@5rdb/api'
 import { ApiError } from './apiError'
-import { getAccessToken } from './utils/accessToken'
+import { getAccessToken, isLoginRequired } from './utils/accessToken'
 
 export { ApiError, errorMessage } from './apiError'
 
@@ -115,24 +115,6 @@ function buildRequest(path: string, request: unknown): { path: string; body: unk
     }
   }
   return { path: result, body }
-}
-
-// Auth0's error codes for a login that is gone and must be repeated
-const LOGIN_REQUIRED_ERRORS = [
-  'login_required',
-  'consent_required',
-  'missing_refresh_token',
-  'invalid_grant',
-]
-
-function isLoginRequired(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'error' in error &&
-    typeof error.error === 'string' &&
-    LOGIN_REQUIRED_ERRORS.includes(error.error)
-  )
 }
 
 // The bearer token for a request that needs one. Without a login the request isn't sent:
