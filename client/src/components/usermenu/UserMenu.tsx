@@ -8,7 +8,9 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Stack,
   TextField,
+  Typography,
 } from '@mui/material'
 import { useState, type JSX } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
@@ -29,7 +31,7 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
 
   const { isAuthenticated, isLoading } = useAuth0()
 
-  const { currentUser, setCurrentUser } = useCurrentUser()
+  const { currentUser, setCurrentUser, userError, retryUser } = useCurrentUser()
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -120,6 +122,21 @@ export function UserMenu(props: { audience: string; scope: string }): JSX.Elemen
           </DialogActions>
         </Dialog>
       </div>
+    )
+  }
+
+  // Logged in at Auth0, but the account couldn't be loaded (server down, ...)
+  if (isAuthenticated && userError) {
+    return (
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+        <Typography variant="body2" title={userError}>
+          Your account couldn't be loaded.
+        </Typography>
+        <Button variant="contained" color="secondary" onClick={retryUser}>
+          Retry
+        </Button>
+        <LogoutButton onLogout={() => setCurrentUser(undefined)} />
+      </Stack>
     )
   }
 
