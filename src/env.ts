@@ -40,14 +40,22 @@ function parseDiscordConfig(): DiscordConfig {
   return { clientId: json.clientId, botToken: json.botToken, isBotEnabled: json.isBotEnabled }
 }
 
+// Without these, the server would start and fail every request that needs them
+function required(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    throw Error(`The ${name} env variable is missing`)
+  }
+  return value
+}
+
 export default {
   databaseUrl: String(process.env.DATABASE_URL),
   host: String(process.env.HOST),
-  jwtSecret: String(process.env.JWT_SECRET),
   nodeEnv: String(process.env.NODE_ENV).trim(),
   serverPort: parseInt(String(process.env.PORT), 10),
-  auth0Domain: String(process.env.AUTH0_DOMAIN),
-  auth0ClientId: String(process.env.AUTH0_CLIENT_ID),
+  auth0Domain: required('AUTH0_DOMAIN'),
+  auth0ClientId: required('AUTH0_CLIENT_ID'),
   betaUrl: String(process.env.BETA_URL),
   discord: parseDiscordConfig(),
 }
