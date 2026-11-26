@@ -1,22 +1,25 @@
 import { NextFunction, Request, Response } from 'express'
 import { expressjwt as jwt } from 'express-jwt'
 import jwks from 'jwks-rsa'
-import env from '../env'
+import { auth0Settings } from '../env'
 import { HttpError } from '../utils/HttpError'
 import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 // The Auth0 API the access tokens are for. The client gets it from /api/auth0.
 export const AUTH0_AUDIENCE = 'http://fiveringsdb.com'
 
+// Read when the API is set up, so the server doesn't start without the Auth0 settings
+const auth0Domain = auth0Settings().domain
+
 export const authorizedOnly = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://${env.auth0Domain}/.well-known/jwks.json`,
+    jwksUri: `https://${auth0Domain}/.well-known/jwks.json`,
   }),
   audience: AUTH0_AUDIENCE,
-  issuer: `https://${env.auth0Domain}/`,
+  issuer: `https://${auth0Domain}/`,
   algorithms: ['RS256'],
 })
 
