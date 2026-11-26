@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import type { UserRole } from '@5rdb/api'
 import { expressjwt as jwt } from 'express-jwt'
 import jwks from 'jwks-rsa'
 import { auth0Settings } from '../env'
@@ -23,14 +24,12 @@ export const authorizedOnly = jwt({
   algorithms: ['RS256'],
 })
 
-export type Role = 'data_admin' | 'rules_admin'
-
 /**
  * Lets only users with the role through, read from the database. Use it behind
  * `authorizedOnly`, wrapped in `asyncHandler`: without a login it fails with 401,
  * without the role with 403.
  */
-export function requireRole(role: Role) {
+export function requireRole(role: UserRole) {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     const user = await requireCurrentUser(req)
     if (!user.roles.includes(role)) {
