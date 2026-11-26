@@ -10,6 +10,7 @@ import api from './api'
 import { cacheControl } from './middlewares/cacheControl'
 import { clearValidationDataAfterWrites } from './middlewares/clearValidationData'
 import { apiNotFound } from './middlewares/apiNotFound'
+import { errorHandler } from './middlewares/errorHandler'
 import { Service } from './typings/Service'
 
 export default async (): Promise<Service> => {
@@ -31,6 +32,7 @@ export default async (): Promise<Service> => {
 
   app.use('/api', api())
   app.use('/api', apiNotFound)
+  app.use('/api', errorHandler)
   app.use(express.static(path.resolve(__dirname, 'public')))
   app.get('/*path', function (req: Request, res: Response) {
     res.sendFile(path.resolve(__dirname, 'public', 'index.html'))
