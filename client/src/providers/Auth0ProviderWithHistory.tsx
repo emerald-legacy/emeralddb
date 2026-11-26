@@ -48,7 +48,6 @@ export function Auth0ProviderWithHistory(props: { children: ReactNode }): JSX.El
         }}
         cacheLocation="localstorage"
         useRefreshTokens
-        useRefreshTokensFallback
         onRedirectCallback={onRedirectCallback}
       >
         {props.children}
