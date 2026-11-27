@@ -78,7 +78,7 @@ export enum Queries {
   TRAITS = 'TRAITS',
 }
 
-export function HeaderBar(props: { audience: string; scope: string }): JSX.Element {
+export function HeaderBar(): JSX.Element {
   const navigate = useNavigate()
   const { isDataAdmin } = useCurrentUser()
   const [cardAnchorEl, setCardAnchorEl] = useState<null | HTMLElement>(null)
@@ -309,7 +309,7 @@ export function HeaderBar(props: { audience: string; scope: string }): JSX.Eleme
                         </ListItem>
                       </Grid>
                       <Grid>
-                        <UserMenu audience={props.audience} scope={props.scope} />
+                        <UserMenu />
                       </Grid>
                       <Grid />
                     </Grid>

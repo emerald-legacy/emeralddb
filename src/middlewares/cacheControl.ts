@@ -6,8 +6,9 @@ const NOT_CACHEABLE = 'no-store'
 // Responses that must always be fresh:
 // - /users/me is user specific
 // - /packs/export is read right after a pack was edited, to import it into another environment
+// - /auth0 must match the client of the same deploy (it's read once per page load)
 function isNeverCached(path: string): boolean {
-  return path === '/users/me' || path.startsWith('/packs/export/')
+  return path === '/users/me' || path === '/auth0' || path.startsWith('/packs/export/')
 }
 
 /**

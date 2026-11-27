@@ -94,13 +94,16 @@ export interface Format {
   info_link?: string
 }
 
+// data_admin edits cards, packs and cycles; rules_admin edits rulings
+export type UserRole = 'data_admin' | 'rules_admin'
+
 export interface User {
   // The Auth0 id. Only ever sent to the user themselves (/users/me), never in public responses
   id: string
   // Stands for the user in public responses (owner_id, author_id); reveals nothing about the account
   public_id: string
   name: string
-  roles: string[]
+  roles: UserRole[]
 }
 
 export interface Deck {

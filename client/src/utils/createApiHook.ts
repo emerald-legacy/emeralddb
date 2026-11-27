@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useReducer } from 'react'
+import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { errorMessage, type ApiResponse } from '../api'
+import { createRequestGuard } from './requestGuard'
 
 interface State<Data> {
   loading: boolean
@@ -38,18 +39,27 @@ export function createApiHook<Data, Id = void>(
 
   return function (resourceId: Id): HookResult<Data> {
     const [state, dispatch] = useReducer(reducer, initialState)
+    const requests = useRef(createRequestGuard())
 
     const fetchData = useCallback(() => {
+      const isLatest = requests.current.start()
       dispatch({ type: 'startRequest' })
       load(resourceId)
-        .then((response) => dispatch({ type: 'success', payload: response.data() }))
+        .then((response) => {
+          if (isLatest()) dispatch({ type: 'success', payload: response.data() })
+        })
         .catch((error: unknown) => {
           console.log(error)
-          dispatch({ type: 'error', error: errorMessage(error) })
+          if (isLatest()) dispatch({ type: 'error', error: errorMessage(error) })
         })
     }, [resourceId])
 
-    useEffect(() => fetchData(), [fetchData])
+    // Another resource id or leaving the page: a late response of the previous one is dropped
+    useEffect(() => {
+      fetchData()
+      const guard = requests.current
+      return () => guard.cancel()
+    }, [fetchData])
 
     return [state, fetchData]
   }

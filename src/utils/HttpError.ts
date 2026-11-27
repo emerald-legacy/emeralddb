@@ -1,6 +1,6 @@
 /**
- * An error with an HTTP status code. Express's default error handler
- * responds with `status` instead of 500 when it's passed to `next()`.
+ * An error with an HTTP status code. Passed to `next()` (or thrown in a handler
+ * wrapped in `asyncHandler`), `errorHandler` responds with `status` and the message.
  */
 export class HttpError extends Error {
   constructor(

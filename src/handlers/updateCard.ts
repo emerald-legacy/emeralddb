@@ -13,10 +13,18 @@ export async function handler(
   req: ValidatedRequest<typeof schema>,
   res: Express.Response
 ): Promise<Card | undefined> {
-  console.log('Update card ' + req.body.id)
-  const existingCard = await getCard(req.body.id)
+  const cardId = req.params.cardId
+  // The id in the body used to win, so a request could update another card than its URL
+  if (req.body.id !== cardId) {
+    res
+      .status(400)
+      .send(`The id in the body (${req.body.id}) is not ${cardId}. To change it, rename the card.`)
+    return
+  }
+  console.log('Update card ' + cardId)
+  const existingCard = await getCard(cardId)
   if (!existingCard) {
-    res.status(400).send(`Card with id ${req.body.id} doesn't exist.`)
+    res.status(400).send(`Card with id ${cardId} doesn't exist.`)
     return
   }
   const validationErrors = await validateCardInput(req.body)

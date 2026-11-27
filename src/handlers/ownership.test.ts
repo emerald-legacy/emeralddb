@@ -64,9 +64,9 @@ function stubStores(): Writes {
   deckStore.getDeck = async (id) => (id === alicesDeck.id ? alicesDeck : undefined)
   deckStore.getDecksForOwner = async (ownerId) =>
     ownerId === alicesDeck.owner_id ? [alicesDeck] : []
-  deckStore.insertDeck = async (deck) => {
+  deckStore.insertDeckOnce = async (deck) => {
     writes.decks.push(deck)
-    return { ...deck, id: 'deck-new' }
+    return { deck, inserted: true }
   }
   deckStore.deleteDeck = async (id) => {
     writes.deleted.push(id)
@@ -76,6 +76,10 @@ function stubStores(): Writes {
   decklistStore.insertDecklist = async (decklist) => {
     writes.decklists.push(decklist)
     return { ...decklist, id: 'decklist-new', created_at: new Date() }
+  }
+  decklistStore.insertDecklistOnce = async (decklist) => {
+    writes.decklists.push(decklist)
+    return { decklist: { ...decklist, created_at: new Date() }, inserted: true }
   }
   decklistStore.deleteDecklist = async (id) => {
     writes.deleted.push(id)

@@ -1,56 +1,43 @@
-import * as express from 'express'
+import { NextFunction, Request, Response } from 'express'
+import type { UserRole } from '@5rdb/api'
 import { expressjwt as jwt } from 'express-jwt'
 import jwks from 'jwks-rsa'
-import { getOrInsertDBUser } from '../gateways/storage'
-import env from '../env'
+import { auth0Settings } from '../env'
+import { HttpError } from '../utils/HttpError'
+import { requireCurrentUser } from '../utils/requireCurrentUser'
 
-const RULES_ADMIN = 'rules_admin'
-const DATA_ADMIN = 'data_admin'
+// The Auth0 API the access tokens are for. The client gets it from /api/auth0.
+export const AUTH0_AUDIENCE = 'http://fiveringsdb.com'
+
+// Read when the API is set up, so the server doesn't start without the Auth0 settings
+const auth0Domain = auth0Settings().domain
 
 export const authorizedOnly = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://${env.auth0Domain}/.well-known/jwks.json`,
+    jwksUri: `https://${auth0Domain}/.well-known/jwks.json`,
   }),
-  audience: 'http://fiveringsdb.com',
-  issuer: `https://${env.auth0Domain}/`,
+  audience: AUTH0_AUDIENCE,
+  issuer: `https://${auth0Domain}/`,
   algorithms: ['RS256'],
 })
 
-export async function rulesAdminOnly(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-): Promise<void> {
-  const userId = req.auth?.sub
-  if (!userId) {
-    res.status(401).send()
-    return
+/**
+ * Lets only users with the role through, read from the database. Use it behind
+ * `authorizedOnly`, wrapped in `asyncHandler`: without a login it fails with 401,
+ * without the role with 403.
+ */
+export function requireRole(role: UserRole) {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+    const user = await requireCurrentUser(req)
+    if (!user.roles.includes(role)) {
+      throw new HttpError(403, `This needs the ${role} role`)
+    }
+    next()
   }
-  const dbUser = await getOrInsertDBUser(userId)
-  if (!dbUser.roles.includes(RULES_ADMIN)) {
-    res.status(401).send()
-    return
-  }
-  next()
 }
 
-export async function dataAdminOnly(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-): Promise<void> {
-  const userId = req.auth?.sub
-  if (!userId) {
-    res.status(401).send()
-    return
-  }
-  const dbUser = await getOrInsertDBUser(userId)
-  if (!dbUser.roles.includes(DATA_ADMIN)) {
-    res.status(401).send()
-    return
-  }
-  next()
-}
+export const dataAdminOnly = requireRole('data_admin')
+export const rulesAdminOnly = requireRole('rules_admin')

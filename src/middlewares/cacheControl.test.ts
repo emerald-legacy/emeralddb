@@ -17,6 +17,9 @@ async function withServer(
   app.get('/api/users/me', (_req, res) => {
     res.json({})
   })
+  app.get('/api/auth0', (_req, res) => {
+    res.json({})
+  })
   app.get('/api/packs/export/:id', (_req, res) => {
     res.json({})
   })
@@ -63,6 +66,13 @@ test('server errors are not cached', async (t) => {
 test('the current user is never cached', async (t) => {
   await withServer(async (get) => {
     const response = await get('/api/users/me')
+    t.is(response.headers.get('cache-control'), 'no-store')
+  })
+})
+
+test('the Auth0 configuration is never cached', async (t) => {
+  await withServer(async (get) => {
+    const response = await get('/api/auth0')
     t.is(response.headers.get('cache-control'), 'no-store')
   })
 })

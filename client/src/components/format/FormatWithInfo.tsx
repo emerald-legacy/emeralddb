@@ -1,7 +1,7 @@
 import { Format } from '@5rdb/api'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { Box, Typography } from '@mui/material'
-import { useState, type JSX } from 'react'
+import { Fragment, useState, type JSX } from 'react'
 import { EmeraldDBLink } from '../EmeraldDBLink'
 
 export function FormatWithInfo(props: { format: Format }): JSX.Element {
@@ -32,11 +32,13 @@ export function FormatWithInfo(props: { format: Format }): JSX.Element {
         {props.format.description && (
           <Typography>
             <b>Description: </b>
-            <span
-              dangerouslySetInnerHTML={{
-                __html: props.format.description.replaceAll('\n', '<br/>'),
-              }}
-            />
+            {/* Plain text: React escapes it, and only the line breaks are kept */}
+            {props.format.description.split('\n').map((line, index) => (
+              <Fragment key={index}>
+                {index > 0 && <br />}
+                {line}
+              </Fragment>
+            ))}
           </Typography>
         )}
         {props.format.maintainer && (

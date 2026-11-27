@@ -7,7 +7,6 @@ import { requireCurrentUser } from '../utils/requireCurrentUser'
 
 export const schema = {
   body: Joi.object<Users$update['request']['body']>({
-    id: Joi.string().required(),
     name: Joi.string().required(),
   }),
 }
@@ -17,11 +16,7 @@ export async function handler(
   res: Express.Response
 ): Promise<User | undefined> {
   const dbUser = await requireCurrentUser(req)
-  if (dbUser.id !== req.body.id) {
-    res.status(403).send()
-    return
-  }
-  const updated = await updateUser(req.body)
+  const updated = await updateUser({ id: dbUser.id, name: req.body.name })
   if (!updated) {
     res.status(404).send()
   }

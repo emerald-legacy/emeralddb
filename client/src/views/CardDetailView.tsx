@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type JSX } from 'react'
+import React, { useState, type JSX } from 'react'
 import { styled } from '@mui/material/styles'
 import {
   Button,
@@ -22,7 +22,6 @@ import { RequestError } from '../components/RequestError'
 import { useCard } from '../hooks/useCard'
 import { CardInformation } from '../components/card/CardInformation'
 import { CardLegality } from '../components/card/CardLegality'
-import { CardInPack } from '@5rdb/api'
 import { useCurrentUser } from '../providers/UserProvider'
 import { RulingList } from '../components/RulingList'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -56,8 +55,9 @@ export function CardDetailView(): JSX.Element {
   const params = useParams<{ id: string }>()
   const { cards, packs, invalidateData } = useUiStore()
   const [data] = useCard(params.id!)
-  const [chosenVersionIndex, setChosenVersionIndex] = useState(0)
-  const [chosenVersion, setChosenVersion] = useState<Omit<CardInPack, 'card_id'>>()
+  // The printing picked on this page. The route keeps this component when moving to another
+  // card, so the card id is kept with it: another card starts with its first printing.
+  const [pickedVersion, setPickedVersion] = useState<{ cardId: string; index: number }>()
   const [deletionModalOpen, setDeletionModalOpen] = useState(false)
   const [renameModalOpen, setRenameModalOpen] = useState(false)
   const [deletionReplacementCardId, setDeletionReplacementCardId] = useState('')
@@ -70,12 +70,6 @@ export function CardDetailView(): JSX.Element {
 
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (data.data) {
-      setChosenVersion(data.data.versions[chosenVersionIndex])
-    }
-  }, [chosenVersionIndex, data])
-
   if (data.loading) {
     return <Loading />
   }
@@ -87,6 +81,11 @@ export function CardDetailView(): JSX.Element {
   }
 
   const card = data.data
+  const chosenVersionIndex =
+    pickedVersion?.cardId === card.id && pickedVersion.index < card.versions.length
+      ? pickedVersion.index
+      : 0
+  const chosenVersion = card.versions[chosenVersionIndex]
 
   const imageWidth = card.type === 'treaty' ? 450 : 300
 
@@ -180,7 +179,9 @@ export function CardDetailView(): JSX.Element {
                 <Grid size={12}>
                   <Tabs
                     value={chosenVersionIndex}
-                    onChange={(_, newValue: number) => setChosenVersionIndex(newValue)}
+                    onChange={(_, newValue: number) =>
+                      setPickedVersion({ cardId: card.id, index: newValue })
+                    }
                     variant="scrollable"
                     scrollButtons="auto"
                     slotProps={{

@@ -40,14 +40,28 @@ function parseDiscordConfig(): DiscordConfig {
   return { clientId: json.clientId, botToken: json.botToken, isBotEnabled: json.isBotEnabled }
 }
 
+function required(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    throw Error(`The ${name} env variable is missing`)
+  }
+  return value
+}
+
+/**
+ * The Auth0 settings. Throws if one is missing, so the server fails at startup instead of
+ * failing every request that needs them. A function, not part of the default export:
+ * scripts like import:prod load env.ts too and don't need Auth0.
+ */
+export function auth0Settings(): { domain: string; clientId: string } {
+  return { domain: required('AUTH0_DOMAIN'), clientId: required('AUTH0_CLIENT_ID') }
+}
+
 export default {
   databaseUrl: String(process.env.DATABASE_URL),
   host: String(process.env.HOST),
-  jwtSecret: String(process.env.JWT_SECRET),
   nodeEnv: String(process.env.NODE_ENV).trim(),
   serverPort: parseInt(String(process.env.PORT), 10),
-  auth0Domain: String(process.env.AUTH0_DOMAIN),
-  auth0ClientId: String(process.env.AUTH0_CLIENT_ID),
   betaUrl: String(process.env.BETA_URL),
   discord: parseDiscordConfig(),
 }

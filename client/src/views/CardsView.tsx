@@ -19,7 +19,8 @@ import { convertTraitList } from '../utils/cardTextUtils'
 import { capitalize } from '../utils/stringUtils'
 import { useState, useEffect, useMemo, useCallback, type JSX } from 'react'
 import { applyFilters, CardFilter, FilterState, initialState } from '../components/CardFilter'
-import { CardWithVersions, Pack } from '@5rdb/api'
+import { CardWithVersions } from '@5rdb/api'
+import { createFilterFromUrlSearchParams } from './cardsUrlFilter'
 import { CardInformation } from '../components/card/CardInformation'
 import { Loading } from '../components/Loading'
 import { CardLink } from '../components/card/CardLink'
@@ -56,28 +57,6 @@ enum SortMode {
   PACK_POSITION = 'pack_position',
 }
 
-function createFilterFromUrlSearchParams(
-  params: URLSearchParams,
-  allPacks: Pack[],
-  initialFilter: FilterState
-): FilterState {
-  const cycle = params.get('cycle')
-  const pack = params.get('pack')
-  const query = params.get('query') || ''
-  const packs = cycle
-    ? allPacks.filter((p) => p.cycle_id === cycle).map((p) => p.id)
-    : pack
-      ? [pack]
-      : []
-
-  return {
-    ...initialFilter,
-    text: decodeURIComponent(query) || initialFilter.text,
-    packs: packs || initialFilter.packs,
-    cycles: cycle ? [cycle] : initialFilter.cycles,
-  }
-}
-
 export function CardsView(): JSX.Element {
   const PAGE_SIZE = 60
 
@@ -96,6 +75,11 @@ export function CardsView(): JSX.Element {
 
   // Handle URL parameter changes in useEffect to prevent render-phase setState
   useEffect(() => {
+    // The filter needs the packs (a cycle stands for its packs) and the cards (one match
+    // opens it); until both are loaded, the URL is read again on the next run
+    if (cards.length === 0 || packs.length === 0) {
+      return
+    }
     if (location.search !== urlParams) {
       const urlSearchParams = new URLSearchParams(location.search)
       const previousSearchParams = new URLSearchParams(urlParams)
@@ -115,7 +99,8 @@ export function CardsView(): JSX.Element {
 
         const urlFilteredCards = applyFilters(cards, formats, urlParamFilter)
         if (urlFilteredCards.length === 1) {
-          navigate(`/card/${urlFilteredCards[0].id}`)
+          // Replaces the search in the history: Back would land on it and jump here again
+          navigate(`/card/${urlFilteredCards[0].id}`, { replace: true })
         }
       }
 

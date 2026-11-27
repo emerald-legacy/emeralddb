@@ -13,6 +13,7 @@ import { Container, Grid, Toolbar, useMediaQuery } from '@mui/material'
 import { UserProvider } from './providers/UserProvider'
 import { ConfirmProvider } from 'material-ui-confirm'
 import { Routes } from './Routes'
+import { PageErrorBoundary } from './components/PageErrorBoundary'
 import { SnackbarProvider } from 'notistack'
 
 import type { JSX } from 'react'
@@ -64,8 +65,6 @@ const queryClient = new QueryClient({
 })
 
 export default function App(): JSX.Element {
-  const audience = 'http://fiveringsdb.com'
-  const scope = 'read:current_user'
   const is1440PxOrBigger = useMediaQuery('(min-width:1440px)')
 
   return (
@@ -73,7 +72,7 @@ export default function App(): JSX.Element {
       <ThemeProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
-            <Auth0ProviderWithHistory audience={audience} scope={scope}>
+            <Auth0ProviderWithHistory>
               <UiStoreProvider>
                 <SnackbarProvider anchorOrigin={{ horizontal: 'right', vertical: 'top' }}>
                   <ConfirmProvider
@@ -84,7 +83,7 @@ export default function App(): JSX.Element {
                     }}
                   >
                     <UserProvider>
-                      <HeaderBar audience={audience} scope={scope} />
+                      <HeaderBar />
                       <Toolbar variant="dense" />
                       <Container maxWidth={false} style={{ paddingTop: 15 }}>
                         <Grid
@@ -94,7 +93,9 @@ export default function App(): JSX.Element {
                           }}
                         >
                           <Grid size={{ xs: 12, md: 12, lg: is1440PxOrBigger ? 10 : 12, xl: 10 }}>
-                            <Routes />
+                            <PageErrorBoundary>
+                              <Routes />
+                            </PageErrorBoundary>
                           </Grid>
                         </Grid>
                       </Container>

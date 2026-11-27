@@ -11,9 +11,10 @@ import { CardWithQuantity, createDeckStatistics } from './deckStatistics'
 import { useDeckValidation } from '../../hooks/useDeckValidation'
 import { CardQuantitySelector } from '../builder/CardQuantitySelector'
 import { Loading } from '../Loading'
-import { useState, type JSX } from 'react'
+import { useRef, useState, type JSX } from 'react'
 import { CardFactionIcon } from '../card/CardFactionIcon'
 import { getImageUrl } from '../../utils/imageUrl'
+import { attemptFor, SaveAttempt } from '../builder/saveDecklist'
 
 export function DeckCardSubList(props: {
   cards: CardWithQuantity[]
@@ -163,14 +164,20 @@ export function Decklist(props: {
     decklist.cards,
     decklist.format
   )
+  // The id of the copy. Copying the same version again reuses it, so a second click or a
+  // retry doesn't create a second copy.
+  const lastCopyAttempt = useRef<SaveAttempt | undefined>(undefined)
 
   if (cards.length === 0) {
     return <Loading />
   }
 
   function copyDeck() {
+    const attempt = attemptFor(lastCopyAttempt.current, decklist.id)
+    lastCopyAttempt.current = attempt
     privateApi.Deck.create({
       body: {
+        id: attempt.deckId,
         forkedFrom: decklist.id,
       },
     })

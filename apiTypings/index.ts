@@ -8,6 +8,7 @@ export type {
   Trait,
   Format,
   User,
+  UserRole,
   Deck,
   Decklist,
   DecklistComment,

@@ -1,6 +1,5 @@
 import { pg } from './pg'
 import { Deck } from '@5rdb/api'
-import { v4 as uuid } from 'uuid'
 import { deleteDecklist, getAllDecklistsForDeck } from './decklist'
 
 export const TABLE = 'decks'
@@ -17,11 +16,20 @@ export async function getDecksForOwner(ownerId: string): Promise<Deck[]> {
   return pg(TABLE).where('owner_id', ownerId)
 }
 
-export async function insertDeck(deck: Omit<Deck, 'id'>): Promise<Deck> {
-  const id = uuid()
-  return pg(TABLE)
-    .insert({ ...deck, id: id }, '*')
-    .then(([row]) => row)
+/**
+ * Inserts the deck unless one with its id exists already, also when two requests insert
+ * the same id at once. Returns the deck with that id and whether this call inserted it.
+ */
+export async function insertDeckOnce(deck: Deck): Promise<{ deck: Deck; inserted: boolean }> {
+  const [inserted] = await pg(TABLE).insert(deck, '*').onConflict('id').ignore()
+  if (inserted) {
+    return { deck: inserted, inserted: true }
+  }
+  const existing = await getDeck(deck.id)
+  if (!existing) {
+    throw new Error(`Deck ${deck.id} was deleted while it was saved again`)
+  }
+  return { deck: existing, inserted: false }
 }
 
 export async function deleteDeck(deckId: string): Promise<void> {

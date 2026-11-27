@@ -3,7 +3,7 @@ import { Button } from '@mui/material'
 
 import type { JSX } from 'react'
 
-export function LoginButton(props: { audience: string; scope: string }): JSX.Element {
+export function LoginButton(): JSX.Element {
   const { loginWithRedirect } = useAuth0()
 
   return (
@@ -12,10 +12,9 @@ export function LoginButton(props: { audience: string; scope: string }): JSX.Ele
       color="secondary"
       onClick={() =>
         loginWithRedirect({
-          authorizationParams: {
-            audience: props.audience,
-            scope: props.scope,
-          },
+          // Back to this page after logging in (see onRedirectCallback). Audience and
+          // scope come from Auth0Provider.
+          appState: { returnTo: window.location.pathname + window.location.search },
         })
       }
     >

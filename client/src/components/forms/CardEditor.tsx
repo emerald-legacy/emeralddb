@@ -22,18 +22,9 @@ import { useSnackbar } from 'notistack'
 import { errorMessage, privateApi, refreshCache } from '../../api'
 import { useNavigate } from 'react-router'
 import { toSlugId } from '../../utils/slugIdUtils'
+import { changedFields } from './cardChanges'
 
 const Root = styled('form')(() => ({}))
-
-function displayValue(value: unknown): string {
-  if (value === null || value === undefined) {
-    return '{null}'
-  }
-  if (Array.isArray(value)) {
-    return value.map(String).join(',')
-  }
-  return String(value)
-}
 
 export function CardEditor(props: { existingCard?: CardType; editMode?: boolean }): JSX.Element {
   const navigate = useNavigate()
@@ -208,63 +199,6 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
     }
   }
 
-  // Compares the displayed values, so arrays are compared by their contents
-  function compareValue(
-    fieldId: string,
-    originalValue: unknown,
-    newValue: unknown
-  ): { fieldId: string; changes: { old: string; new: string } }[] {
-    const changes = { old: displayValue(originalValue), new: displayValue(newValue) }
-    if (changes.old !== changes.new) {
-      return [
-        {
-          fieldId: fieldId,
-          changes: changes,
-        },
-      ]
-    }
-    return []
-  }
-
-  function getChangedFields(
-    originalCard: CardType
-  ): { fieldId: string; changes: { old: string; new: string } }[] {
-    const changes: { fieldId: string; changes: { old: string; new: string } }[] = []
-    changes.push(...compareValue('id', originalCard.id, id))
-    changes.push(...compareValue('name', originalCard.name, name))
-    changes.push(...compareValue('name_extra', originalCard.name_extra, name_extra))
-    changes.push(...compareValue('faction', originalCard.faction, faction))
-    changes.push(...compareValue('side', originalCard.side, side))
-    changes.push(...compareValue('type', originalCard.type, type))
-    changes.push(...compareValue('is_unique', originalCard.is_unique, is_unique))
-    changes.push(
-      ...compareValue('role_restriction', originalCard.role_restrictions, role_restrictions)
-    )
-    changes.push(...compareValue('text', originalCard.text, text))
-    changes.push(...compareValue('restricted_in', originalCard.restricted_in, restricted_in))
-    changes.push(...compareValue('banned_in', originalCard.banned_in, banned_in))
-    changes.push(
-      ...compareValue('splash_banned_in', originalCard.splash_banned_in, splash_banned_in)
-    )
-    changes.push(...compareValue('allowed_clans', originalCard.allowed_clans, allowed_clans))
-    changes.push(...compareValue('deck_limit', originalCard.deck_limit, deck_limit))
-    changes.push(...compareValue('traits', originalCard.traits, traits))
-    changes.push(...compareValue('influence_cost', originalCard.influence_cost, influence_cost))
-    changes.push(...compareValue('elements', originalCard.elements, elements))
-    changes.push(...compareValue('strength', originalCard.strength, strength))
-    changes.push(...compareValue('glory', originalCard.glory, glory))
-    changes.push(...compareValue('fate', originalCard.fate, fate))
-    changes.push(...compareValue('honor', originalCard.honor, honor))
-    changes.push(...compareValue('influence_pool', originalCard.influence_pool, influence_pool))
-    changes.push(...compareValue('strength_bonus', originalCard.strength_bonus, strength_bonus))
-    changes.push(...compareValue('military', originalCard.military, military))
-    changes.push(...compareValue('political', originalCard.political, political))
-    changes.push(...compareValue('military_bonus', originalCard.military_bonus, military_bonus))
-    changes.push(...compareValue('political_bonus', originalCard.political_bonus, political_bonus))
-
-    return changes
-  }
-
   // An empty stat means "no value" and is rendered as a crossed-out label on the card, so it has to
   // be stored as NULL. An empty text field yields '' and a cleared number field yields NaN; both
   // are sent as explicit null, because a field left out of the body would keep its old DB value.
@@ -312,18 +246,17 @@ export function CardEditor(props: { existingCard?: CardType; editMode?: boolean 
     const originalCard = props.existingCard
     if (originalCard) {
       // Update on existing card
-      const changedFields = getChangedFields(originalCard)
-      if (changedFields.length === 0) {
+      const changes = changedFields(originalCard, assembleCard())
+      if (changes.length === 0) {
         confirm({ description: 'No changes were made.', title: '' })
       } else {
         const confirmationMessage = (
           <span>
             The following changes will be submitted:
             <br />
-            {changedFields.map((changedField) => (
-              <span>
-                <b>{changedField.fieldId}</b>: {changedField.changes.old} {'-->'}{' '}
-                {changedField.changes.new}
+            {changes.map((change) => (
+              <span key={change.fieldId}>
+                <b>{change.fieldId}</b>: {change.old} {'-->'} {change.new}
                 <br />
               </span>
             ))}
